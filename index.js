@@ -15,7 +15,7 @@ const table = {
     },
     {
       name: 'checkingBalance',
-      type: 'double'
+      type: 'float'
     },
     {
       name: 'permissions',
@@ -38,8 +38,6 @@ function createObject(table) {
   
   parent[table.name] = class {
     constructor(data = {}) {
-      
-      
       table.fields.forEach((col) => {
         if ( col.type == 'int' )
           this[col.name] = (arg) => { if ( arg === undefined ) return this[`_${col.name}`]; else if ( typeof arg == 'number' ) this[`_${col.name}`] = parseInt(arg); else throw new Error(`${table.name}.${col.name}(${typeof arg}): Invalid signature.`); return this; };
