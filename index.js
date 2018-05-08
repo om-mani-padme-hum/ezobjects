@@ -1,3 +1,8 @@
+/**
+ * @copyright 2018 Rich Lowe
+ * @license MIT
+ */
+
 const table = {
   name: 'Person',
   fields: [
