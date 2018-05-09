@@ -1,4 +1,4 @@
-# EZ Objects v0.5.1
+# EZ Objects v0.5.2
 
 Under development, but completely useable.
 
@@ -7,15 +7,15 @@ Under development, but completely useable.
 This module, when required, is a function that takes a single object argument.  At present, that object can have the
 following keys:
 
-* className - A string containing the name of the desired class object
+* className - A string containing the name of the desired class object (required)
 * extends - An object that you wish the class to extend from (optional, note this is the class itself, not the name)
-* fields - An array of fields (properties) that the class will have getters/setters/initialization for
+* fields - An array of fields (properties) that the class will have getters/setters/initialization for (optional)
 
 Each field in the array is an object that can have the following keys:
 
-* name - The name of the field
-* type - The type of the field (string, int, float, boolean, Array, or any other object name)
-* default - The default initialized value
+* name - The name of the field (required)
+* type - The type of the field (required, can be string, int, float, boolean, Array, or any other object name)
+* default - The default initialized value (optional)
 
 Default defaults are:
 
@@ -26,10 +26,11 @@ Default defaults are:
 * Array - []
 * Any others - null
 
-Note that the created objects are added to the global space, being `global` (node) or `window` (browser).  They can
-have other properties/methods added using the prototype, though note that if you want prototype-added properties to be 
-initialized, you'll have to rewrite the init() function manually.  Alternatively, you can just extend the
-class and init the parent with `super`.  See examples below.
+Note that the created objects are added to the global space, being `global` (node) or `window` (browser), though you'll
+have to browserify or equivalent to use in browser.  Like normal classes, they can have other properties/methods added 
+externally using the prototype, though note that if you want external prototype-added properties to be initialized, you'll 
+have to rewrite the init() function manually.  Alternatively, you can just extend the class and init the parent with 
+`super`.  See examples below.
 
 ## Example
 
