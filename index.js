@@ -51,7 +51,6 @@ module.exports = (obj) => {
   
   /** Loop through each field in the obj */
   obj.fields.forEach((col) => {
-    console.log(col);
     /** For 'int' type fields */
     if ( col.type == 'int' ) {
       parent[obj.name].prototype[col.name] = function (arg) { 
