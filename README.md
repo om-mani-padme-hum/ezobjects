@@ -1,4 +1,4 @@
-# EZ Objects v0.6.3
+# EZ Objects v0.6.4
 
 Under development, but completely useable.
 
@@ -30,7 +30,7 @@ Note that the created objects are added to the global space, being `global` (nod
 have to browserify or equivalent to use in browser.  Like normal classes, they can have other properties/methods added 
 externally using the prototype, though note that if you want external prototype-added properties to be initialized, you'll 
 have to rewrite the init() function manually.  Alternatively, you can just extend the class and init the parent with 
-`super`.  See examples below.
+`super`, see examples below.
 
 ## Example
 
@@ -108,7 +108,7 @@ DatabaseRecord.prototype.table = function (arg) {
   this._table = arg;
 };
 
-/** Yuck, now I have to manually override the init() call */
+/** Yuck, now I have to manually override the init() call if I want it initialized */
 DatabaseRecord.prototype.init = function (data = {}) {
   this.id(data.id || 0);
   this.table(data.table || '');
@@ -118,7 +118,7 @@ const e = new DatabaseRecord();
 
 console.log(e);
 
-/** These objects can be extended */
+/** These objects can be extended instead to accomplish the same thing if preferred */
 class DatabaseRecord2 extends DatabaseRecord {
   constructor(data = {}) {
     super(data);
