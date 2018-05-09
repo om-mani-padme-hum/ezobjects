@@ -42,6 +42,7 @@ const table = {
   ]
 };
 
+/** Create a class on the global scope using the configuration provided in `table` */
 function createObject(table) {
   let parent;
   
@@ -53,9 +54,7 @@ function createObject(table) {
   
   /** Create new class on global scope */
   parent[table.className] = class {
-    /**
-     * Constructor for new object.
-     */
+    /** Constructor for new object. */
     constructor(data = {}) {
       /** Loop through each field in the table */
       table.fields.forEach((col) => {
@@ -188,12 +187,15 @@ function createObject(table) {
   Object.defineProperty(parent[table.className], 'name', {value: table.name});
 }
 
+/** Create our table model! */
 createObject(table);
 
+/** Example newly initialized object using defaults */
 const a = new Person();
 
 console.log(a);
 
+/** Example newly initialized object using data object as parameter to constructor */
 const b = new Person({
   id: 1,
   firstName: 'Rich',
@@ -205,6 +207,7 @@ const b = new Person({
 
 console.log(b);
 
+/** Example newly initialized object using defaults, then assigning properties using setter methods */
 const c = new Person();
 
 c.id(2);

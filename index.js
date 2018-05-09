@@ -46,9 +46,7 @@ function createObject(table) {
   
   /** Create new class on global scope */
   parent[table.className] = class {
-    /**
-     * Constructor for new object.
-     */
+    /** Constructor for new object. */
     constructor(data = {}) {
       /** Loop through each field in the table */
       table.fields.forEach((col) => {
@@ -178,11 +176,13 @@ function createObject(table) {
    * Because we're creating this object dynamically, we need to manually give it a name 
    * attribute so we can identify it by its type when we want to.
    */
-  Object.defineProperty(parent[table.className], 'name', {value: table.name});
+  Object.defineProperty(parent[table.className], 'name', { value: table.name });
 }
 
+/** Create our table model! */
 createObject(table);
 
+/** Example uses of resulting class on global scope */
 const a = new Person();
 
 console.log(a);
