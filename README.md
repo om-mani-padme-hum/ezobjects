@@ -46,11 +46,12 @@ const table = {
 /** Create our table model! */
 ezobjects(table);
 
-/** Example uses of resulting class on global scope */
+/** Example new object initialized to defaults */
 const a = new Person();
 
 console.log(a);
 
+/** Example new object initialized using `data` object passed to constructor */
 const b = new Person({
   id: 1,
   firstName: 'Rich',
@@ -62,6 +63,7 @@ const b = new Person({
 
 console.log(b);
 
+/** Example new object initialized to defaults, then loaded with data using setter methods */
 const c = new Person();
 
 c.id(2);
