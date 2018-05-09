@@ -119,11 +119,10 @@ module.exports = (table) => {
       });
       
       this.init(data);
-      
     }
     
     init(data = {}) {
-      /** Loop through each field in the table again */
+      /** Loop through each field in the table */
       table.fields.forEach((col) => {
         /** Initialize 'int' and 'float' types to zero */
         if ( col.type == 'int' || col.type == 'float' )
