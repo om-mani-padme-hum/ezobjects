@@ -121,6 +121,7 @@ module.exports = (table) => {
       this.init(data);
     }
     
+    /** Initialize object with any provided `data` */
     init(data = {}) {
       /** Loop through each field in the table */
       table.fields.forEach((col) => {
