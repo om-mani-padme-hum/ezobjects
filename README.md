@@ -1,4 +1,4 @@
-# EZ Objects v0.6.1
+# EZ Objects v0.6.2
 
 Under development, but completely useable.
 
@@ -37,16 +37,18 @@ have to rewrite the init() function manually.  Alternatively, you can just exten
 ```javascript
 const ezobjects = require('ezobjects');
 
-/** 
- * Create a customized object on the global (node) or window (browser) namespace, complete with 
- * constructor/init/getters/setters with strict type checking, TypeError thrown if invalid type.
- */
+/** Create a customized object on the global (node) or window (browser) namespace, complete with constructor/init/getters/setters */
 ezobjects({
   name: 'DatabaseRecord',
   fields: [
     { name: 'id', type: 'int' }
   ]
 });
+
+/** Example of the object newly instansiated */
+const a = new DatabaseRecord();
+
+console.log(a);
 
 /** Create another customized object that extends the first one */
 ezobjects({
@@ -62,12 +64,12 @@ ezobjects({
 });
 
 /** Example of the extended object newly instansiated */
-const a = new Person();
+const b = new Person();
 
-console.log(a);
+console.log(b);
 
 /** Example of the extended object instansiated and initialized using object passed to constructor */
-const b = new Person({
+const c = new Person({
   id: 1,
   firstName: 'Rich',
   lastName: 'Lowe',
@@ -76,10 +78,10 @@ const b = new Person({
   favoriteDay: new Date('01-01-2018')
 });
 
-console.log(b);
+console.log(c);
 
 /** Example of the extended object instansiated, then loaded with data using setter methods */
-const c = new Person();
+const d = new Person();
 
 c.id(2);
 c.firstName('Bert');
@@ -88,7 +90,7 @@ c.checkingBalance(91425518.32);
 c.permissions([1, 4]);
 c.favoriteDay(new Date('06-01-2017'));
 
-console.log(c);
+console.log(d);
 
 /** Example of the extended object's properties being accessed using getter methods */
 console.log(`ID: ${c.id()}`);
@@ -112,9 +114,9 @@ DatabaseRecord.prototype.init = function (data = {}) {
   this.table(data.table || '');
 };
 
-const d = new DatabaseRecord();
+const e = new DatabaseRecord();
 
-console.log(d);
+console.log(e);
 
 /** These objects can be extended */
 class DatabaseRecord2 extends DatabaseRecord {
@@ -135,14 +137,15 @@ class DatabaseRecord2 extends DatabaseRecord {
   }
 }
 
-const e = new DatabaseRecord2();
+const f = new DatabaseRecord2();
 
-console.log(e);
+console.log(f);
 ```
 
 ## Example Output
 
 ```
+DatabaseRecord { _id: 0 }
 Person {
   _id: 0,
   _firstName: '',
@@ -158,12 +161,12 @@ Person {
   _permissions: [ 1, 2, 3 ],
   _favoriteDay: 2018-01-01T06:00:00.000Z }
 Person {
-  _id: 2,
-  _firstName: 'Bert',
-  _lastName: 'Reynolds',
-  _checkingBalance: 91425518.32,
-  _permissions: [ 1, 4 ],
-  _favoriteDay: 2017-06-01T05:00:00.000Z }
+  _id: 0,
+  _firstName: '',
+  _lastName: '',
+  _checkingBalance: 0,
+  _permissions: [],
+  _favoriteDay: null }
 ID: 2
 First Name: Bert
 Last Name: Reynolds
