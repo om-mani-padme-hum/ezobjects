@@ -7,7 +7,8 @@ We're just getting started, check back later.
 ```javascript
 const ezobjects = require('ezobjects');
 
-const table = {
+/** Create our customized object complete with constructor/init/getters/setters! */
+ezobjects({
   tableName: 'people',
   className: 'Person',
   fields: [
@@ -18,10 +19,7 @@ const table = {
     { name: 'permissions', type: 'Array' },
     { name: 'favoriteDay', type: 'Date' }
   ]
-};
-
-/** Create our table model! */
-ezobjects(table);
+});
 
 /** Example new object initialized to defaults */
 const a = new Person();
