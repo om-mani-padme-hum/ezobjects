@@ -11,31 +11,12 @@ const table = {
   tableName: 'people',
   className: 'Person',
   fields: [
-    {
-      name: 'id',
-      type: 'int',
-      default: -1
-    },
-    {
-      name: 'firstName',
-      type: 'string'
-    },
-    {
-      name: 'lastName',
-      type: 'string'
-    },
-    {
-      name: 'checkingBalance',
-      type: 'float'
-    },
-    {
-      name: 'permissions',
-      type: 'Array'
-    },
-    {
-      name: 'favoriteDay',
-      type: 'Date'
-    }
+    { name: 'id', type: 'int', default: -1 },
+    { name: 'firstName', type: 'string' },
+    { name: 'lastName', type: 'string' },
+    { name: 'checkingBalance', type: 'float' },
+    { name: 'permissions', type: 'Array' },
+    { name: 'favoriteDay', type: 'Date' }
   ]
 };
 
