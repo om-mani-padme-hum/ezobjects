@@ -198,4 +198,13 @@ const b = new Person({
 
 console.log(b);
 
+const c = new Person();
 
+c.id(2);
+c.firstName('Bert');
+c.lastName('Reynolds');
+c.checkingBalance(91425518.32);
+c.permissions([1, 4]);
+c.favoriteDay(new Date('06-01-2017'));
+
+console.log(c);
