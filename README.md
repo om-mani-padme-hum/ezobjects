@@ -71,7 +71,7 @@ c.favoriteDay(new Date('06-01-2017'));
 
 console.log(c);
 
-/** Example retrieving data from object */
+/** Example retrieving data from object using getter methods */
 console.log(`ID: ${c.id()}`);
 console.log(`First Name: ${c.firstName()}`);
 console.log(`Last Name: ${c.lastName()}`);
