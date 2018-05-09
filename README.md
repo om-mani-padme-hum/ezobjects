@@ -9,7 +9,6 @@ const ezobjects = require('ezobjects');
 const util = require('util');
 
 ezobjects({
-  tableName: 'records',
   className: 'DatabaseRecord',
   fields: [
     { name: 'id', type: 'int' }
@@ -22,7 +21,6 @@ console.log(test);
 
 /** Create our customized object complete with constructor/init/getters/setters! */
 ezobjects({
-  tableName: 'people',
   className: 'Person',
   extends: DatabaseRecord,
   fields: [
