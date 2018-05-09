@@ -1,4 +1,4 @@
-# EZ Objects v0.5.3
+# EZ Objects v0.6.0
 
 Under development, but completely useable.
 
@@ -37,7 +37,10 @@ have to rewrite the init() function manually.  Alternatively, you can just exten
 ```javascript
 const ezobjects = require('ezobjects');
 
-/** Create a customized object on the global (node) or window (browser) namespace, complete with constructor/init/getters/setters */
+/** 
+ * Create a customized object on the global (node) or window (browser) namespace, complete with 
+ * constructor/init/getters/setters with strict type checking, TypeError thrown if invalid type.
+ */
 ezobjects({
   name: 'DatabaseRecord',
   fields: [

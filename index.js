@@ -65,7 +65,7 @@ module.exports = (obj) => {
 
         /** Handle type errors */
         else 
-          throw new Error(`${obj.name}.${col.name}(${typeof arg}): Invalid signature.`); 
+          throw new TypeError(`${obj.name}.${col.name}(${typeof arg}): Invalid signature.`); 
 
         /** Return this object for set call chaining */
         return this; 
@@ -85,7 +85,7 @@ module.exports = (obj) => {
 
         /** Handle type errors */
         else 
-          throw new Error(`${obj.name}.${col.name}(${typeof arg}): Invalid signature.`); 
+          throw new TypeError(`${obj.name}.${col.name}(${typeof arg}): Invalid signature.`); 
 
         /** Return this object for set call chaining */
         return this; 
@@ -105,7 +105,7 @@ module.exports = (obj) => {
 
         /** Handle type errors */
         else 
-          throw new Error(`${obj.name}.${col.name}(${typeof arg}): Invalid signature.`); 
+          throw new TypeError(`${obj.name}.${col.name}(${typeof arg}): Invalid signature.`); 
 
         /** Return this object for set call chaining */
         return this; 
@@ -125,7 +125,7 @@ module.exports = (obj) => {
 
         /** Handle type errors */
         else 
-          throw new Error(`${obj.name}.${col.name}(${typeof arg}): Invalid signature.`); 
+          throw new TypeError(`${obj.name}.${col.name}(${typeof arg}): Invalid signature.`); 
 
         /** Return this object for set call chaining */
         return this; 
@@ -145,7 +145,7 @@ module.exports = (obj) => {
 
         /** Handle type errors */
         else 
-          throw new Error(`${obj.name}.${col.name}(${typeof arg}): Invalid signature.`); 
+          throw new TypeError(`${obj.name}.${col.name}(${typeof arg}): Invalid signature.`); 
 
         /** Return this object for set call chaining */
         return this; 
@@ -165,7 +165,7 @@ module.exports = (obj) => {
 
         /** Handle type errors */
         else 
-          throw new Error(`${obj.name}.${col.name}(${typeof arg}): Invalid signature.`); 
+          throw new TypeError(`${obj.name}.${col.name}(${typeof arg}): Invalid signature.`); 
 
         /** Return this object for set call chaining */
         return this; 
