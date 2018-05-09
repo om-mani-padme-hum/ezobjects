@@ -208,7 +208,7 @@ console.log(b);
 
 ## Output
 
-```json
+```
 
 { id: [Function],
   firstName: [Function],
