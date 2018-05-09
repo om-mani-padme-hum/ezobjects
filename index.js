@@ -118,6 +118,11 @@ module.exports = (table) => {
         }
       });
       
+      this.init(data);
+      
+    }
+    
+    init(data = {}) {
       /** Loop through each field in the table again */
       table.fields.forEach((col) => {
         /** Initialize 'int' and 'float' types to zero */
