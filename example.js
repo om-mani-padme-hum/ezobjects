@@ -71,7 +71,7 @@ DatabaseRecord.prototype.table = function (arg) {
   this._table = arg;
 };
 
-/** Yuck, now I have to manually override the init() call */
+/** Yuck, now I have to manually override the init() call if I want it initialized */
 DatabaseRecord.prototype.init = function (data = {}) {
   this.id(data.id || 0);
   this.table(data.table || '');
@@ -81,7 +81,7 @@ const e = new DatabaseRecord();
 
 console.log(e);
 
-/** These objects can be extended */
+/** These objects can be extended instead to accomplish the same thing if preferred */
 class DatabaseRecord2 extends DatabaseRecord {
   constructor(data = {}) {
     super(data);

@@ -1,4 +1,4 @@
-# EZ Objects v0.6.4
+# EZ Objects v0.6.5
 
 Under development, but completely useable.
 
