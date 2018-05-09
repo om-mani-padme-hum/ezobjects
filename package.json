@@ -4,8 +4,8 @@
   "description": "Easy dynamic object generation with strict typing and set chaining",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "eslint index.js"
+    "start": "node example.js",
+    "test": "eslint example.js index.js"
   },
   "keywords": [
     "EZ",
