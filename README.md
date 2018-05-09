@@ -5,10 +5,6 @@ We're just getting started, check back later.
 ## Example
 
 ```javascript
-/**
- * @copyright 2018 Rich Lowe
- * @license MIT
- */
 const ezobjects = require('ezobjects');
 
 const table = {

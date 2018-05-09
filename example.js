@@ -1,7 +1,3 @@
-/**
- * @copyright 2018 Rich Lowe
- * @license MIT
- */
 const ezobjects = require('./index');
 
 const table = {
