@@ -1,4 +1,4 @@
-# EZ Objects v0.6.2
+# EZ Objects v0.6.3
 
 Under development, but completely useable.
 
@@ -9,7 +9,7 @@ following keys:
 
 * name - A string containing the name of the desired class object (required)
 * extends - An object that you wish the class to extend from (optional, note this is the class itself, not the name)
-* fields - An array of fields (properties) that the class will have getters/setters/initialization for (optional)
+* properties - An array of properties for which the class will have getters/setters/initialization implemented (optional)
 
 Each field in the array is an object that can have the following keys:
 
@@ -37,10 +37,10 @@ have to rewrite the init() function manually.  Alternatively, you can just exten
 ```javascript
 const ezobjects = require('ezobjects');
 
-/** Create a customized object on the global (node) or window (browser) namespace, complete with constructor/init/getters/setters */
+/** Create a customized object on the global (node) or window (browser) namespace */
 ezobjects({
   name: 'DatabaseRecord',
-  fields: [
+  properties: [
     { name: 'id', type: 'int' }
   ]
 });
@@ -54,7 +54,7 @@ console.log(a);
 ezobjects({
   name: 'Person',
   extends: DatabaseRecord,
-  fields: [
+  properties: [
     { name: 'firstName', type: 'string' },
     { name: 'lastName', type: 'string' },
     { name: 'checkingBalance', type: 'float' },

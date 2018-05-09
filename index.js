@@ -25,7 +25,7 @@ module.exports = (obj) => {
         super.init(data);
     
       /** Loop through each field in the obj */
-      obj.fields.forEach((col) => {
+      obj.properties.forEach((col) => {
         /** Initialize 'int' and 'float' types to zero */
         if ( col.type == 'int' || col.type == 'float' )
           this[col.name](data[col.name] || col.default || 0);
@@ -50,8 +50,8 @@ module.exports = (obj) => {
   }
   
   /** Loop through each field in the obj */
-  obj.fields.forEach((col) => {
-    /** For 'int' type fields */
+  obj.properties.forEach((col) => {
+    /** For 'int' type properties */
     if ( col.type == 'int' ) {
       parent[obj.name].prototype[col.name] = function (arg) { 
         /** Getter */
@@ -71,7 +71,7 @@ module.exports = (obj) => {
       };
     } 
 
-    /** For 'float' type fields */
+    /** For 'float' type properties */
     else if ( col.type == 'float' ) {
       parent[obj.name].prototype[col.name] = function (arg) { 
         /** Getter */
@@ -91,7 +91,7 @@ module.exports = (obj) => {
       };
     } 
 
-    /** For 'boolean' type fields */
+    /** For 'boolean' type properties */
     else if ( col.type == 'boolean' ) {
       parent[obj.name].prototype[col.name] = function (arg) { 
         /** Getter */
@@ -111,7 +111,7 @@ module.exports = (obj) => {
       };
     }
     
-    /** For 'string' type fields */
+    /** For 'string' type properties */
     else if ( col.type == 'string' ) {
       parent[obj.name].prototype[col.name] = function (arg) { 
         /** Getter */
@@ -131,7 +131,7 @@ module.exports = (obj) => {
       };
     } 
 
-    /** For 'Array' type fields */
+    /** For 'Array' type properties */
     else if ( col.type == 'Array' ) {
       parent[obj.name].prototype[col.name] = function (arg) { 
         /** Getter */

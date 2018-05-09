@@ -1,9 +1,9 @@
 const ezobjects = require('./index');
 
-/** Create a customized object on the global (node) or window (browser) namespace, complete with constructor/init/getters/setters */
+/** Create a customized object on the global (node) or window (browser) namespace */
 ezobjects({
   name: 'DatabaseRecord',
-  fields: [
+  properties: [
     { name: 'id', type: 'int' }
   ]
 });
@@ -17,7 +17,7 @@ console.log(a);
 ezobjects({
   name: 'Person',
   extends: DatabaseRecord,
-  fields: [
+  properties: [
     { name: 'firstName', type: 'string' },
     { name: 'lastName', type: 'string' },
     { name: 'checkingBalance', type: 'float' },
