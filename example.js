@@ -63,3 +63,11 @@ c.permissions([1, 4]);
 c.favoriteDay(new Date('06-01-2017'));
 
 console.log(c);
+
+/** Example retrieving data from object */
+console.log(`ID: ${c.id()}`);
+console.log(`First Name: ${c.firstName()}`);
+console.log(`Last Name: ${c.lastName()}`);
+console.log(`Checking Balance: $${c.checkingBalance()}`);
+console.log(`Permissions: ${c.permissions().join(`, `)}`);
+console.log(`Favorite Day: ${c.favoriteDay().toString()}`);
