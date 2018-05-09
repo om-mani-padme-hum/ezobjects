@@ -1,6 +1,6 @@
-const ezobjects = require('ezobjects');
-const util = require('util');
+const ezobjects = require('./index');
 
+/** Create a customized object on the global (node) or window (browser) namespace, complete with constructor/init/getters/setters */
 ezobjects({
   className: 'DatabaseRecord',
   fields: [
@@ -8,11 +8,7 @@ ezobjects({
   ]
 });
 
-const test = new DatabaseRecord();
-
-console.log(test);
-
-/** Create our customized object complete with constructor/init/getters/setters! */
+/** Create another customized object that extends the first one */
 ezobjects({
   className: 'Person',
   extends: DatabaseRecord,
@@ -25,12 +21,12 @@ ezobjects({
   ]
 });
 
-/** Example new object initialized to defaults */
+/** Example of the extended object newly instansiated */
 const a = new Person();
 
-console.log(util.inspect(a, { depth: null}));
+console.log(a);
 
-/** Example new object initialized using `data` object passed to constructor */
+/** Example of the extended object instansiated and initialized using object passed to constructor */
 const b = new Person({
   id: 1,
   firstName: 'Rich',
@@ -40,9 +36,9 @@ const b = new Person({
   favoriteDay: new Date('01-01-2018')
 });
 
-console.log(util.inspect(b, { depth: null}));
+console.log(b);
 
-/** Example new object initialized to defaults, then loaded with data using setter methods */
+/** Example of the extended object instansiated, then loaded with data using setter methods */
 const c = new Person();
 
 c.id(2);
@@ -52,12 +48,53 @@ c.checkingBalance(91425518.32);
 c.permissions([1, 4]);
 c.favoriteDay(new Date('06-01-2017'));
 
-console.log(util.inspect(c, { depth: null}));
+console.log(c);
 
-/** Example retrieving data from object using getter methods */
+/** Example of the extended object's properties being accessed using getter methods */
 console.log(`ID: ${c.id()}`);
 console.log(`First Name: ${c.firstName()}`);
 console.log(`Last Name: ${c.lastName()}`);
 console.log(`Checking Balance: $${c.checkingBalance()}`);
 console.log(`Permissions: ${c.permissions().join(`, `)}`);
 console.log(`Favorite Day: ${c.favoriteDay().toString()}`);
+
+/** Adding capability to the generated object's prototype */
+DatabaseRecord.prototype.table = function (arg) {
+  if ( arg === undefined )
+    return this._table;
+  
+  this._table = arg;
+};
+
+/** Yuck, now I have to manually override the init() call */
+DatabaseRecord.prototype.init = function (data = {}) {
+  this.id(data.id || 0);
+  this.table(data.table || '');
+};
+
+const d = new DatabaseRecord();
+
+console.log(d);
+
+/** These objects can be extended */
+class DatabaseRecord2 extends DatabaseRecord {
+  constructor(data = {}) {
+    super(data);
+  }
+
+  init(data = {}) {
+    super.init(data);
+    this.test('Test');
+  }
+
+  test(arg) {
+    if ( arg === undefined )
+      return this._test;
+
+    this._test = arg;
+  }
+}
+
+const e = new DatabaseRecord2();
+
+console.log(e);
