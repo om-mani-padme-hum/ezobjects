@@ -1,4 +1,4 @@
-# EZ Objects v0.5.2
+# EZ Objects v0.5.3
 
 Under development, but completely useable.
 
@@ -7,7 +7,7 @@ Under development, but completely useable.
 This module, when required, is a function that takes a single object argument.  At present, that object can have the
 following keys:
 
-* className - A string containing the name of the desired class object (required)
+* name - A string containing the name of the desired class object (required)
 * extends - An object that you wish the class to extend from (optional, note this is the class itself, not the name)
 * fields - An array of fields (properties) that the class will have getters/setters/initialization for (optional)
 
@@ -39,7 +39,7 @@ const ezobjects = require('ezobjects');
 
 /** Create a customized object on the global (node) or window (browser) namespace, complete with constructor/init/getters/setters */
 ezobjects({
-  className: 'DatabaseRecord',
+  name: 'DatabaseRecord',
   fields: [
     { name: 'id', type: 'int' }
   ]
@@ -47,7 +47,7 @@ ezobjects({
 
 /** Create another customized object that extends the first one */
 ezobjects({
-  className: 'Person',
+  name: 'Person',
   extends: DatabaseRecord,
   fields: [
     { name: 'firstName', type: 'string' },

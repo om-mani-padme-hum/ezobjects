@@ -2,7 +2,7 @@
  * @copyright 2018 Rich Lowe
  * @license MIT
  */
-module.exports = (table) => {
+module.exports = (obj) => {
   let parent;
   
   /** Figure out proper global scope between node (global) and browser (window) */
@@ -12,7 +12,7 @@ module.exports = (table) => {
     parent = global;
   
   /** Create new class on global scope */
-  parent[table.className] = class extends (table.extends || Object) {
+  parent[obj.name] = class extends (obj.extends || Object) {
     /** Constructor for new object. */
     constructor(data = {}) {
       super(data);
@@ -24,8 +24,8 @@ module.exports = (table) => {
       if ( typeof super.init === 'function' )
         super.init(data);
     
-      /** Loop through each field in the table */
-      table.fields.forEach((col) => {
+      /** Loop through each field in the obj */
+      obj.fields.forEach((col) => {
         /** Initialize 'int' and 'float' types to zero */
         if ( col.type == 'int' || col.type == 'float' )
           this[col.name](data[col.name] || col.default || 0);
@@ -49,11 +49,12 @@ module.exports = (table) => {
     }
   }
   
-  /** Loop through each field in the table */
-  table.fields.forEach((col) => {
+  /** Loop through each field in the obj */
+  obj.fields.forEach((col) => {
+    console.log(col);
     /** For 'int' type fields */
     if ( col.type == 'int' ) {
-      parent[table.className].prototype[col.name] = function (arg) { 
+      parent[obj.name].prototype[col.name] = function (arg) { 
         /** Getter */
         if ( arg === undefined ) 
           return this[`_${col.name}`]; 
@@ -64,7 +65,7 @@ module.exports = (table) => {
 
         /** Handle type errors */
         else 
-          throw new Error(`${table.className}.${col.name}(${typeof arg}): Invalid signature.`); 
+          throw new Error(`${obj.name}.${col.name}(${typeof arg}): Invalid signature.`); 
 
         /** Return this object for set call chaining */
         return this; 
@@ -73,7 +74,7 @@ module.exports = (table) => {
 
     /** For 'float' type fields */
     else if ( col.type == 'float' ) {
-      parent[table.className].prototype[col.name] = function (arg) { 
+      parent[obj.name].prototype[col.name] = function (arg) { 
         /** Getter */
         if ( arg === undefined ) 
           return this[`_${col.name}`]; 
@@ -84,7 +85,7 @@ module.exports = (table) => {
 
         /** Handle type errors */
         else 
-          throw new Error(`${table.className}.${col.name}(${typeof arg}): Invalid signature.`); 
+          throw new Error(`${obj.name}.${col.name}(${typeof arg}): Invalid signature.`); 
 
         /** Return this object for set call chaining */
         return this; 
@@ -92,8 +93,8 @@ module.exports = (table) => {
     } 
 
     /** For 'boolean' type fields */
-    if ( col.type == 'boolean' ) {
-      parent[table.className].prototype[col.name] = function (arg) { 
+    else if ( col.type == 'boolean' ) {
+      parent[obj.name].prototype[col.name] = function (arg) { 
         /** Getter */
         if ( arg === undefined ) 
           return this[`_${col.name}`]; 
@@ -104,7 +105,7 @@ module.exports = (table) => {
 
         /** Handle type errors */
         else 
-          throw new Error(`${table.className}.${col.name}(${typeof arg}): Invalid signature.`); 
+          throw new Error(`${obj.name}.${col.name}(${typeof arg}): Invalid signature.`); 
 
         /** Return this object for set call chaining */
         return this; 
@@ -113,7 +114,7 @@ module.exports = (table) => {
     
     /** For 'string' type fields */
     else if ( col.type == 'string' ) {
-      parent[table.className].prototype[col.name] = function (arg) { 
+      parent[obj.name].prototype[col.name] = function (arg) { 
         /** Getter */
         if ( arg === undefined ) 
           return this[`_${col.name}`]; 
@@ -124,7 +125,7 @@ module.exports = (table) => {
 
         /** Handle type errors */
         else 
-          throw new Error(`${table.className}.${col.name}(${typeof arg}): Invalid signature.`); 
+          throw new Error(`${obj.name}.${col.name}(${typeof arg}): Invalid signature.`); 
 
         /** Return this object for set call chaining */
         return this; 
@@ -133,7 +134,7 @@ module.exports = (table) => {
 
     /** For 'Array' type fields */
     else if ( col.type == 'Array' ) {
-      parent[table.className].prototype[col.name] = function (arg) { 
+      parent[obj.name].prototype[col.name] = function (arg) { 
         /** Getter */
         if ( arg === undefined ) 
           return this[`_${col.name}`]; 
@@ -144,7 +145,7 @@ module.exports = (table) => {
 
         /** Handle type errors */
         else 
-          throw new Error(`${table.className}.${col.name}(${typeof arg}): Invalid signature.`); 
+          throw new Error(`${obj.name}.${col.name}(${typeof arg}): Invalid signature.`); 
 
         /** Return this object for set call chaining */
         return this; 
@@ -153,7 +154,7 @@ module.exports = (table) => {
 
     /** For all other field types */
     else {
-      parent[table.className].prototype[col.name] = function (arg) { 
+      parent[obj.name].prototype[col.name] = function (arg) { 
         /** Getter */
         if ( arg === undefined ) 
           return this[`_${col.name}`]; 
@@ -164,7 +165,7 @@ module.exports = (table) => {
 
         /** Handle type errors */
         else 
-          throw new Error(`${table.className}.${col.name}(${typeof arg}): Invalid signature.`); 
+          throw new Error(`${obj.name}.${col.name}(${typeof arg}): Invalid signature.`); 
 
         /** Return this object for set call chaining */
         return this; 
@@ -176,5 +177,5 @@ module.exports = (table) => {
    * Because we're creating this object dynamically, we need to manually give it a name 
    * attribute so we can identify it by its type when we want to.
    */
-  Object.defineProperty(parent[table.className], 'name', { value: table.className });
+  Object.defineProperty(parent[obj.name], 'name', { value: obj.name });
 }
