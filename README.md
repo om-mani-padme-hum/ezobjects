@@ -1,4 +1,4 @@
-# EZ Objects v0.4.1
+# EZ Objects v0.5.0
 
 Under development, but completely useable.  Added capability to extend classes.  Not much more
 planned for this tool, but may fork off additional versions that interact with MySQL and/or other

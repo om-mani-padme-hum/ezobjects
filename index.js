@@ -87,6 +87,26 @@ module.exports = (table) => {
       };
     } 
 
+    /** For 'boolean' type fields */
+    if ( col.type == 'boolean' ) {
+      parent[table.className].prototype[col.name] = function (arg) { 
+        /** Getter */
+        if ( arg === undefined ) 
+          return this[`_${col.name}`]; 
+
+        /** Setter */
+        else if ( typeof arg == 'boolean' ) 
+          this[`_${col.name}`] = arg; 
+
+        /** Handle type errors */
+        else 
+          throw new Error(`${table.className}.${col.name}(${typeof arg}): Invalid signature.`); 
+
+        /** Return this object for set call chaining */
+        return this; 
+      };
+    }
+    
     /** For 'string' type fields */
     else if ( col.type == 'string' ) {
       parent[table.className].prototype[col.name] = function (arg) { 
