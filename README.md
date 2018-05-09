@@ -1,4 +1,4 @@
-# EZ Objects
+# EZ Objects v0.4.1
 
 Under development, but completely useable.  Added capability to extend classes.  Not much more
 planned for this tool, but may fork off additional versions that interact with MySQL and/or other
@@ -7,7 +7,7 @@ databases.
 ## Example
 
 ```javascript
-const ezobjects = require('./index');
+const ezobjects = require('ezobjects');
 
 /** Create a customized object on the global (node) or window (browser) namespace, complete with constructor/init/getters/setters */
 ezobjects({
