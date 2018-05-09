@@ -1,4 +1,4 @@
-# EZ Objects v0.6.5
+# EZ Objects v0.6.6
 
 Under development, but completely useable.
 
@@ -11,10 +11,10 @@ following keys:
 * extends - An object that you wish the class to extend from (optional, note this is the class itself, not the name)
 * properties - An array of properties for which the class will have getters/setters/initialization implemented (optional)
 
-Each field in the array is an object that can have the following keys:
+Each property in the properties array is an object that can have the following keys:
 
-* name - The name of the field (required)
-* type - The type of the field (required, can be string, int, float, boolean, Array, or any other object name)
+* name - The name of the property (required)
+* type - The type of the property (required, can be string, int, float, boolean, Array, or any other object name)
 * default - The default initialized value (optional)
 
 Default defaults are:

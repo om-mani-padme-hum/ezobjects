@@ -24,7 +24,7 @@ module.exports = (obj) => {
       if ( typeof super.init === 'function' )
         super.init(data);
     
-      /** Loop through each field in the obj */
+      /** Loop through each property in the obj */
       obj.properties.forEach((col) => {
         /** Initialize 'int' and 'float' types to zero */
         if ( col.type == 'int' || col.type == 'float' )
@@ -49,7 +49,7 @@ module.exports = (obj) => {
     }
   }
   
-  /** Loop through each field in the obj */
+  /** Loop through each property in the obj */
   obj.properties.forEach((col) => {
     /** For 'int' type properties */
     if ( col.type == 'int' ) {
@@ -151,7 +151,7 @@ module.exports = (obj) => {
       };
     }
 
-    /** For all other field types */
+    /** For all other property types */
     else {
       parent[obj.name].prototype[col.name] = function (arg) { 
         /** Getter */
