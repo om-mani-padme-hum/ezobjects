@@ -1,8 +1,35 @@
-# EZ Objects v0.5.0
+# EZ Objects v0.5.1
 
-Under development, but completely useable.  Added capability to extend classes.  Not much more
-planned for this tool, but may fork off additional versions that interact with MySQL and/or other
-databases.
+Under development, but completely useable.
+
+## Principles of Operation
+
+This module, when required, is a function that takes a single object argument.  At present, that object can have the
+following keys:
+
+* className - A string containing the name of the desired class object
+* extends - An object that you wish the class to extend from (optional, note this is the class itself, not the name)
+* fields - An array of fields (properties) that the class will have getters/setters/initialization for
+
+Each field in the array is an object that can have the following keys:
+
+* name - The name of the field
+* type - The type of the field (string, int, float, boolean, Array, or any other object name)
+* default - The default initialized value
+
+Default defaults are:
+
+* string - ''
+* int - 0
+* float - 0
+* boolean - false
+* Array - []
+* Any others - null
+
+Note that the created objects are added to the global space, being `global` (node) or `window` (browser).  They can
+have other properties/methods added using the prototype, though note that if you want prototype-added properties to be 
+initialized, you'll have to rewrite the init() function manually.  Alternatively, you can just extend the
+class and init the parent with `super`.  See examples below.
 
 ## Example
 

@@ -30,6 +30,10 @@ module.exports = (table) => {
         if ( col.type == 'int' || col.type == 'float' )
           this[col.name](data[col.name] || col.default || 0);
 
+        /** Initialize 'boolean' types to false */
+        else if ( col.type == 'boolean' )
+          this[col.name](data[col.name] || col.default || false);
+        
         /** Initialize 'string' types to empty */
         else if ( col.type == 'string' )
           this[col.name](data[col.name] || col.default || '');
