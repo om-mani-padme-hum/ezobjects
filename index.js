@@ -27,6 +27,15 @@ module.exports = (obj) => {
       if ( typeof super.init === 'function' )
         super.init(data);
     
+      if ( typeof data == 'string' )
+        data = JSON.parse(data);
+
+      Object.keys(data).forEach((key) => {
+        Object.defineProperty(data, key.replace(/^_/, ''),
+        Object.getOwnPropertyDescriptor(data, key));
+        delete data[key];
+      });
+      
       /** Loop through each property in the obj */
       obj.properties.forEach((col) => {
         /** Initialize 'int' and 'float' types to zero */

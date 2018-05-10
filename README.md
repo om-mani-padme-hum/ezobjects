@@ -1,4 +1,4 @@
-# EZ Objects v1.0.1
+# EZ Objects v1.1.0
 
 Fully operational!  Please open an issue for any bug reports or feature requests.
 
