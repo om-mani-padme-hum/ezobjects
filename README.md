@@ -1,4 +1,4 @@
-# EZ Objects v1.0.0
+# EZ Objects v1.0.1
 
 Fully operational!  Please open an issue for any bug reports or feature requests.
 
@@ -243,10 +243,20 @@ class DatabaseRecord2 extends DatabaseRecord {
   }
 
   test(arg) {
+    /** Getter */
     if ( arg === undefined )
       return this._test;
 
-    this._test = arg;
+    /** Setter */
+    else if ( typeof arg == 'string' )
+      this._test = arg.toString();
+
+    /** Handle type errors */
+    else
+      throw new TypeError(`${this.constructor.name}.test(${typeof arg}): Invalid signature.`);
+
+    /** Return this object for set call chaining */
+    return this;
   }
 }
 

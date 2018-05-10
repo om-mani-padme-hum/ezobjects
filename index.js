@@ -1,6 +1,8 @@
 /**
+ * @module ezobjects
  * @copyright 2018 Rich Lowe
  * @license MIT
+ * @description Easy, automatic object creation from simple templates with strict typing
  */
 module.exports = (obj) => {
   let parent;
@@ -20,6 +22,7 @@ module.exports = (obj) => {
       this.init(data);
     }
     
+    /** Initializer */
     init(data = {}) {
       if ( typeof super.init === 'function' )
         super.init(data);
@@ -53,6 +56,7 @@ module.exports = (obj) => {
   obj.properties.forEach((col) => {
     /** For 'int' type properties */
     if ( col.type == 'int' ) {
+      /** Create class method on prototype */
       parent[obj.name].prototype[col.name] = function (arg) { 
         /** Getter */
         if ( arg === undefined ) 
@@ -73,6 +77,7 @@ module.exports = (obj) => {
 
     /** For 'float' type properties */
     else if ( col.type == 'float' ) {
+      /** Create class method on prototype */
       parent[obj.name].prototype[col.name] = function (arg) { 
         /** Getter */
         if ( arg === undefined ) 
@@ -93,6 +98,7 @@ module.exports = (obj) => {
 
     /** For 'boolean' type properties */
     else if ( col.type == 'boolean' ) {
+      /** Create class method on prototype */
       parent[obj.name].prototype[col.name] = function (arg) { 
         /** Getter */
         if ( arg === undefined ) 
@@ -113,6 +119,7 @@ module.exports = (obj) => {
     
     /** For 'string' type properties */
     else if ( col.type == 'string' ) {
+      /** Create class method on prototype */
       parent[obj.name].prototype[col.name] = function (arg) { 
         /** Getter */
         if ( arg === undefined ) 
@@ -120,7 +127,7 @@ module.exports = (obj) => {
 
         /** Setter */
         else if ( typeof arg == 'string' ) 
-          this[`_${col.name}`] = arg.toString(); 
+          this[`_${col.name}`] = arg; 
 
         /** Handle type errors */
         else 
@@ -133,6 +140,7 @@ module.exports = (obj) => {
 
     /** For 'Array' type properties */
     else if ( col.type == 'Array' ) {
+      /** Create class method on prototype */
       parent[obj.name].prototype[col.name] = function (arg) { 
         /** Getter */
         if ( arg === undefined ) 
@@ -153,6 +161,7 @@ module.exports = (obj) => {
 
     /** For all other property types */
     else {
+      /** Create class method on prototype */
       parent[obj.name].prototype[col.name] = function (arg) { 
         /** Getter */
         if ( arg === undefined ) 

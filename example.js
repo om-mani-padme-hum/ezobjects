@@ -112,10 +112,20 @@ class DatabaseRecord2 extends DatabaseRecord {
   }
 
   test(arg) {
+    /** Getter */
     if ( arg === undefined )
       return this._test;
 
-    this._test = arg;
+    /** Setter */
+    else if ( typeof arg == 'string' )
+      this._test = arg;
+
+    /** Handle type errors */
+    else
+      throw new TypeError(`${this.constructor.name}.test(${typeof arg}): Invalid signature.`);
+
+    /** Return this object for set call chaining */
+    return this;
   }
 }
 
