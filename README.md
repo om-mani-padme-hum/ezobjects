@@ -1,4 +1,4 @@
-# EZ Objects v0.6.6
+# EZ Objects v0.6.7
 
 Under development, but completely useable.
 
@@ -32,8 +32,9 @@ externally using the prototype, though note that if you want external prototype-
 have to rewrite the init() function manually.  Alternatively, you can just extend the class and init the parent with 
 `super`, see examples below.
 
-## Example
+## Examples
 
+#### Creating a class
 ```javascript
 const ezobjects = require('ezobjects');
 
@@ -49,7 +50,17 @@ ezobjects({
 const a = new DatabaseRecord();
 
 console.log(a);
+```
 
+#### Output
+
+```
+DatabaseRecord { _id: 0 }
+```
+
+#### Creating a class that's extended from another class
+
+```javascript
 /** Create another customized object that extends the first one */
 ezobjects({
   name: 'Person',
@@ -67,7 +78,23 @@ ezobjects({
 const b = new Person();
 
 console.log(b);
+```
 
+#### Output
+
+```
+Person {
+  _id: 0,
+  _firstName: '',
+  _lastName: '',
+  _checkingBalance: 0,
+  _permissions: [],
+  _favoriteDay: null }
+```
+
+#### Using an intializer object passed to constructor
+
+```javascript
 /** Example of the extended object instansiated and initialized using object passed to constructor */
 const c = new Person({
   id: 1,
@@ -79,19 +106,51 @@ const c = new Person({
 });
 
 console.log(c);
+```
 
+#### Output
+
+```
+Person {
+  _id: 1,
+  _firstName: 'Rich',
+  _lastName: 'Lowe',
+  _checkingBalance: 4.87,
+  _permissions: [ 1, 2, 3 ],
+  _favoriteDay: 2018-01-01T06:00:00.000Z }
+```
+
+#### Using the auto-created setters
+
+```javascript
 /** Example of the extended object instansiated, then loaded with data using setter methods */
 const d = new Person();
 
-c.id(2);
-c.firstName('Bert');
-c.lastName('Reynolds');
-c.checkingBalance(91425518.32);
-c.permissions([1, 4]);
-c.favoriteDay(new Date('06-01-2017'));
+d.id(2);
+d.firstName('Bert');
+d.lastName('Reynolds');
+d.checkingBalance(91425518.32);
+d.permissions([1, 4]);
+d.favoriteDay(new Date('06-01-2017'));
 
 console.log(d);
+```
 
+#### Output
+
+```
+Person {
+  _id: 2,
+  _firstName: 'Bert',
+  _lastName: 'Reynolds',
+  _checkingBalance: 91425518.32,
+  _permissions: [ 1, 4 ],
+  _favoriteDay: 2017-06-01T05:00:00.000Z }
+```
+
+#### Using the auto-created getters
+
+```javascript
 /** Example of the extended object's properties being accessed using getter methods */
 console.log(`ID: ${c.id()}`);
 console.log(`First Name: ${c.firstName()}`);
@@ -99,7 +158,22 @@ console.log(`Last Name: ${c.lastName()}`);
 console.log(`Checking Balance: $${c.checkingBalance()}`);
 console.log(`Permissions: ${c.permissions().join(`, `)}`);
 console.log(`Favorite Day: ${c.favoriteDay().toString()}`);
+```
 
+#### Output
+
+```
+ID: 2
+First Name: Bert
+Last Name: Reynolds
+Checking Balance: $91425518.32
+Permissions: 1, 4
+Favorite Day: Thu Jun 01 2017 00:00:00 GMT-0500 (CDT)
+```
+
+#### Adding to class using its prototype
+
+```javascript
 /** Adding capability to the generated object's prototype */
 DatabaseRecord.prototype.table = function (arg) {
   if ( arg === undefined )
@@ -117,7 +191,17 @@ DatabaseRecord.prototype.init = function (data = {}) {
 const e = new DatabaseRecord();
 
 console.log(e);
+```
 
+#### Output
+
+```
+DatabaseRecord { _id: 0, _table: '' }
+```
+
+#### Extending the class
+
+```javascript
 /** These objects can be extended instead to accomplish the same thing if preferred */
 class DatabaseRecord2 extends DatabaseRecord {
   constructor(data = {}) {
@@ -142,37 +226,8 @@ const f = new DatabaseRecord2();
 console.log(f);
 ```
 
-## Example Output
+#### Output
 
 ```
-DatabaseRecord { _id: 0 }
-Person {
-  _id: 0,
-  _firstName: '',
-  _lastName: '',
-  _checkingBalance: 0,
-  _permissions: [],
-  _favoriteDay: null }
-Person {
-  _id: 1,
-  _firstName: 'Rich',
-  _lastName: 'Lowe',
-  _checkingBalance: 4.87,
-  _permissions: [ 1, 2, 3 ],
-  _favoriteDay: 2018-01-01T06:00:00.000Z }
-Person {
-  _id: 0,
-  _firstName: '',
-  _lastName: '',
-  _checkingBalance: 0,
-  _permissions: [],
-  _favoriteDay: null }
-ID: 2
-First Name: Bert
-Last Name: Reynolds
-Checking Balance: $91425518.32
-Permissions: 1, 4
-Favorite Day: Thu Jun 01 2017 00:00:00 GMT-0500 (CDT)
-DatabaseRecord { _id: 0, _table: '' }
 DatabaseRecord2 { _id: 0, _table: '', _test: 'Test' }
 ```

@@ -46,12 +46,12 @@ console.log(c);
 /** Example of the extended object instansiated, then loaded with data using setter methods */
 const d = new Person();
 
-c.id(2);
-c.firstName('Bert');
-c.lastName('Reynolds');
-c.checkingBalance(91425518.32);
-c.permissions([1, 4]);
-c.favoriteDay(new Date('06-01-2017'));
+d.id(2);
+d.firstName('Bert');
+d.lastName('Reynolds');
+d.checkingBalance(91425518.32);
+d.permissions([1, 4]);
+d.favoriteDay(new Date('06-01-2017'));
 
 console.log(d);
 
