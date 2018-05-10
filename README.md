@@ -1,6 +1,6 @@
-# EZ Objects v0.6.8
+# EZ Objects v1.0.0
 
-Under development, but completely useable.
+Fully operational!  Please open an issue for any bug reports or feature requests.
 
 ## Principles of Operation
 
@@ -171,15 +171,25 @@ Permissions: 1, 4
 Favorite Day: Thu Jun 01 2017 00:00:00 GMT-0500 (CDT)
 ```
 
-#### Adding capability by using the class prototype
+#### Adding properties by using the class prototype
 
 ```javascript
-/** Adding capability to the generated object's prototype */
+/** Adding property to the generated object's prototype */
 DatabaseRecord.prototype.table = function (arg) {
+  /** Getter */
   if ( arg === undefined )
     return this._table;
   
-  this._table = arg;
+  /** Setter */
+  else if ( typeof arg == 'string' )
+    this._table = arg;
+  
+  /** Handle type errors */
+  else
+    throw new TypeError(`${this.constructor.name}.table(${typeof arg}): Invalid signature.`);
+  
+  /** Return this object for set call chaining */
+  return this;
 };
 
 /** Yuck, now I have to manually override the init() call if I want it initialized */
@@ -199,10 +209,29 @@ console.log(e);
 DatabaseRecord { _id: 0, _table: '' }
 ```
 
-#### Adding capability by extending the class
+#### Adding capability other than properties by using the class prototype
 
 ```javascript
-/** These objects can be extended instead to accomplish the same thing if preferred */
+/** Adding arbitrary capability other than property to the generated object's prototype */
+DatabaseRecord.prototype.hello = function () {
+  return "Hello, World!";
+};
+
+const f = new DatabaseRecord();
+
+console.log(f.hello());
+```
+
+#### Output
+
+```
+Hello, World!
+```
+
+#### Adding properties and/or capability by extending the class
+
+```javascript
+/** These objects can be extended instead to accomplish the same things if preferred */
 class DatabaseRecord2 extends DatabaseRecord {
   constructor(data = {}) {
     super(data);
@@ -221,13 +250,15 @@ class DatabaseRecord2 extends DatabaseRecord {
   }
 }
 
-const f = new DatabaseRecord2();
+const g = new DatabaseRecord2();
 
-console.log(f);
+console.log(g);
+console.log(g.hello());
 ```
 
 #### Output
 
 ```
 DatabaseRecord2 { _id: 0, _table: '', _test: 'Test' }
+Hello, World!
 ```

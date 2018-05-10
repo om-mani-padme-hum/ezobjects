@@ -63,12 +63,22 @@ console.log(`Checking Balance: $${d.checkingBalance()}`);
 console.log(`Permissions: ${d.permissions().join(`, `)}`);
 console.log(`Favorite Day: ${d.favoriteDay().toString()}`);
 
-/** Adding capability to the generated object's prototype */
+/** Adding property to the generated object's prototype */
 DatabaseRecord.prototype.table = function (arg) {
+  /** Getter */
   if ( arg === undefined )
     return this._table;
   
-  this._table = arg;
+  /** Setter */
+  else if ( typeof arg == 'string' )
+    this._table = arg;
+  
+  /** Handle type errors */
+  else
+    throw new TypeError(`${this.constructor.name}.table(${typeof arg}): Invalid signature.`);
+  
+  /** Return this object for set call chaining */
+  return this;
 };
 
 /** Yuck, now I have to manually override the init() call if I want it initialized */
@@ -81,7 +91,16 @@ const e = new DatabaseRecord();
 
 console.log(e);
 
-/** These objects can be extended instead to accomplish the same thing if preferred */
+/** Adding arbitrary capability other than property to the generated object's prototype */
+DatabaseRecord.prototype.hello = function () {
+  return "Hello, World!";
+};
+
+const f = new DatabaseRecord();
+
+console.log(f.hello());
+
+/** These objects can be extended instead to accomplish the same things if preferred */
 class DatabaseRecord2 extends DatabaseRecord {
   constructor(data = {}) {
     super(data);
@@ -100,6 +119,7 @@ class DatabaseRecord2 extends DatabaseRecord {
   }
 }
 
-const f = new DatabaseRecord2();
+const g = new DatabaseRecord2();
 
-console.log(f);
+console.log(g);
+console.log(g.hello());
