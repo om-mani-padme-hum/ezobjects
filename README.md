@@ -1,4 +1,4 @@
-# EZ Objects v0.6.7
+# EZ Objects v0.6.8
 
 Under development, but completely useable.
 
@@ -152,12 +152,12 @@ Person {
 
 ```javascript
 /** Example of the extended object's properties being accessed using getter methods */
-console.log(`ID: ${c.id()}`);
-console.log(`First Name: ${c.firstName()}`);
-console.log(`Last Name: ${c.lastName()}`);
-console.log(`Checking Balance: $${c.checkingBalance()}`);
-console.log(`Permissions: ${c.permissions().join(`, `)}`);
-console.log(`Favorite Day: ${c.favoriteDay().toString()}`);
+console.log(`ID: ${d.id()}`);
+console.log(`First Name: ${d.firstName()}`);
+console.log(`Last Name: ${d.lastName()}`);
+console.log(`Checking Balance: $${d.checkingBalance()}`);
+console.log(`Permissions: ${d.permissions().join(`, `)}`);
+console.log(`Favorite Day: ${d.favoriteDay().toString()}`);
 ```
 
 #### Output
@@ -171,7 +171,7 @@ Permissions: 1, 4
 Favorite Day: Thu Jun 01 2017 00:00:00 GMT-0500 (CDT)
 ```
 
-#### Adding to class using its prototype
+#### Adding capability by using the class prototype
 
 ```javascript
 /** Adding capability to the generated object's prototype */
@@ -199,7 +199,7 @@ console.log(e);
 DatabaseRecord { _id: 0, _table: '' }
 ```
 
-#### Extending the class
+#### Adding capability by extending the class
 
 ```javascript
 /** These objects can be extended instead to accomplish the same thing if preferred */

@@ -56,12 +56,12 @@ d.favoriteDay(new Date('06-01-2017'));
 console.log(d);
 
 /** Example of the extended object's properties being accessed using getter methods */
-console.log(`ID: ${c.id()}`);
-console.log(`First Name: ${c.firstName()}`);
-console.log(`Last Name: ${c.lastName()}`);
-console.log(`Checking Balance: $${c.checkingBalance()}`);
-console.log(`Permissions: ${c.permissions().join(`, `)}`);
-console.log(`Favorite Day: ${c.favoriteDay().toString()}`);
+console.log(`ID: ${d.id()}`);
+console.log(`First Name: ${d.firstName()}`);
+console.log(`Last Name: ${d.lastName()}`);
+console.log(`Checking Balance: $${d.checkingBalance()}`);
+console.log(`Permissions: ${d.permissions().join(`, `)}`);
+console.log(`Favorite Day: ${d.favoriteDay().toString()}`);
 
 /** Adding capability to the generated object's prototype */
 DatabaseRecord.prototype.table = function (arg) {
