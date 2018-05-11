@@ -1,18 +1,22 @@
-# EZ Objects v1.1.2
+# EZ Objects v1.1.3
 
 EZ Objects is a Node.js module, the purpose of which is to save you lots of time writing the initializer, property getters, 
 and property setters for your data model objects.  The library takes the form of a single function.  This function can be 
 passed a generic object containing a few configuration keys, defined below, that will allow it to automatically generate a 
 new ES6 class object with the following features:
 
-* Auto-initializes all properties (including parent object properties, if extended)
-* * Default default values for different data types are listed further below
-* * You can specify the default value for a property in the config when you create the EZ Object
-* * You can pass a value that the property should have when instansiating the EZ Object
-* Automatically creates methods that perform getter/setter functionality with strict data typing
-* * Methods use myMethod() for getter and myMethod(val) for setter
-* * Methods throw TypeError if type does not match that specified
-* * Methods return 'this' when setting so set calls can be chained
+Auto-initializes all properties (including parent object properties, if extended)
+* Default default values for different data types are listed further below
+* You can specify the default value for a property in the config when you create the EZ Object
+* You can pass a value that the property should have when instansiating the EZ Object
+* If the object has been JSON encoded and parsed, the properties will have the internal property 
+underscores `_`, fortunately the module will strip the `_` from the object if you wish to initialize 
+a new object using a JSON decoded version of the same object
+
+Automatically creates methods that perform getter/setter functionality with strict data typing
+* Methods use myMethod() for getter and myMethod(val) for setter
+* Methods throw TypeError if type does not match that specified
+* Methods return 'this' when setting so set calls can be chained
 
 See the examples below to witness them used in a variety of situations.
 
