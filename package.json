@@ -1,15 +1,15 @@
 {
   "name": "ezobjects",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Easy dynamic object generation with strict typing and set chaining",
   "main": "index.js",
   "scripts": {
     "start": "node example.js",
     "test": "eslint example.js index.js"
   },
-  "repository" : { 
-    "type" : "git", 
-    "url" : "https://github.com/om-mani-padme-hum/ezobjects.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/om-mani-padme-hum/ezobjects.git"
   },
   "keywords": [
     "EZ",
