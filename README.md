@@ -1,4 +1,4 @@
-# EZ Objects v1.1.4
+# EZ Objects v1.1.5
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing the initializers, property getters, and property setters for your data model objects.  The library 

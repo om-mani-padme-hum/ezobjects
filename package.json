@@ -7,6 +7,10 @@
     "start": "node example.js",
     "test": "eslint example.js index.js"
   },
+  "repository" : { 
+    "type" : "git", 
+    "url" : "https://github.com/om-mani-padme-hum/ezobjects.git"
+  },
   "keywords": [
     "EZ",
     "node",
