@@ -21,5 +21,8 @@
     "creation"
   ],
   "author": "Rich Lowe",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "mysql": "^2.15.0"
+  }
 }

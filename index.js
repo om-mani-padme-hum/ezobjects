@@ -4,7 +4,7 @@
  * @license MIT
  * @description Easy, automatic object creation from simple templates with strict typing
  */
-module.exports = (obj) => {
+module.exports.createObject = (obj) => {
   let parent;
   
   /** Figure out proper global scope between node (global) and browser (window) */
@@ -14,7 +14,7 @@ module.exports = (obj) => {
     parent = global;
   
   /** Create new class on global scope */
-  parent[obj.name] = class extends (obj.extends || Object) {
+  parent[obj.className] = class extends (obj.extends || Object) {
     /** Constructor for new object. */
     constructor(data = {}) {
       super(data);
@@ -38,89 +38,68 @@ module.exports = (obj) => {
       });
             
       /** Loop through each property in the obj */
-      obj.properties.forEach((col) => {
-        /** Initialize 'int' and 'float' types to zero */
-        if ( col.type == 'int' || col.type == 'float' )
-          this[col.name](data[col.name] || col.default || 0);
+      obj.properties.forEach((property) => {
+        /** Initialize 'number' types to zero */
+        if ( property.type == 'number' )
+          this[property.name](data[property.name] || property.default || 0);
 
         /** Initialize 'boolean' types to false */
-        else if ( col.type == 'boolean' )
-          this[col.name](data[col.name] || col.default || false);
+        else if ( property.type == 'boolean' )
+          this[property.name](data[property.name] || property.default || false);
         
         /** Initialize 'string' types to empty */
-        else if ( col.type == 'string' )
-          this[col.name](data[col.name] || col.default || '');
+        else if ( property.type == 'string' )
+          this[property.name](data[property.name] || property.default || '');
 
         /** Initialize 'Array' types to empty */
-        else if ( col.type == 'Array' )
-          this[col.name](data[col.name] || col.default || []);
+        else if ( property.type == 'Array' )
+          this[property.name](data[property.name] || property.default || []);
 
         /** Initialize all other types to null */
         else
-          this[col.name](data[col.name] || col.default || null);
+          this[property.name](data[property.name] || property.default || null);
       });
     }
   }
   
   /** Loop through each property in the obj */
-  obj.properties.forEach((col) => {
-    /** For 'int' type properties */
-    if ( col.type == 'int' ) {
+  obj.properties.forEach((property) => {
+    /** For 'number' type properties */
+    if ( property.type == 'number' ) {
       /** Create class method on prototype */
-      parent[obj.name].prototype[col.name] = function (arg) { 
+      parent[obj.className].prototype[property.name] = function (arg) { 
         /** Getter */
         if ( arg === undefined ) 
-          return this[`_${col.name}`]; 
+          return this[`_${property.name}`]; 
 
         /** Setter */
         else if ( typeof arg == 'number' ) 
-          this[`_${col.name}`] = parseInt(arg); 
+          this[`_${property.name}`] = arg; 
 
         /** Handle type errors */
         else 
-          throw new TypeError(`${this.constructor.name}.${col.name}(${typeof arg}): Invalid signature.`); 
+          throw new TypeError(`${this.constructor.name}.${property.name}(${typeof arg}): Invalid signature.`); 
 
         /** Return this object for set call chaining */
         return this; 
       };
-    } 
-
-    /** For 'float' type properties */
-    else if ( col.type == 'float' ) {
-      /** Create class method on prototype */
-      parent[obj.name].prototype[col.name] = function (arg) { 
-        /** Getter */
-        if ( arg === undefined ) 
-          return this[`_${col.name}`]; 
-
-        /** Setter */
-        else if ( typeof arg == 'number' ) 
-          this[`_${col.name}`] = parseFloat(arg); 
-
-        /** Handle type errors */
-        else 
-          throw new TypeError(`${this.constructor.name}.${col.name}(${typeof arg}): Invalid signature.`); 
-
-        /** Return this object for set call chaining */
-        return this; 
-      };
-    } 
+    }
 
     /** For 'boolean' type properties */
-    else if ( col.type == 'boolean' ) {
+    else if ( property.type == 'boolean' ) {
       /** Create class method on prototype */
-      parent[obj.name].prototype[col.name] = function (arg) { 
+      parent[obj.className].prototype[property.name] = function (arg) { 
         /** Getter */
         if ( arg === undefined ) 
-          return this[`_${col.name}`]; 
+          return this[`_${property.name}`]; 
 
         /** Setter */
         else if ( typeof arg == 'boolean' ) 
-          this[`_${col.name}`] = arg; 
+          this[`_${property.name}`] = arg; 
 
         /** Handle type errors */
         else 
-          throw new TypeError(`${this.constructor.name}.${col.name}(${typeof arg}): Invalid signature.`); 
+          throw new TypeError(`${this.constructor.name}.${property.name}(${typeof arg}): Invalid signature.`); 
 
         /** Return this object for set call chaining */
         return this; 
@@ -128,20 +107,20 @@ module.exports = (obj) => {
     }
     
     /** For 'string' type properties */
-    else if ( col.type == 'string' ) {
+    else if ( property.type == 'string' ) {
       /** Create class method on prototype */
-      parent[obj.name].prototype[col.name] = function (arg) { 
+      parent[obj.className].prototype[property.name] = function (arg) { 
         /** Getter */
         if ( arg === undefined ) 
-          return this[`_${col.name}`]; 
+          return this[`_${property.name}`]; 
 
         /** Setter */
         else if ( typeof arg == 'string' ) 
-          this[`_${col.name}`] = arg; 
+          this[`_${property.name}`] = arg; 
 
         /** Handle type errors */
         else 
-          throw new TypeError(`${this.constructor.name}.${col.name}(${typeof arg}): Invalid signature.`); 
+          throw new TypeError(`${this.constructor.name}.${property.name}(${typeof arg}): Invalid signature.`); 
 
         /** Return this object for set call chaining */
         return this; 
@@ -149,20 +128,20 @@ module.exports = (obj) => {
     } 
 
     /** For 'Array' type properties */
-    else if ( col.type == 'Array' ) {
+    else if ( property.type == 'Array' ) {
       /** Create class method on prototype */
-      parent[obj.name].prototype[col.name] = function (arg) { 
+      parent[obj.className].prototype[property.name] = function (arg) { 
         /** Getter */
         if ( arg === undefined ) 
-          return this[`_${col.name}`]; 
+          return this[`_${property.name}`]; 
 
         /** Setter */
-        else if ( typeof arg == 'object' && arg.constructor.name == col.type )
-          this[`_${col.name}`] = arg; 
+        else if ( typeof arg == 'object' && arg.constructor.name == property.type )
+          this[`_${property.name}`] = arg; 
 
         /** Handle type errors */
         else 
-          throw new TypeError(`${this.constructor.name}.${col.name}(${typeof arg}): Invalid signature.`); 
+          throw new TypeError(`${this.constructor.name}.${property.name}(${typeof arg}): Invalid signature.`); 
 
         /** Return this object for set call chaining */
         return this; 
@@ -172,18 +151,18 @@ module.exports = (obj) => {
     /** For all other property types */
     else {
       /** Create class method on prototype */
-      parent[obj.name].prototype[col.name] = function (arg) { 
+      parent[obj.className].prototype[property.name] = function (arg) { 
         /** Getter */
         if ( arg === undefined ) 
-          return this[`_${col.name}`]; 
+          return this[`_${property.name}`]; 
 
         /** Setter */
-        else if ( arg === null || ( typeof arg == 'object' && arg.constructor.name == col.type ) ) 
-          this[`_${col.name}`] = arg; 
+        else if ( arg === null || ( typeof arg == 'object' && arg.constructor.name == property.type ) ) 
+          this[`_${property.name}`] = arg; 
 
         /** Handle type errors */
         else 
-          throw new TypeError(`${this.constructor.name}.${col.name}(${typeof arg}): Invalid signature.`); 
+          throw new TypeError(`${this.constructor.name}.${property.name}(${typeof arg}): Invalid signature.`); 
 
         /** Return this object for set call chaining */
         return this; 
@@ -195,5 +174,5 @@ module.exports = (obj) => {
    * Because we're creating this object dynamically, we need to manually give it a name 
    * attribute so we can identify it by its type when we want to.
    */
-  Object.defineProperty(parent[obj.name], 'name', { value: obj.name });
+  Object.defineProperty(parent[obj.className], 'name', { value: obj.className });
 }
