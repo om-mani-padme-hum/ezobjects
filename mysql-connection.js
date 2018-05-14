@@ -2,8 +2,7 @@
 const mysql = require('mysql');
 
 /**
- * @class core.MySQLConnection
- * @added v1.1.5
+ * @class MySQLConnection
  * @author Rich Lowe
  * @copyright 2018 Rich Lowe
  * @description Class for establishing and querying MySQL connections.
@@ -11,7 +10,6 @@ const mysql = require('mysql');
 class MySQLConnection {
   /**
    * @signature new MySQLConnection([data])
-   * @added v1.1.5
    * @param config Object
    * @returns MySQLConnection
    * @description Returns a new [MySQLConnection] instance and initializes using `config`, if provided, otherwise 
@@ -25,7 +23,6 @@ class MySQLConnection {
   
   /**
    * @signature abort()
-   * @added v1.1.5
    * @returns Promise
    * @description Abort the current SQL transaction, returning a [Promise] that resolves when finished.
    */
@@ -46,7 +43,6 @@ class MySQLConnection {
   
   /**
    * @signature begin()
-   * @added v1.1.5
    * @returns Promise
    * @description Begins an SQL transaction, returning a [Promise] that resolves when finished or rejects
    * on error.
@@ -79,7 +75,6 @@ class MySQLConnection {
   
   /**
    * @signature commit()
-   * @added v1.1.5
    * @returns Promise
    * @description Commits an SQL transaction, returning a [Promise] that resolves when finished or rejects
    * on error.  Rejected commits have their transactions automatically rolled back.
@@ -111,12 +106,10 @@ class MySQLConnection {
   
   /**
    * @signature config()
-   * @added v1.1.5
    * @returns Object
    * @description Returns the configuration settings for this database connection.
    *
    * @signature config(settings)
-   * @added v1.1.5
    * @param settings Object
    * @throws TypeError if `settings` is not a valid [Object]
    * @returns this
@@ -141,12 +134,10 @@ class MySQLConnection {
   
   /**
    * @signature conn()
-   * @added v1.1.5
    * @returns mysql.Connection
    * @description Returns the database connection object.
    *
    * @signature conn(connection)
-   * @added v1.1.5
    * @param connection mysql.Connection
    * @throws TypeError if `connection` is not a valid [mysql.Connection]
    * @returns this
@@ -171,7 +162,6 @@ class MySQLConnection {
   
   /**
    * @signature connect()
-   * @added v1.1.5
    * @returns Promise
    * @description Connects to the MySQL database, returning a [Promise] that resolves when finished or rejects on error.
    */
@@ -204,12 +194,10 @@ class MySQLConnection {
   
   /**
    * @signature inTransaction()
-   * @added v1.1.5
    * @returns boolean
    * @description Returns a boolean indicating whether the database connection is in the middle of a transaction.
    *
    * @signature inTransaction(flag)
-   * @added v1.1.5
    * @param flag boolean
    * @throws TypeError if `flag` is not a valid [boolean]
    * @returns this
@@ -234,7 +222,6 @@ class MySQLConnection {
   
   /**
    * @signature query(query, params)
-   * @added v1.1.5
    * @param query string Valid MySQL query
    * @param params Array Ordered array with values matching the parameters marked by '?' in the `query`
    * @returns Promise
@@ -253,7 +240,6 @@ class MySQLConnection {
   
   /**
    * @signature execute(query, params)
-   * @added v1.1.5
    * @param query string Valid MySQL query
    * @param params Array Ordered array with values matching the parameters marked by '?' int he `query`
    * @returns Promise
@@ -295,7 +281,6 @@ class MySQLConnection {
   
   /**
    * @signature close()
-   * @added v1.1.5
    * @description Asynchronously closes the database connection, if connected.
    */
   close() {

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node example.js",
-    "test": "eslint example.js index.js"
+    "test": "eslint example.js example-mysql.js index.js mysql-connection.js"
   },
   "repository": {
     "type": "git",

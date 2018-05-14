@@ -1,5 +1,4 @@
 const ezobjects = require('./index');
-const ezobjectsMySQL = require('./ezobjects-mysql');
 const mysqlConnection = require('./mysql-connection');
 
 const db = new mysqlConnection.MySQLConnection({
@@ -37,8 +36,8 @@ const configPerson = {
 
 (async () => {
   try {
-    await ezobjectsMySQL.createTable(db, configPerson);
-    ezobjectsMySQL.createObject(configPerson);
+    await ezobjects.createTable(db, configPerson);
+    ezobjects.createObject(configPerson);
 
     const person = new Person({
       firstName: 'Rich',
