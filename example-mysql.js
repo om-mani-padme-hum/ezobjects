@@ -1,17 +1,17 @@
+/** Require external modules */
+const fs = require('fs');
+const moment = require('moment');
+
+/** Require internal modules */
 const ezobjects = require('./index');
 const mysqlConnection = require('./mysql-connection');
 
-const db = new mysqlConnection.MySQLConnection({
-  host: 'localhost',
-  user: 'ezobjects',
-  password: 'password',
-  database: 'ezobjects'
-});
+const db = new mysqlConnection.MySQLConnection(JSON.parse(fs.readFileSync('mysql-config.json')));
 
 const configDatabaseRecord = {
   className: 'DatabaseRecord',
   properties: [
-    { name: 'id', type: 'number', mysqlType: 'int', autoIncrement: true, primary: true }
+    { name: 'id', type: 'number', mysqlType: 'int', autoIncrement: true, primary: true, setTransform: x => parseInt(x) }
   ]
 };
 
@@ -25,9 +25,9 @@ const configPerson = {
   properties: [
     { name: 'firstName', type: 'string', mysqlType: 'varchar', length: 20 },
     { name: 'lastName', type: 'string', mysqlType: 'varchar', length: 20 },
-    { name: 'checkingBalance', type: 'number', mysqlType: 'double' },
-    { name: 'permissions', type: 'string', mysqlType: 'text' },
-    { name: 'favoriteDay', type: 'Date', mysqlType: 'datetime' }
+    { name: 'checkingBalance', type: 'number', mysqlType: 'double', setTransform: x => parseFloat(x) },
+    { name: 'permissions', type: 'Array', mysqlType: 'text', saveTransform: x => x.join(','), loadTransform: x => x.split(',') },
+    { name: 'favoriteDay', type: 'Date', mysqlType: 'datetime', saveTransform: x => moment(x).format('Y-MM-DD HH:mm:ss'), loadTransform: x => new Date(x) }
   ],
   indexes: [
     { name: 'lastName', type: 'BTREE', columns: [ 'lastName' ] }
@@ -43,7 +43,7 @@ const configPerson = {
       firstName: 'Rich',
       lastName: 'Lowe',
       checkingBalance: 4.32,
-      permissions: 'asdf',
+      permissions: [1, 3, 4],
       favoriteDay: new Date('01-01-2018')
     });
 
