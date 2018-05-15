@@ -1,3 +1,5 @@
+const mysqlConnection = require('./mysql-connection');
+
 /**
  * @module ezobjects
  * @copyright 2018 Rich Lowe
@@ -637,3 +639,5 @@ module.exports.createObject = (obj) => {
   Object.defineProperty(parent[obj.className], 'name', { value: obj.className });
 }
 
+/** Re-export MySQLConnection */
+module.exports.MySQLConnection = mysqlConnection.MySQLConnection;

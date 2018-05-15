@@ -4,10 +4,9 @@ const moment = require('moment');
 
 /** Require internal modules */
 const ezobjects = require('./index');
-const mysqlConnection = require('./mysql-connection');
 
 /** Connect to the MySQL database using login info stored externally */
-const db = new mysqlConnection.MySQLConnection(JSON.parse(fs.readFileSync('mysql-config.json')));
+const db = new ezobjects.MySQLConnection(JSON.parse(fs.readFileSync('mysql-config.json')));
 
 /** Configure a new EZ Object called DatabaseRecord with one 'id' property */
 const configDatabaseRecord = {
@@ -67,7 +66,7 @@ const configPerson = {
     console.log(person);
 
     /** Create a second instance of the Person object */
-    const person2 = new Person();.
+    const person2 = new Person();
 
     /** Await loading of database record with ID 2 into person2 */
     await person2.load(db, 2);
