@@ -34,6 +34,7 @@ const ezobjects = require('ezobjects');
 const fs = require('fs');
 const moment = require('moment');
 
+
 /** Load external MySQL configuration */
 const config = JSON.parse(fs.readFileSync('mysql-config.json'));
 
@@ -69,15 +70,44 @@ const configPerson = {
   ]
 };
 
+/** Create the Person object */
+ezobjects.createObject(configPerson);
+
+/** Create new person, initializing with object passed to constructor */
 const person = new Person({
   firstName: 'Rich',
   lastName: 'Lowe',
   checkingBalance: 4.32,
   permissions: [1, 3, 5],
   favoriteDay: new Date('01-01-2018')
-})
+});
 
-person.insert(db);
+/** Self-executing async wrapper so we can await results */
+(async () => {
+  /** Create table if it doesn't already exist */
+  await ezobjects.createTable(db, configPerson);
+  
+  /** Insert person into the database */
+  await person.insert(db);
+  
+  /** Log person (should have automatically incremented ID now) */
+  console.log(person);
+  
+  /** Close database connection */
+  db.close();
+})();
+```
+
+### Expected Output
+
+```
+Person {
+  _id: 8,
+  _firstName: 'Rich',
+  _lastName: 'Lowe',
+  _checkingBalance: 4.32,
+  _permissions: [ 1, 3, 5 ],
+  _favoriteDay: 2018-01-01T06:00:00.000Z }
 ```
 
 In this snippet, we've created two classes, DatabaseRecord and Person.  Person extends DatabaseRecord and is also associated with
@@ -95,9 +125,9 @@ are saved or loaded from the database.
 
 The module has three exports:
 
-* ezobjects.createTable(obj) - Creates a MySQL table corresponding to the configuration outlined in `obj`, if it doesn't already exist
+* ezobjects.createTable(db, obj) - Creates a MySQL table corresponding to the configuration outlined in `obj`, if it doesn't already exist
 * ezobjects.createObject(obj) - Creates an ES6 class with constructor/init/getters/setters, and insert/load/update if `tableName` is configured
-* ezobjects.MySQLConnection - A MySQL database connection wrapper that uses the standard mysql package and wraps it with async/await and transaction helpers
+* ezobjects.MySQLConnection(config) - A MySQL database connection wrapper that uses the standard mysql package and wraps it with async/await and transaction helpers
 
 An object configuration can have the following:
 
