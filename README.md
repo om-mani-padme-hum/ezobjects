@@ -161,6 +161,104 @@ insert the object properties as a new MySQL record, load a MySQL record into the
 with the object properties.  Transforms can be used to adjust the values properties when they are get or set in the object, or when they
 are saved or loaded from the database.
 
+## Various Uses of EZ Objects
+
+### Constructor Default
+
+```javascript
+const a = new Person();
+
+console.log(a);
+```
+
+### Expected Output
+
+```
+Person {
+  _id: 0,
+  _firstName: '',
+  _lastName: '',
+  _checkingBalance: 0,
+  _permissions: [],
+  _favoriteDay: null }
+```
+
+### Using Initializer Object
+
+```javascript
+const b = new Person({
+  id: 1,
+  firstName: 'Rich',
+  lastName: 'Lowe',
+  checkingBalance: 4.32,
+  permissions: [1, 3, 5],
+  favoriteDay: new Date('01-01-2018')
+});
+
+console.log(b);
+```
+
+### Expected Output
+
+```
+Person {
+  _id: 1,
+  _firstName: 'Rich',
+  _lastName: 'Lowe',
+  _checkingBalance: 4.32,
+  _permissions: [ 1, 4, 5 ],
+  _favoriteDay: 2018-01-01T06:00:00.000Z }
+```
+
+### Using Auto-generated Setters
+
+```javascript
+const c = new Person();
+
+c.id(2);
+c.firstName('Bert');
+c.lastName('Reynolds');
+c.checkingBalance(91425518.32);
+c.permissions([1, 4]);
+c.favoriteDay(new Date('06-01-2017'));
+
+console.log(c);
+```
+
+### Expected Output
+
+```
+Person {
+  _id: 2,
+  _firstName: 'Bert',
+  _lastName: 'Reynolds',
+  _checkingBalance: 91425518.32,
+  _permissions: [ 1, 4 ],
+  _favoriteDay: 2017-06-01T05:00:00.000Z }
+```
+
+### Using Auto-generated Getters
+
+```javascript
+console.log(`ID: ${c.id()}`);
+console.log(`First Name: ${c.firstName()}`);
+console.log(`Last Name: ${c.lastName()}`);
+console.log(`Checking Balance: $${c.checkingBalance()}`);
+console.log(`Permissions: ${c.permissions().join(`, `)}`);
+console.log(`Favorite Day: ${c.favoriteDay().toString()}`);
+```
+
+### Expected Output
+
+```
+ID: 2
+First Name: Bert
+Last Name: Reynolds
+Checking Balance: $91425518.32
+Permissions: 1, 4
+Favorite Day: Thu Jun 01 2017 00:00:00 GMT-0500 (CDT)
+```
+
 ## Module Specification
 
 ### The module has three exports:
@@ -177,7 +275,7 @@ are saved or loaded from the database.
 ### An object configuration can have the following:
 
 * tableName - string - (optional) Provide if object should be linked with MySQL database table
-* classname - string - (required) Name of the class
+* className - string - (required) Name of the class
 * extends - object - (optional) The object that the new object should be extended from [required to extend object]
 * extendsConfig - object - (optional) The EZ Object configuration for the object that is being extended from [required to extend object]
 * properties - Array - (required) An array of properties that the object (and MySQL table, if applicable) should contain
