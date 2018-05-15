@@ -1,4 +1,4 @@
-# EZ Objects v2.0.1
+# EZ Objects v2.0.2
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects.  All you have to do is create simple configurations for each of your objects and then call
@@ -9,7 +9,10 @@ the library function(s).  Let's start by showing a basic example:
 ```javascript
 const ezobjects = require('ezobjects');
 
-/** Create a customized object on the global (node) or window (browser) namespace */
+/** 
+ * Create a customized object on the global (node) or window (browser) 
+ * namespace.
+ */
 ezobjects.createObject({
   className: 'DatabaseRecord',
   properties: [
@@ -38,12 +41,15 @@ const moment = require('moment');
 /** Load external MySQL configuration */
 const configMySQL = JSON.parse(fs.readFileSync('mysql-config.json'));
 
-/** Connect to the MySQL database using our MySQL module async/await wrapper */
+/** 
+ * Connect to the MySQL database using our MySQL module async/await 
+ * wrapper.
+ */
 const db = new ezobjects.MySQLConnection(configMySQL);
 
 /** 
- * Configure a new EZ Object called DatabaseRecord with one 'id' property that 
- * contains extended MySQL configuration settings.
+ * Configure a new EZ Object called DatabaseRecord with one 'id' 
+ * property that contains extended MySQL configuration settings.
  */
 const configDatabaseRecord = {
   className: 'DatabaseRecord',
@@ -267,7 +273,7 @@ Favorite Day: Thu Jun 01 2017 00:00:00 GMT-0500 (CDT)
 * Creates a MySQL table corresponding to the configuration outlined in `obj`, if it doesn't already exist
 
 **ezobjects.createObject(obj)**
-* Creates an ES6 class corresponding to the configuration outlined in `obj`, with constructor/init/getters/setters, and insert/load/update if `tableName` is configured
+* Creates an ES6 class corresponding to the configuration outlined in `obj`, with constructor, initializer, getters, setters, and insert/load/update if `tableName` is configured
 
 **ezobjects.MySQLConnection(config)**
 * A MySQL database connection wrapper that uses the standard mysql package and wraps it with async/await and transaction helpers
