@@ -41,29 +41,69 @@ const config = JSON.parse(fs.readFileSync('mysql-config.json'));
 /** Connect to the MySQL database using our MySQL module async/await wrapper */
 const db = new ezobjects.MySQLConnection(config);
 
-/** Configure a new EZ Object called DatabaseRecord with one 'id' property that contains extended MySQL configuration settings */
+/** 
+ * Configure a new EZ Object called DatabaseRecord with one 'id' property that 
+ * contains extended MySQL configuration settings.
+ */
 const configDatabaseRecord = {
   className: 'DatabaseRecord',
   properties: [
-    { name: 'id', type: 'number', mysqlType: 'int', autoIncrement: true, primary: true, setTransform: x => parseInt(x) }
+    { 
+      name: 'id', 
+      type: 'number', 
+      mysqlType: 'int', 
+      autoIncrement: true, 
+      primary: true, 
+      setTransform: x => parseInt(x) 
+    }
   ]
 };
 
 /** Create the DatabaseRecord object */
 ezobjects.createObject(configDatabaseRecord);
 
-/** Configure a new EZ Object called Person that extends from the DatabaseRecord object and adds several additional properties and a MySQL index */
+/** 
+ * Configure a new EZ Object called Person that extends from the DatabaseRecord 
+ * object and adds several additional properties and a MySQL index.
+ */
 const configPerson = {
   tableName: 'people',
   className: 'Person',
   extends: DatabaseRecord,
   extendsConfig: configDatabaseRecord,
   properties: [
-    { name: 'firstName', type: 'string', mysqlType: 'varchar', length: 20 },
-    { name: 'lastName', type: 'string', mysqlType: 'varchar', length: 20 },
-    { name: 'checkingBalance', type: 'number', mysqlType: 'double', setTransform: x => parseFloat(x) },
-    { name: 'permissions', type: 'Array', mysqlType: 'text', saveTransform: x => x.join(','), loadTransform: x => x.split(',') },
-    { name: 'favoriteDay', type: 'Date', mysqlType: 'datetime', saveTransform: x => moment(x).format('Y-MM-DD HH:mm:ss'), loadTransform: x => new Date(x) }
+    { 
+      name: 'firstName', 
+      type: 'string', 
+      mysqlType: 'varchar', 
+      length: 20 
+    },
+    { 
+      name: 'lastName', 
+      type: 'string', 
+      mysqlType: 'varchar', 
+      length: 20 
+    },
+    { 
+      name: 'checkingBalance', 
+      type: 'number', 
+      mysqlType: 'double', 
+      setTransform: x => parseFloat(x) 
+    },
+    { 
+      name: 'permissions', 
+      type: 'Array', 
+      mysqlType: 'text', 
+      saveTransform: x => x.join(','), 
+      loadTransform: x => x.split(',') 
+    },
+    { 
+      name: 'favoriteDay', 
+      type: 'Date', 
+      mysqlType: 'datetime', 
+      saveTransform: x => moment(x).format('Y-MM-DD HH:mm:ss'), 
+      loadTransform: x => new Date(x) 
+    }
   ],
   indexes: [
     { name: 'lastName', type: 'BTREE', columns: [ 'lastName' ] }
@@ -165,7 +205,7 @@ are saved or loaded from the database.
 * saveTransform - function - (optional) Function that transforms and returns the property value prior to saving in the database
 * loadTransform - function - (optional) Function that transforms and returns the property value after loading from the database
 
-#### An index configuration can have the following (for MySQL table association only):
+### An index configuration can have the following (for MySQL table association only):
 
 * name - string - (required) Name of the index, can be arbitrary, but must be unique and not PRIMARY
 * type - string - (optional) Index type, can be BTREE or HASH, defaults to BTREE
