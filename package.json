@@ -1,6 +1,6 @@
 {
   "name": "ezobjects",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Easy dynamic object generation with strict typing and set chaining",
   "main": "index.js",
   "scripts": {
