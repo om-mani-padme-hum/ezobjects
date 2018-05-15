@@ -267,7 +267,7 @@ console.log(`Favorite Day: ${c.favoriteDay().toString()}`);
 
 ### Expected Output
 
-```
+``` 
 ID: 2
 First Name: Bert
 Last Name: Reynolds

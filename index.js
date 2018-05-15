@@ -11,7 +11,7 @@ const mysqlConnection = require('./mysql-connection');
  *
  * @signature ezobjects.createTable(db, obj)
  * @param db MySQLConnection
- * @param obj Object
+ * @param obj Object Configuration object
  * @description A function for automatically generating a MySQL table, if it doesn't already
  * exist, based on the values in the provided configuration object.
  */
@@ -543,9 +543,9 @@ module.exports.createObject = (obj) => {
         /** If the first argument is a MySQL RowDataPacket, load from row data */
         else if ( typeof arg1 == 'object' && ( arg1.constructor.name == 'RowDataPacket' || arg1.constructor.name == 'Array' ) ) {
           /** Loop through each property */
-          obj.properties.forEach((property) => {
+          Object.keys(arg1).forEach((key) => {
             /** Append property in object */
-            this[property.name](arg1[property.name]);
+            this[key](arg1[key]);
           });
         } 
         
