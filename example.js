@@ -1,10 +1,10 @@
 const ezobjects = require('./index');
 
 /** Create a customized object on the global (node) or window (browser) namespace */
-ezobjects({
-  name: 'DatabaseRecord',
+ezobjects.createObject({
+  className: 'DatabaseRecord',
   properties: [
-    { name: 'id', type: 'int' }
+    { name: 'id', type: 'number', setTransform: x => parseInt(x) }
   ]
 });
 
@@ -14,13 +14,13 @@ const a = new DatabaseRecord();
 console.log(a);
 
 /** Create another customized object that extends the first one */
-ezobjects({
-  name: 'Person',
+ezobjects.createObject({
+  className: 'Person',
   extends: DatabaseRecord,
   properties: [
     { name: 'firstName', type: 'string' },
     { name: 'lastName', type: 'string' },
-    { name: 'checkingBalance', type: 'float' },
+    { name: 'checkingBalance', type: 'number', setTransform: x => parseFloat(x) },
     { name: 'permissions', type: 'Array' },
     { name: 'favoriteDay', type: 'Date' }
   ]

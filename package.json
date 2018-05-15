@@ -4,8 +4,8 @@
   "description": "Easy dynamic object generation with strict typing and set chaining",
   "main": "index.js",
   "scripts": {
-    "start": "node example.js",
-    "test": "eslint example.js index.js"
+    "start": "node example-mysql.js",
+    "test": "eslint example.js example-mysql.js index.js mysql-connection.js"
   },
   "repository": {
     "type": "git",
@@ -21,5 +21,9 @@
     "creation"
   ],
   "author": "Rich Lowe",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "moment": "^2.22.1",
+    "mysql": "^2.15.0"
+  }
 }
