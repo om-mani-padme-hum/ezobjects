@@ -125,9 +125,14 @@ are saved or loaded from the database.
 
 The module has three exports:
 
-* ezobjects.createTable(db, obj) - Creates a MySQL table corresponding to the configuration outlined in `obj`, if it doesn't already exist
-* ezobjects.createObject(obj) - Creates an ES6 class with constructor/init/getters/setters, and insert/load/update if `tableName` is configured
-* ezobjects.MySQLConnection(config) - A MySQL database connection wrapper that uses the standard mysql package and wraps it with async/await and transaction helpers
+ezobjects.createTable(db, obj)
+* Creates a MySQL table corresponding to the configuration outlined in `obj`, if it doesn't already exist
+
+ezobjects.createObject(obj)
+* Creates an ES6 class corresponding to the configuration outlined in `obj`, with constructor/init/getters/setters, and insert/load/update if `tableName` is configured
+
+ezobjects.MySQLConnection(config)
+* A MySQL database connection wrapper that uses the standard mysql package and wraps it with async/await and transaction helpers
 
 An object configuration can have the following:
 
