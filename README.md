@@ -69,8 +69,9 @@ const configDatabaseRecord = {
 ezobjects.createObject(configDatabaseRecord);
 
 /** 
- * Configure a new EZ Object called Person that extends from the DatabaseRecord 
- * object and adds several additional properties and a MySQL index.
+ * Configure a new EZ Object called Person that extends from the 
+ * DatabaseRecord object and adds several additional properties and 
+ * a MySQL index.
  */
 const configPerson = {
   tableName: 'people',
