@@ -123,7 +123,7 @@ are saved or loaded from the database.
 
 ## Module Specification
 
-#### The module has three exports:
+### The module has three exports:
 
 **ezobjects.createTable(db, obj)**
 * Creates a MySQL table corresponding to the configuration outlined in `obj`, if it doesn't already exist
@@ -134,7 +134,7 @@ are saved or loaded from the database.
 **ezobjects.MySQLConnection(config)**
 * A MySQL database connection wrapper that uses the standard mysql package and wraps it with async/await and transaction helpers
 
-#### An object configuration can have the following:
+### An object configuration can have the following:
 
 * tableName - string - (optional) Provide if object should be linked with MySQL database table
 * classname - string - (required) Name of the class
@@ -143,7 +143,7 @@ are saved or loaded from the database.
 * properties - Array - (required) An array of properties that the object (and MySQL table, if applicable) should contain
 * indexes - Array - (optional) An array of indexes that should be created in the MySQL table, if applicable
 
-#### A property configuration can have the following:
+### A property configuration can have the following:
 
 * name - string - (required) Name of the property, must conform to both JavaScript and MySQL rules
 * type - string - (required) JavaScript data type for the property
