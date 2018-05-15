@@ -25,5 +25,8 @@
   "dependencies": {
     "moment": "^2.22.1",
     "mysql": "^2.15.0"
+  },
+  "devDependencies": {
+    "docket-parser": "^0.6.6"
   }
 }

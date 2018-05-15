@@ -9,11 +9,11 @@ const mysqlConnection = require('./mysql-connection');
  * update() methods in addition to the constructor, initializer, and getters/setters for
  * all configured properties.
  *
- * @signature createTable(db, obj)
- * @module ezobjects
+ * @signature ezobjects.createTable(db, obj)
  * @param db MySQLConnection
  * @param obj Object
- * @descrtiption Create a MySQL table with the specifications outlined in `obj`, if it doesn't already exist.
+ * @description A function for automatically generating a MySQL table, if it doesn't already
+ * exist, based on the values in the provided configuration object.
  */
 module.exports.createTable = async (db, obj) => {
   /** Create some helpful arrays for identifying MySQL types that have certain features */
@@ -191,10 +191,10 @@ module.exports.createTable = async (db, obj) => {
 };
 
 /**
- * @signature createObject(obj)
- * @module ezobjects
+ * @signature ezobjects.createObject(obj)
  * @param obj Object Configuration object
- * @description Easy, automatic object creation from simple templates with strict typing
+ * @description A function for automatically generating a class object based on
+ * the values in the provided configuration object.
  */
 module.exports.createObject = (obj) => {
   /** Create default transform function that doesn't change the input */

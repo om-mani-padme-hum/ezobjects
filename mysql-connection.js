@@ -2,7 +2,7 @@
 const mysql = require('mysql');
 
 /**
- * @class MySQLConnection
+ * @class ezobjects.MySQLConnection
  * @author Rich Lowe
  * @copyright 2018 Rich Lowe
  * @description Class for establishing and querying MySQL connections.
