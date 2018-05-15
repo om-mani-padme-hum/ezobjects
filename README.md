@@ -36,10 +36,10 @@ const moment = require('moment');
 
 
 /** Load external MySQL configuration */
-const config = JSON.parse(fs.readFileSync('mysql-config.json'));
+const configMySQL = JSON.parse(fs.readFileSync('mysql-config.json'));
 
 /** Connect to the MySQL database using our MySQL module async/await wrapper */
-const db = new ezobjects.MySQLConnection(config);
+const db = new ezobjects.MySQLConnection(configMySQL);
 
 /** 
  * Configure a new EZ Object called DatabaseRecord with one 'id' property that 
