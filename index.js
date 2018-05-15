@@ -542,11 +542,22 @@ module.exports.createObject = (obj) => {
         
         /** If the first argument is a MySQL RowDataPacket, load from row data */
         else if ( typeof arg1 == 'object' && ( arg1.constructor.name == 'RowDataPacket' || arg1.constructor.name == 'Array' ) ) {
-          /** Loop through each property */
-          Object.keys(arg1).forEach((key) => {
-            /** Append property in object */
-            this[key](arg1[key]);
-          });
+          /** Create helper method for recursively loading property values into object */
+          const loadProperties = (obj) => {
+            /** If this object extends another, recursively add extended property values into objecct */
+            if ( obj.extendsConfig )
+              loadProperties(obj.extendsConfig);
+
+            /** Loop through each property */
+            obj.properties.forEach((property) => {
+              /** Append property in object */
+              if ( typeof arg1[property.name] !== 'undefined' )
+                this[property.name](property.loadTransform(arg1[property.name]));
+            });
+          };
+
+          /** Store loaded record properties into object */
+          loadProperties(obj);
         } 
         
         /** Otherwise throw TypeError */
