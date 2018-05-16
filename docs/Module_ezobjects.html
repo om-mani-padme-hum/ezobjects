@@ -18,7 +18,7 @@
     <div id='top' class='container'>
       <div class='row'>
         <div class='col'>
-          <h1 class='display-4 mb-0'>EZ Objects v2.3.0</h1>
+          <h1 class='display-4 mb-0'>EZ Objects v2.3.1</h1>
         </div>
       </div>
       <hr>
@@ -50,6 +50,8 @@
                 <li class='py-1'><a class='text-success' href='#s-MySQLConnection-execute'>mySQLConnection.execute(query, params)</a></li>
                 <li class='py-1'><a class='text-success' href='#s-MySQLConnection-close'>mySQLConnection.close()</a></li>
               </ul>
+                <li class='py-1'><a class='text-success' href='#s-ezobjects-createTable'>ezobjects.createTable</a></li>
+                <li class='py-1'><a class='text-success' href='#s-ezobjects-createObject'>ezobjects.createObject</a></li>
             </ul>
 
           </ul>
@@ -86,7 +88,7 @@
         
         <div class='row'>
           <div class='col'>
-            <p>Easy automatic class creation using simple configuration objects.  Capable of automatically creating a matching MySQL table and generating insert(), load(), and update() methods in addition to the constructor, initializer, and getters/setters for all configured properties.</p>
+            <p>Easy automatic class creation using simple configuration objects.  Capable of automatically creating a matching MySQL table and generating delete(), insert(), load(),  and update() methods in addition to the constructor, initializer, and getters/setters for all configured properties.</p>
           </div>
         </div>
         
@@ -624,6 +626,76 @@
         <div class='row'>
           <div class='col'>
             <p>Asynchronously closes the database connection, if connected.</p>
+          </div>
+        </div>
+        
+      </div>
+
+      <div id='s-ezobjects-createTable' class='row'>
+        <div class='col'>
+          <h4 class='mt-2 pl-3'>ezobjects.createTable(db, obj) <small>[<a class='text-success' href='#top'>top</a>]</small></h4>
+        </div>
+      </div>
+      <div class='pl-4'>
+        
+        
+        
+        
+        
+        
+        
+        <div class='row'>
+          <div class='col'>
+            <ul>
+        
+              <li class='py-1'><code class='text-dark p-1'>db</code> &lt;<a class='text-success' href='#'>MySQLConnection</a>&gt; </li>
+        
+              <li class='py-1'><code class='text-dark p-1'>obj</code> &lt;<a class='text-success' href='#'>Object</a>&gt; Configuration object</li>
+        
+        
+        
+            </ul>
+          </div>
+        </div>
+        
+        
+        <div class='row'>
+          <div class='col'>
+            <p>A function for automatically generating a MySQL table, if it doesn't already exist, based on the values in the provided configuration object.</p>
+          </div>
+        </div>
+        
+      </div>
+
+      <div id='s-ezobjects-createObject' class='row'>
+        <div class='col'>
+          <h4 class='mt-2 pl-3'>ezobjects.createObject(obj) <small>[<a class='text-success' href='#top'>top</a>]</small></h4>
+        </div>
+      </div>
+      <div class='pl-4'>
+        
+        
+        
+        
+        
+        
+        
+        <div class='row'>
+          <div class='col'>
+            <ul>
+        
+              <li class='py-1'><code class='text-dark p-1'>obj</code> &lt;<a class='text-success' href='#'>Object</a>&gt; Configuration object</li>
+        
+        
+        
+            </ul>
+          </div>
+        </div>
+        
+        
+        <div class='row'>
+          <div class='col'>
+            <p>A function for automatically generating a class object based on the values in the provided configuration object.</p>
           </div>
         </div>
         

@@ -27,6 +27,6 @@
     "mysql": "^2.15.0"
   },
   "devDependencies": {
-    "docket-parser": "^0.6.6"
+    "docket-parser": "^0.6.7"
   }
 }

@@ -5,8 +5,8 @@ const mysqlConnection = require('./mysql-connection');
  * @copyright 2018 Rich Lowe
  * @license MIT
  * @description Easy automatic class creation using simple configuration objects.  Capable
- * of automatically creating a matching MySQL table and generating insert(), load(), and
- * update() methods in addition to the constructor, initializer, and getters/setters for
+ * of automatically creating a matching MySQL table and generating delete(), insert(), load(), 
+ * and update() methods in addition to the constructor, initializer, and getters/setters for
  * all configured properties.
  *
  * @signature ezobjects.createTable(db, obj)
