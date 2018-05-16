@@ -85,8 +85,8 @@ module.exports.createTable = async (db, obj) => {
         createQuery += ` NOT NULL`;
 
       /** Properties with DEFAULT */
-      if ( property.default )
-        createQuery += ` DEFAULT ${property.default}`;
+      if ( property.mysqlDefault )
+        createQuery += ` DEFAULT ${property.mysqlDefault}`;
 
       /** Properties with AUTO_INCREMENT */
       if ( property.autoIncrement )

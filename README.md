@@ -1,4 +1,4 @@
-# EZ Objects v2.2.1
+# EZ Objects v2.3.0
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects.  All you have to do is create simple configurations for each of your objects and then call
@@ -39,7 +39,6 @@ const moment = require('moment');
 
 /** 
  * Load external MySQL configuration which uses the following JSON format:
- *
  * {
  *   "host"          : "localhost",
  *   "user"          : "ezobjects",
@@ -311,7 +310,8 @@ Favorite Day: Thu Jun 01 2017 00:00:00 GMT-0500 (CDT)
 * primary - boolean - (optional) Indicates the property is a PRIMARY KEY in the MySQL table [required for MySQL table association on at least one property in the table]
 * unique - boolean - (optional) Indicates the property is a UNIQUE KEY in the MySQL table
 * null - boolean - (optional) Indicates the property can be NULL [default is properties must be NOT NULL]
-* default - mixed - (optional) Sets the default value for the property in the MySQL table, assuming its of the correct type
+* default - mixed - (optional) Sets the default value for the property in the class object
+* mysqlDefault - mixed - (optional) Sets the default value for the property in the MySQL table, assuming its of the correct type
 * unsigned - boolean - (optional) Indicates the property should be unsigned in the MySQL table
 * zerofill - boolean - (optional) Indicates the property should be zero-filled in the MySQL table
 * comment - string - (optional) Indicates the property should note the provided comment in the MySQL table
