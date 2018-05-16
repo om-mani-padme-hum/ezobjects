@@ -388,6 +388,23 @@ module.exports.createObject = (obj) => {
     }
     
     if ( typeof obj.tableName == 'string' ) {
+      /** Create MySQL delete method on prototype */
+      parent[obj.className].prototype.delete = async function (db) { 
+        /** If the argument is a valid database, delete the record */
+        if ( typeof db == 'object' && db.constructor.name == 'MySQLConnection' ) {
+          /** Execute query to delete record from database */
+          await db.query(`DELETE FROM ${obj.tableName} WHERE id = ?`, [this.id()]);
+        } 
+        
+        /** Otherwise throw TypeError */
+        else {
+          throw new TypeError(`${this.constructor.name}.delete(${typeof db}): Invalid signature.`);
+        }
+
+        /** Allow for call chaining */
+        return this;
+      };
+      
       /** Create MySQL insert method on prototype */
       parent[obj.className].prototype.insert = async function (db) { 
         /** If the argument is a valid database, insert record into database and capture ID */
@@ -635,23 +652,6 @@ module.exports.createObject = (obj) => {
         /** Otherwise throw TypeError */
         else {
           throw new TypeError(`${this.constructor.name}.update(${typeof db}): Invalid signature.`);
-        }
-
-        /** Allow for call chaining */
-        return this;
-      };
-      
-      /** Create MySQL delete method on prototype */
-      parent[obj.className].prototype.delete = async function (db) { 
-        /** If the argument is a valid database, update database record */
-        if ( typeof db == 'object' && db.constructor.name == 'MySQLConnection' ) {
-          /** Execute query to update record in database */
-          await db.query(`DELETE FROM ${obj.tableName} WHERE id = ?`, [this.id()]);
-        } 
-        
-        /** Otherwise throw TypeError */
-        else {
-          throw new TypeError(`${this.constructor.name}.delete(${typeof db}): Invalid signature.`);
         }
 
         /** Allow for call chaining */

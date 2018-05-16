@@ -1,4 +1,4 @@
-# EZ Objects v2.2.0
+# EZ Objects v2.2.1
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects.  All you have to do is create simple configurations for each of your objects and then call
@@ -36,7 +36,6 @@ setter and apply parseInt() to it.
 const ezobjects = require('ezobjects');
 const fs = require('fs');
 const moment = require('moment');
-
 
 /** 
  * Load external MySQL configuration which uses the following JSON format:
@@ -161,7 +160,7 @@ const person = new Person({
 
 ```
 Person {
-  _id: 8,
+  _id: 1,
   _firstName: 'Rich',
   _lastName: 'Lowe',
   _checkingBalance: 4.32,
