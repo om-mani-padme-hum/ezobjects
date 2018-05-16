@@ -1,7 +1,7 @@
 {
   "name": "ezobjects",
   "version": "2.3.2",
-  "description": "Easy dynamic object generation with strict typing and set chaining",
+  "description": "Easy dynamic object generation with optional MySQL table linking",
   "main": "index.js",
   "scripts": {
     "start": "node example-mysql.js",
@@ -12,13 +12,18 @@
     "url": "https://github.com/om-mani-padme-hum/ezobjects.git"
   },
   "keywords": [
+    "easy",
+    "automatic",
     "EZ",
     "node",
     "javascript",
     "dynamic",
     "object",
     "class",
-    "creation"
+    "creation",
+    "generation",
+    "mysql",
+    "database"
   ],
   "author": "Rich Lowe",
   "license": "MIT",
