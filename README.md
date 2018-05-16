@@ -1,4 +1,4 @@
-# EZ Objects v2.1.1
+# EZ Objects v2.2.0
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects.  All you have to do is create simple configurations for each of your objects and then call
@@ -39,7 +39,7 @@ const moment = require('moment');
 
 
 /** 
- * Load external MySQL configuration which has the following JSON:
+ * Load external MySQL configuration which uses the following JSON format:
  *
  * {
  *   "host"          : "localhost",
@@ -47,13 +47,15 @@ const moment = require('moment');
  *   "password"      : "myPassword",
  *   "database"      : "ezobjects"
  * }
- * 
  */
 const configMySQL = JSON.parse(fs.readFileSync('mysql-config.json'));
 
 /** 
- * Connect to the MySQL database using our MySQL module async/await 
- * wrapper.
+ * Create a connection object for the MySQL database using our MySQL 
+ * module async/await wrapper.  Currently, using the ezobjects MySQL 
+ * database is the only option, but future versions may seek to expand 
+ * the option to other databases, or at least allow the standard mysql 
+ * module to work.
  */
 const db = new ezobjects.MySQLConnection(configMySQL);
 
@@ -146,10 +148,10 @@ const person = new Person({
   
   /** Insert person into the database */
   await person.insert(db);
-  
+              
   /** Log person (should have automatically incremented ID now) */
   console.log(person);
-  
+
   /** Close database connection */
   db.close();
 })();
@@ -173,10 +175,10 @@ configuration options can be provided, which are outlined in more detail below. 
 for faster searching.  While not required, the moment library is used to help translate date formats between MySQL and JavaScript.
 
 Since the Person class configuration provided a `tableName` property, it will automatically have additional methods created that are
-not present in a basic EZ Object.  The additional methods are insert(db), load(db, id), and update(db).  These methods can be used to
-insert the object properties as a new MySQL record, load a MySQL record into the object properties, or update an existing MySQL record 
-with the object properties.  Transforms can be used to adjust the values properties when they are get or set in the object, or when they
-are saved or loaded from the database.
+not present in a basic EZ Object.  The additional methods are delete(db), insert(db), load(db, id), and update(db).  These methods can 
+be used to delete the MySQL record corresponding to the object, insert the object properties as a new MySQL record, load a MySQL record 
+into the object properties, or update an existing MySQL record using the object properties.  Transforms can be used to validate or
+manipulate the property values when they are get or set in the object, or when they are saved or loaded from the database.
 
 ## Various Uses of EZ Objects
 
@@ -276,6 +278,8 @@ Permissions: 1, 4
 Favorite Day: Thu Jun 01 2017 00:00:00 GMT-0500 (CDT)
 ```
 
+#### See example.js and example-mysql.js for more!
+
 ## Module Specification
 
 ### The module has three exports:
@@ -284,7 +288,7 @@ Favorite Day: Thu Jun 01 2017 00:00:00 GMT-0500 (CDT)
 * Creates a MySQL table corresponding to the configuration outlined in `obj`, if it doesn't already exist
 
 **ezobjects.createObject(obj)**
-* Creates an ES6 class corresponding to the configuration outlined in `obj`, with constructor, initializer, getters, setters, and insert/load/update if `tableName` is configured
+* Creates an ES6 class corresponding to the configuration outlined in `obj`, with constructor, initializer, getters, setters, and also delete, insert, load, and update if `tableName` is configured
 
 **ezobjects.MySQLConnection(config)**
 * A MySQL database connection wrapper that uses the standard mysql package and wraps it with async/await and transaction helpers

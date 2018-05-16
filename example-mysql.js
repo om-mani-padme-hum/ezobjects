@@ -66,19 +66,25 @@ const configPerson = {
     console.log(person);
 
     /** Create a second instance of the Person object */
-    const person2 = new Person();
+    const anotherPerson = new Person();
 
-    /** Await loading of database record with ID 2 into person2 */
-    await person2.load(db, 2);
+    /** Await loading of database record with ID 1 into person2 */
+    await anotherPerson.load(db, 1);
 
     /** Log the current value of person2 */
-    console.log(person2);
+    console.log(anotherPerson);
 
     /** Set person2's checking balance to 50.74 */
-    person2.checkingBalance(50.74);
+    anotherPerson.checkingBalance(50.74);
 
     /** Await update of person2 in database */
-    await person2.update(db);
+    await anotherPerson.update(db);
+    
+    /** Delete the person at ID # 1 */
+    await anotherPerson.delete(db);
+    
+    /** Try to load person at ID # 1 (will throw error) */
+    await anotherPerson.load(db, 1);
   } catch ( err ) {
     /** Log any caught errors */
     console.log(err.message);
