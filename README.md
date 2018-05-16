@@ -1,4 +1,4 @@
-# EZ Objects v2.4.1
+# EZ Objects v2.4.2
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects.  All you have to do is create simple configurations for each of your objects and then call
@@ -63,9 +63,9 @@ ezobjects.createObject({
  * type for myProperty
  * @returns this
  * @description Set the value of the property, throwing an error if the 
- * javascript data type does not match the configuration, this is how the 
- * strict typing is implemented.  This signature returns `this` to allow 
- * for set call chaining.
+ * javascript data type does not match the configuration, this is how
+ * the strict typing is implemented.  This signature returns `this` to 
+ * allow for set call chaining.
  */
  
 const record = new DatabaseRecord();
@@ -89,7 +89,8 @@ const fs = require('fs');
 const moment = require('moment');
 
 /** 
- * Load external MySQL configuration which uses the following JSON format:
+ * Load external MySQL configuration which uses the following JSON 
+ * format:
  * {
  *   "host"          : "localhost",
  *   "user"          : "ezobjects",
@@ -129,9 +130,10 @@ const configDatabaseRecord = {
 /** 
  * Create the DatabaseRecord object -- Note: This object is not 
  * linked to a MySQL table directory, and therefore has no tableName
- * property, but it has the MySQL configuration properties on `id` because
- * it will be extended by a class that is linked to a MySQL table and
- * therefore it will need the MySQL configuration of the `id` property.
+ * property, but it has the MySQL configuration properties on `id` 
+ * because it will be extended by a class that is linked to a MySQL 
+ * table and therefore it will need the MySQL configuration of the 
+ * `id` property.
  */
 ezobjects.createObject(configDatabaseRecord);
 
@@ -195,8 +197,9 @@ const configUser = {
 ezobjects.createObject(configUser);
 
 /**
- * The User object has all of the signatures listed in the comments for
- * Basic Example above, but also has the following signatures added 
+ * The User object has all of the signatures listed in the comments 
+ * for the Basic Example above, but also has the following signatures 
+ * added 
  * since it has a tableName defined:
  *
  * @signature delete(db)
@@ -207,8 +210,8 @@ ezobjects.createObject(configUser);
  * @signature insert(db)
  * @param db MySQLConnection
  * @description Insert this object's property values into the database 
- * `db`, table `tableName`, and store the resulting insertId in the `id` 
- * property of this object.
+ * `db`, table `tableName`, and store the resulting insertId in the 
+ * `id` property of this object.
  *
  * @signature load(db, id)
  * @param db MySQLConnection
@@ -219,8 +222,8 @@ ezobjects.createObject(configUser);
  *
  * @signature load(db, fieldValue)
  * @param db MySQLConnection
- * @param fieldValue mixed The value of the `stringSearchField` property 
- * of the record you wish to load
+ * @param fieldValue mixed The value of the `stringSearchField` 
+ * property of the record you wish to load
  * @description Load the record in database `db`, table `tableName`, 
  * that has its `stringSearchField` field equal to provided `id` 
  * parameter.  Here, the actual field name of `stringSearchField` is 
