@@ -1,3 +1,7 @@
+/** Require external modules */
+const url = require('url');
+
+/** Require local modules */
 const mysqlConnection = require('./mysql-connection');
 
 /**
@@ -406,9 +410,25 @@ module.exports.createObject = (obj) => {
       };
       
       /** Create MySQL insert method on prototype */
-      parent[obj.className].prototype.insert = async function (db) { 
+      parent[obj.className].prototype.insert = async function (arg1) { 
+        /** Provide option for inserting record from browser if developer implements ajax backend */
+        if ( typeof window !== 'undefined' && typeof arg1 == 'string' ) {
+          const url = new URL(arg1);
+
+          const result = await $.get({
+            url: url.href,
+            data: JSON.stringify(this),
+            dataType: 'json'
+          });
+
+          if ( result && result.insertId )
+            this.id(result.insertId);
+          else
+            throw new Error(`${obj.className}.insert(): Unable to insert record, invalid response from remote host.`);
+        }
+        
         /** If the argument is a valid database, insert record into database and capture ID */
-        if ( typeof db == 'object' && db.constructor.name == 'MySQLConnection' ) {
+        else if ( typeof arg1 == 'object' && arg1.constructor.name == 'MySQLConnection' ) {
           /** Create array for storing values to insert */
           const params = [];
 
@@ -488,7 +508,7 @@ module.exports.createObject = (obj) => {
           query += `)`;
 
           /** Execute query to add record to database */
-          const result = await db.query(query, params);
+          const result = await arg1.query(query, params);
 
           /** Store the resulting insert ID */
           this.id(result.insertId);
@@ -496,7 +516,7 @@ module.exports.createObject = (obj) => {
         
         /** Otherwise throw TypeError */
         else {
-          throw new TypeError(`${this.constructor.name}.insert(${typeof db}): Invalid signature.`);
+          throw new TypeError(`${this.constructor.name}.insert(${typeof arg1}): Invalid signature.`);
         }
 
         /** Allow for call chaining */
@@ -504,9 +524,24 @@ module.exports.createObject = (obj) => {
       };
 
       /** Create MySQL load method on prototype */
-      parent[obj.className].prototype.load = async function (arg1, arg2) { 
+      parent[obj.className].prototype.load = async function (arg1, arg2) {
+        /** Provide option for loading record from browser if developer implements ajax backend */
+        if ( typeof window !== 'undefined' && typeof arg1 == 'string' ) {
+          const url = new URL(arg1);
+
+          const result = await $.get({
+            url: url.href,
+            dataType: 'json'
+          });
+
+          if ( result )
+            this.init(result);
+          else
+            throw new Error(`${obj.className}.load(): Unable to load record, invalid response from remote host.`);
+        }
+
         /** If the first argument is a valid database and the second is a number, load record from database by ID */
-        if ( typeof arg1 == 'object' && arg1.constructor.name == 'MySQLConnection' && typeof arg2 == 'number' ) {
+        else if ( typeof arg1 == 'object' && arg1.constructor.name == 'MySQLConnection' && ( typeof arg2 == 'number' || ( typeof arg2 == 'string' && typeof obj.stringSearchField == 'string' ) ) ) {
           /** Begin SELECT query */
           let query = `SELECT `;
 
@@ -531,7 +566,11 @@ module.exports.createObject = (obj) => {
           
           /** Finish query */
           query += ` FROM ${obj.tableName} `;
-          query += `WHERE id = ?`;
+          
+          if ( typeof arg2 === 'string' && typeof obj.stringSearchField === 'string' )
+            query += `WHERE ${obj.stringSearchField} = ?`;
+          else
+            query += `WHERE id = ?`;
 
           /** Execute query to load record properties from the database */
           const result = await arg1.query(query, [arg2]);
@@ -587,9 +626,23 @@ module.exports.createObject = (obj) => {
       };
 
       /** Create MySQL update method on prototype */
-      parent[obj.className].prototype.update = async function (db) { 
+      parent[obj.className].prototype.update = async function (arg1) { 
+        /** Provide option for inserting record from browser if developer implements ajax backend */
+        if ( typeof window !== 'undefined' && typeof arg1 == 'string' ) {
+          const url = new URL(arg1);
+
+          const result = await $.get({
+            url: url.href,
+            data: JSON.stringify(this),
+            dataType: 'json'
+          });
+
+          if ( !result )
+            throw new Error(`${obj.className}.update(): Unable to update record, invalid response from remote host.`);
+        }
+        
         /** If the argument is a valid database, update database record */
-        if ( typeof db == 'object' && db.constructor.name == 'MySQLConnection' ) {
+        else if ( typeof arg1 == 'object' && arg1.constructor.name == 'MySQLConnection' ) {
           /** Create array for storing values to update */
           const params = [];
 
@@ -646,12 +699,12 @@ module.exports.createObject = (obj) => {
           query += ` WHERE id = ?`;
 
           /** Execute query to update record in database */
-          await db.query(query, params);
+          await arg1.query(query, params);
         } 
         
         /** Otherwise throw TypeError */
         else {
-          throw new TypeError(`${this.constructor.name}.update(${typeof db}): Invalid signature.`);
+          throw new TypeError(`${this.constructor.name}.update(${typeof arg1}): Invalid signature.`);
         }
 
         /** Allow for call chaining */

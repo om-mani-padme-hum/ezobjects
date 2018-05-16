@@ -1,4 +1,4 @@
-# EZ Objects v2.3.3
+# EZ Objects v2.4.0
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects.  All you have to do is create simple configurations for each of your objects and then call
@@ -20,6 +20,47 @@ ezobjects.createObject({
   ]
 });
 
+/** 
+ * There now exists a class called DatabaseRecord which has the following signatures:
+ * 
+ * @signature new DatabaseRecord([data])
+ * @param data PlainObject 
+ * @description Create a new DatabaseRecord object and initialize using either defaults
+ * or any provided key/value pairs in the plain object `data`.  Keys can either be equal 
+ * to the name of a property, or they can be have an underscore before the name of a 
+ * property, as would be the case if you were to JSON.stringify() and then JSON.parse()
+ * an EZ Object.  This allows for easy transferability in cases where JSON is used as 
+ * the transfer medium.
+ *
+ * @signature new DatabaseRecord([data])
+ * @param data string 
+ * @description Create a new DatabaseRecord object and initialize using either defaults
+ * or any provided key/value pairs in the JSON encoded string `data`.  Keys can either 
+ * be equal to the name of a property, or they can be have an underscore before the name 
+ * of a property, as would be the case if you were to JSON.stringify() an EZ Object.  This 
+ * allows for easy transferability in cases where JSON is used as the transfer medium.
+ *
+ * @signature init([data])
+ * @param data PlainObject 
+ * @description Initialize this object using either defaults or any provided key/value 
+ * pairs in the plain object `data`.  This is also the method used by the constructor.
+ *
+ * In addition, each property you define will have a single method that is a getter and setter, and it
+ * will have the following signatures:
+ *
+ * @signature myProperty()
+ * @returns mixed
+ * @description Get the value of the property.
+ *
+ * @signature myProperty(value)
+ * @param value mixed
+ * @throws TypeError if `value` is not of the correct javascript data type for myProperty
+ * @returns this
+ * @description Set the value of the property, throwing an error if the javascript data type 
+ * does not match the configuration, this is how the strict typing is implemented.  This
+ * signature returns `this` to allow for set call chaining.
+ */
+ 
 const record = new DatabaseRecord();
 ```
 
@@ -32,8 +73,11 @@ setter and apply parseInt() to it.
 
 ## MySQL Example w/ Extended Object
 
+**Importing Note:** You must have a unique integer property named `id` to be able to use the MySQL
+functionality of EZ Objects.
+
 ```javascript
-const ezobjects = require('ezobjects');
+const ezobjects = require('./index');
 const fs = require('fs');
 const moment = require('moment');
 
@@ -59,7 +103,7 @@ const db = new ezobjects.MySQLConnection(configMySQL);
 
 /** 
  * Configure a new EZ Object called DatabaseRecord with one 'id' 
- * property that contains extended MySQL configuration settings.
+ * property that contains additional MySQL configuration settings.
  */
 const configDatabaseRecord = {
   className: 'DatabaseRecord',
@@ -75,20 +119,33 @@ const configDatabaseRecord = {
   ]
 };
 
-/** Create the DatabaseRecord object */
+/** 
+ * Create the DatabaseRecord object -- Note: This object is not 
+ * linked to a MySQL table directory, and therefore has no tableName
+ * property, but it has the MySQL configuration properties on `id` because
+ * it will be extended by a class that is linked to a MySQL table and
+ * therefore it will need the MySQL configuration of the `id` property.
+ */
 ezobjects.createObject(configDatabaseRecord);
 
 /** 
- * Configure a new EZ Object called Person that extends from the 
+ * Configure a new EZ Object called User that extends from the 
  * DatabaseRecord object and adds several additional properties and 
  * a MySQL index.
  */
-const configPerson = {
-  tableName: 'people',
-  className: 'Person',
+const configUser = {
+  tableName: 'users',
+  className: 'User',
   extends: DatabaseRecord,
   extendsConfig: configDatabaseRecord,
+  stringSearchField: 'username',
   properties: [
+    {
+      name: 'username',
+      type: 'string',
+      mysqlType: 'varchar',
+      length: 20
+    },
     { 
       name: 'firstName', 
       type: 'string', 
@@ -112,7 +169,7 @@ const configPerson = {
       type: 'Array', 
       mysqlType: 'text', 
       saveTransform: x => x.join(','), 
-      loadTransform: x => x.split(',') 
+      loadTransform: x => x.split(',').map(x => parseInt(x))
     },
     { 
       name: 'favoriteDay', 
@@ -127,11 +184,58 @@ const configPerson = {
   ]
 };
 
-/** Create the Person object */
-ezobjects.createObject(configPerson);
+/** Create the User object */
+ezobjects.createObject(configUser);
 
-/** Create new person, initializing with object passed to constructor */
-const person = new Person({
+/**
+ * The User object has all of the signatures listed in the comments for
+ * Basic Example above, but also has the following signatures added since
+ * it has a tableName defined:
+ *
+ * @signature delete(db)
+ * @param db MySQLConnection
+ * @description Delete the record in database `db`, table `tableName`, that
+ * has its `id` field equal to the `id` property of this object.
+ *
+ * @signature insert(db)
+ * @param db MySQLConnection
+ * @description Insert this object's property values into the database `db`, 
+ * table `tableName`, and store the resulting insertId in the `id` property
+ * of this object.
+ *
+ * @signature load(db, id)
+ * @param db MySQLConnection
+ * @param id number The value of the `id` property of the record you wish to load
+ * @description Load the record in database `db`, table `tableName`, that has
+ * its `id` field equal to provided `id` parameter.
+ *
+ * @signature load(db, fieldValue)
+ * @param db MySQLConnection
+ * @param fieldValue mixed The value of the `stringSearchField` property of the 
+ * record you wish to load
+ * @description Load the record in database `db`, table `tableName`, that has
+ * its `stringSearchField` field equal to provided `id` parameter.  Here, the
+ * actual field name of `stringSearchField` is provided in the object
+ * configuration, see the more detailed specifications below.
+ *
+ * @signature load(url)
+ * @param url The URL of a back-end that provides JSON data compatible with this
+ * object's initializer
+ * @description Load the JSON-encoded data obtained from `url` using this object's
+ * initializer.  This signature is useful only when your classes are standalone 
+ * browserify'd and requires you to implement a backend at `url` that will output 
+ * the JSON.  This signature requires you have jQuery loaded prior to use.
+ *
+ * @signature update(db)
+ * @param db MySQLConnection
+ * @description Update the record in database `db`, table `tableName`, with its
+ * `id` field equal to the `id` property of this object, using this object's
+ * property values.
+ */
+
+/** Create new user, initializing with object passed to constructor */
+const user = new User({
+  username: 'richlowe',
   firstName: 'Rich',
   lastName: 'Lowe',
   checkingBalance: 4.32,
@@ -142,13 +246,13 @@ const person = new Person({
 /** Self-executing async wrapper so we can await results */
 (async () => {
   /** Create table if it doesn't already exist */
-  await ezobjects.createTable(db, configPerson);
+  await ezobjects.createTable(db, configUser);
   
-  /** Insert person into the database */
-  await person.insert(db);
+  /** Insert user into the database */
+  await user.insert(db);
               
-  /** Log person (should have automatically incremented ID now) */
-  console.log(person);
+  /** Log user (should have automatically incremented ID now) */
+  console.log(user);
 
   /** Close database connection */
   db.close();
@@ -158,8 +262,9 @@ const person = new Person({
 ### Expected Output
 
 ```
-Person {
+User {
   _id: 1,
+  _username: 'richlowe',
   _firstName: 'Rich',
   _lastName: 'Lowe',
   _checkingBalance: 4.32,
@@ -167,12 +272,13 @@ Person {
   _favoriteDay: 2018-01-01T06:00:00.000Z }
 ```
 
-In this snippet, we've created two classes, DatabaseRecord and Person.  Person extends DatabaseRecord and is also associated with
-a MySQL table called `people`.  Each property is given a JavaScript `type` and a MySQL `mysqlType`.  Additional MySQL property
+In this snippet, we've created two classes, DatabaseRecord and User.  User extends DatabaseRecord and is also associated with
+a MySQL table called `users`.  Each property is given a JavaScript `type` and a MySQL `mysqlType`.  Additional MySQL property
 configuration options can be provided, which are outlined in more detail below.  A BTREE index is also added on the lastName column
-for faster searching.  While not required, the moment library is used to help translate date formats between MySQL and JavaScript.
+for faster searching by lastName.  While not required, the moment library is used to help translate date formats between MySQL 
+and JavaScript.
 
-Since the Person class configuration provided a `tableName` property, it will automatically have additional methods created that are
+Since the User class configuration provided a `tableName` property, it will automatically have additional methods created that are
 not present in a basic EZ Object.  The additional methods are delete(db), insert(db), load(db, id), and update(db).  These methods can 
 be used to delete the MySQL record corresponding to the object, insert the object properties as a new MySQL record, load a MySQL record 
 into the object properties, or update an existing MySQL record using the object properties.  Transforms can be used to validate or
@@ -183,7 +289,7 @@ manipulate the property values when they are get or set in the object, or when t
 ### Constructor Default
 
 ```javascript
-const a = new Person();
+const a = new User();
 
 console.log(a);
 ```
@@ -191,7 +297,7 @@ console.log(a);
 ### Expected Output
 
 ```
-Person {
+User {
   _id: 0,
   _firstName: '',
   _lastName: '',
@@ -203,7 +309,7 @@ Person {
 ### Using Initializer Object
 
 ```javascript
-const b = new Person({
+const b = new User({
   id: 1,
   firstName: 'Rich',
   lastName: 'Lowe',
@@ -218,7 +324,7 @@ console.log(b);
 ### Expected Output
 
 ```
-Person {
+User {
   _id: 1,
   _firstName: 'Rich',
   _lastName: 'Lowe',
@@ -230,7 +336,7 @@ Person {
 ### Using Auto-generated Setters
 
 ```javascript
-const c = new Person();
+const c = new User();
 
 c.id(2);
 c.firstName('Bert');
@@ -245,7 +351,7 @@ console.log(c);
 ### Expected Output
 
 ```
-Person {
+User {
   _id: 2,
   _firstName: 'Bert',
   _lastName: 'Reynolds',
@@ -297,6 +403,7 @@ Favorite Day: Thu Jun 01 2017 00:00:00 GMT-0500 (CDT)
 * className - string - (required) Name of the class
 * extends - object - (optional) The object that the new object should be extended from [required to extend object]
 * extendsConfig - object - (optional) The EZ Object configuration for the object that is being extended from [required to extend object]
+* stringSearchField - string (optional) The name of a unique property of type `string` that you want to be able to load with as an alternative to `id`
 * properties - Array - (required) An array of properties that the object (and MySQL table, if applicable) should contain
 * indexes - Array - (optional) An array of indexes that should be created in the MySQL table, if applicable
 
@@ -331,3 +438,11 @@ Favorite Day: Thu Jun 01 2017 00:00:00 GMT-0500 (CDT)
 * withParser - string - (optional) Indicates the index should use the provided parser
 * visible - boolean - (optional) Indicates the index should be visible
 * invisible - boolean - (optional) Indicates the index should be invisible
+
+### Default intiailizations for different JavaScript types
+
+* number - 0
+* string - ''
+* boolean - false
+* Array - []
+* anything else - null
