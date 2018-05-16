@@ -1,4 +1,4 @@
-# EZ Objects v2.4.0
+# EZ Objects v2.4.1
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects.  All you have to do is create simple configurations for each of your objects and then call
@@ -21,32 +21,37 @@ ezobjects.createObject({
 });
 
 /** 
- * There now exists a class called DatabaseRecord which has the following signatures:
+ * There now exists a class called DatabaseRecord which has the 
+ * following signatures:
  * 
  * @signature new DatabaseRecord([data])
  * @param data PlainObject 
- * @description Create a new DatabaseRecord object and initialize using either defaults
- * or any provided key/value pairs in the plain object `data`.  Keys can either be equal 
- * to the name of a property, or they can be have an underscore before the name of a 
- * property, as would be the case if you were to JSON.stringify() and then JSON.parse()
- * an EZ Object.  This allows for easy transferability in cases where JSON is used as 
- * the transfer medium.
+ * @description Create a new DatabaseRecord object and initialize 
+ * using either defaults or any provided key/value pairs in the plain 
+ * object `data`.  Keys can either be equal to the name of a property, 
+ * or they can be have an underscore before the name of a property, as 
+ * would be the case if you were to JSON.stringify() and then 
+ * JSON.parse() an EZ Object.  This allows for easy transferability in 
+ * cases where JSON is used as the transfer medium.
  *
  * @signature new DatabaseRecord([data])
  * @param data string 
- * @description Create a new DatabaseRecord object and initialize using either defaults
- * or any provided key/value pairs in the JSON encoded string `data`.  Keys can either 
- * be equal to the name of a property, or they can be have an underscore before the name 
- * of a property, as would be the case if you were to JSON.stringify() an EZ Object.  This 
- * allows for easy transferability in cases where JSON is used as the transfer medium.
+ * @description Create a new DatabaseRecord object and initialize using 
+ * either defaults or any provided key/value pairs in the JSON encoded 
+ * string `data`.  Keys can either be equal to the name of a property, 
+ * or they can be have an underscore before the name of a property, as 
+ * would be the case if you were to JSON.stringify() an EZ Object.  This 
+ * allows for easy transferability in cases where JSON is used as the 
+ * transfer medium.
  *
  * @signature init([data])
  * @param data PlainObject 
- * @description Initialize this object using either defaults or any provided key/value 
- * pairs in the plain object `data`.  This is also the method used by the constructor.
+ * @description Initialize this object using either defaults or any 
+ * provided key/value pairs in the plain object `data`.  This is also 
+ * the method used by the constructor.
  *
- * In addition, each property you define will have a single method that is a getter and setter, and it
- * will have the following signatures:
+ * In addition, each property you define will have a single method that 
+ * is a getter and setter, and it will have the following signatures:
  *
  * @signature myProperty()
  * @returns mixed
@@ -54,11 +59,13 @@ ezobjects.createObject({
  *
  * @signature myProperty(value)
  * @param value mixed
- * @throws TypeError if `value` is not of the correct javascript data type for myProperty
+ * @throws TypeError if `value` is not of the correct javascript data 
+ * type for myProperty
  * @returns this
- * @description Set the value of the property, throwing an error if the javascript data type 
- * does not match the configuration, this is how the strict typing is implemented.  This
- * signature returns `this` to allow for set call chaining.
+ * @description Set the value of the property, throwing an error if the 
+ * javascript data type does not match the configuration, this is how the 
+ * strict typing is implemented.  This signature returns `this` to allow 
+ * for set call chaining.
  */
  
 const record = new DatabaseRecord();
@@ -189,48 +196,51 @@ ezobjects.createObject(configUser);
 
 /**
  * The User object has all of the signatures listed in the comments for
- * Basic Example above, but also has the following signatures added since
- * it has a tableName defined:
+ * Basic Example above, but also has the following signatures added 
+ * since it has a tableName defined:
  *
  * @signature delete(db)
  * @param db MySQLConnection
- * @description Delete the record in database `db`, table `tableName`, that
- * has its `id` field equal to the `id` property of this object.
+ * @description Delete the record in database `db`, table `tableName`, 
+ * that has its `id` field equal to the `id` property of this object.
  *
  * @signature insert(db)
  * @param db MySQLConnection
- * @description Insert this object's property values into the database `db`, 
- * table `tableName`, and store the resulting insertId in the `id` property
- * of this object.
+ * @description Insert this object's property values into the database 
+ * `db`, table `tableName`, and store the resulting insertId in the `id` 
+ * property of this object.
  *
  * @signature load(db, id)
  * @param db MySQLConnection
- * @param id number The value of the `id` property of the record you wish to load
- * @description Load the record in database `db`, table `tableName`, that has
- * its `id` field equal to provided `id` parameter.
+ * @param id number The value of the `id` property of the record you 
+ * wish to load
+ * @description Load the record in database `db`, table `tableName`, 
+ * that has its `id` field equal to provided `id` parameter.
  *
  * @signature load(db, fieldValue)
  * @param db MySQLConnection
- * @param fieldValue mixed The value of the `stringSearchField` property of the 
- * record you wish to load
- * @description Load the record in database `db`, table `tableName`, that has
- * its `stringSearchField` field equal to provided `id` parameter.  Here, the
- * actual field name of `stringSearchField` is provided in the object
- * configuration, see the more detailed specifications below.
+ * @param fieldValue mixed The value of the `stringSearchField` property 
+ * of the record you wish to load
+ * @description Load the record in database `db`, table `tableName`, 
+ * that has its `stringSearchField` field equal to provided `id` 
+ * parameter.  Here, the actual field name of `stringSearchField` is 
+ * provided in the object configuration, see the more detailed 
+ * specifications below.
  *
  * @signature load(url)
- * @param url The URL of a back-end that provides JSON data compatible with this
- * object's initializer
- * @description Load the JSON-encoded data obtained from `url` using this object's
- * initializer.  This signature is useful only when your classes are standalone 
- * browserify'd and requires you to implement a backend at `url` that will output 
- * the JSON.  This signature requires you have jQuery loaded prior to use.
+ * @param url The URL of a back-end that provides JSON data compatible 
+ * with this object's initializer
+ * @description Load the JSON-encoded data obtained from `url` using 
+ * this object's initializer.  This signature is useful only when your 
+ * classes are standalone browserify'd and requires you to implement a 
+ * backend at `url` that will output the JSON.  This signature requires 
+ * you have jQuery loaded prior to use.
  *
  * @signature update(db)
  * @param db MySQLConnection
- * @description Update the record in database `db`, table `tableName`, with its
- * `id` field equal to the `id` property of this object, using this object's
- * property values.
+ * @description Update the record in database `db`, table `tableName`, 
+ * with its `id` field equal to the `id` property of this object, using 
+ * this object's property values.
  */
 
 /** Create new user, initializing with object passed to constructor */
