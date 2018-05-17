@@ -1,4 +1,4 @@
-# EZ Objects v2.5.2
+# EZ Objects v2.5.3
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects.  All you have to do is create simple configurations for each of your objects and then call
@@ -98,7 +98,6 @@ const configUser = {
   className: 'User',
   extends: DatabaseRecord,
   extendsConfig: configDatabaseRecord,
-  stringSearchField: 'username',
   properties: [
     {
       name: 'username',
@@ -309,12 +308,12 @@ See the following for how to configure your EZ Objects:
 
 ### An object configuration can have the following:
 
-* **tableName** - `string` - (optional) Provide if object should be linked with MySQL database table
 * **className** - `string` - (required) Name of the class
-* **extends** - `mixed` - (optional) The object that the new object should be extended from [required to extend object]
-* **extendsConfig** - `object` - (optional) The EZ Object configuration for the object that is being extended from [required to extend object]
-* **stringSearchField** - `string` - (optional) The name of a unique property of type `string` that you want to be able to load with as an alternative to `id`
 * **properties** - `Array` - (required) An array of properties that the object (and MySQL table, if applicable) should contain
+* **extends** - `mixed` - (optional) The object that the new object should be extended from [required to extend object]
+* **extendsConfig** - `object` - (optional) The EZ Object configuration for the object that is being extended from [required to extend object for use with MySQL table link]
+* **tableName** - `string` - (optional) Provide if object should be linked with MySQL database table
+* **stringSearchField** - `string` - (optional) The name of a unique property of type `string` that you want to be able to load with as an alternative to `id`
 * **indexes** - `Array` - (optional) An array of indexes that should be created in the MySQL table, if applicable
 
 ### A property configuration can have the following:
