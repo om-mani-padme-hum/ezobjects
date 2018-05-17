@@ -1,4 +1,4 @@
-# EZ Objects v2.5.6
+# EZ Objects v2.5.7
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects.  All you have to do is create simple configurations for each of your objects and then call
@@ -357,6 +357,7 @@ See the following for how to configure your EZ Objects:
 
 * **name** - `string` - (required) Name of the property, must conform to both JavaScript and MySQL rules
 * **type** - `string` - (required) JavaScript data type for the property
+* **default** - `mixed` - (optional) Sets the default value for the property in the class object
 * **getTransform** - `function` - (optional) Function that transforms and returns the property value prior to getting
 * **setTransform** - `function` - (optional) Function that transforms and returns the property value prior to setting
 
@@ -368,7 +369,6 @@ See the following for how to configure your EZ Objects:
 * **primary** - `boolean` - (optional) Indicates the property is a PRIMARY KEY in the MySQL table [required for MySQL table association on at least one property in the table]
 * **unique** - `boolean` - (optional) Indicates the property is a UNIQUE KEY in the MySQL table
 * **null** - `boolean` - (optional) Indicates the property can be NULL [default is properties must be NOT NULL]
-* **default** - `mixed` - (optional) Sets the default value for the property in the class object
 * **mysqlDefault** - `mixed` - (optional) Sets the default value for the property in the MySQL table, assuming its of the correct type
 * **unsigned** - `boolean` - (optional) Indicates the property should be unsigned in the MySQL table
 * **zerofill** - `boolean` - (optional) Indicates the property should be zero-filled in the MySQL table
@@ -379,7 +379,7 @@ See the following for how to configure your EZ Objects:
 * **saveTransform** - `function` - (optional) Function that transforms and returns the property value prior to saving in the database
 * **loadTransform** - `function` - (optional) Function that transforms and returns the property value after loading from the database
 
-### An MySQL index configuration can have the following (for MySQL table association only):
+### A MySQL index configuration can have the following (for MySQL table association only):
 
 * **name** - `string` - (required) Name of the index, can be arbitrary, but must be unique and not PRIMARY
 * **columns** - `Array` - (required) An array of strings containing property names to be indexed
