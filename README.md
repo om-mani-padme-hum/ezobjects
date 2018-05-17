@@ -1,4 +1,4 @@
-# EZ Objects v2.5.5
+# EZ Objects v2.5.6
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects.  All you have to do is create simple configurations for each of your objects and then call
@@ -340,20 +340,28 @@ A MySQL database connection class that wraps the standard mysql object and provi
 
 See the following for how to configure your EZ Objects:
 
-### An object configuration can have the following:
+### A basic object configuration can have the following:
 
 * **className** - `string` - (required) Name of the class
-* **properties** - `Array` - (required) An array of properties that the object (and MySQL table, if applicable) should contain
+* **properties** - `Array` - (required) An array of property configurations that the object (and MySQL table, if applicable) should have corresponding properties for
 * **extends** - `mixed` - (optional) The object that the new object should be extended from [required to extend object]
+
+### A MySQL object configuration can also have the following:
+
 * **extendsConfig** - `object` - (optional) The EZ Object configuration for the object that is being extended from [required to extend object for use with MySQL table link]
 * **tableName** - `string` - (optional) Provide if object should be linked with MySQL database table
 * **stringSearchField** - `string` - (optional) The name of a unique property of type `string` that you want to be able to load with as an alternative to `id`
-* **indexes** - `Array` - (optional) An array of indexes that should be created in the MySQL table, if applicable
+* **indexes** - `Array` - (optional) An array of MySQL index configurations that should be created in the MySQL table
 
-### A property configuration can have the following:
+### A basic property configuration can have the following:
 
 * **name** - `string` - (required) Name of the property, must conform to both JavaScript and MySQL rules
 * **type** - `string` - (required) JavaScript data type for the property
+* **getTransform** - `function` - (optional) Function that transforms and returns the property value prior to getting
+* **setTransform** - `function` - (optional) Function that transforms and returns the property value prior to setting
+
+### A MySQL property configuration can also have the following:
+
 * **mysqlType** - `string` - (optional) MySQL data type for the property [required for MySQL table association]
 * **length** - `number` - (optional) MySQL data length for the property [required for MySQL table association on some data types like VARCHAR]
 * **decimals** - `number` - (optional) Number of decimals that should be provided for certain data types when SELECT'ed from the MySQL table
@@ -368,12 +376,10 @@ See the following for how to configure your EZ Objects:
 * **charsetName** - `string` - (optional) Indicates the property should use the provided charset in the MySQL table
 * **collationName** - `string` - (optional) Indicates the property should use the provided collation in the MySQL table
 * **autoIncrement** - `boolean` - (optional) Indicates the property should be auto-incremented in the MySQL table
-* **getTransform** - `function` - (optional) Function that transforms and returns the property value prior to getting
-* **setTransform** - `function` - (optional) Function that transforms and returns the property value prior to setting
 * **saveTransform** - `function` - (optional) Function that transforms and returns the property value prior to saving in the database
 * **loadTransform** - `function` - (optional) Function that transforms and returns the property value after loading from the database
 
-### An index configuration can have the following (for MySQL table association only):
+### An MySQL index configuration can have the following (for MySQL table association only):
 
 * **name** - `string` - (required) Name of the index, can be arbitrary, but must be unique and not PRIMARY
 * **columns** - `Array` - (required) An array of strings containing property names to be indexed
