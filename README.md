@@ -1,4 +1,4 @@
-# EZ Objects v2.5.4
+# EZ Objects v2.5.5
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects.  All you have to do is create simple configurations for each of your objects and then call
@@ -376,6 +376,7 @@ See the following for how to configure your EZ Objects:
 ### An index configuration can have the following (for MySQL table association only):
 
 * **name** - `string` - (required) Name of the index, can be arbitrary, but must be unique and not PRIMARY
+* **columns** - `Array` - (required) An array of strings containing property names to be indexed
 * **type** - `string` - (optional) Index type, can be BTREE or HASH, defaults to BTREE
 * **keyBlockSize** - `number` - (optional) Indicates the index should use the provided key block size
 * **withParser** - `string` - (optional) Indicates the index should use the provided parser
@@ -389,3 +390,12 @@ See the following for how to configure your EZ Objects:
 * `boolean` - false
 * `Array` - []
 * Everything else - null
+
+## Contributing
+
+Please open an issue on the GitHub repository if you find any broken functionality or other bugs/errors.  Feature requests
+will also be accepted, but are not guaranteed to be implemented.
+
+## License
+
+MIT Licensed
