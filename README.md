@@ -234,29 +234,29 @@ User {
 These are the object method signatures even the most basic of EZ Objects will have:
 
 ### new MyObject([data])
- * **Parameters:** data PlainObject (optional)
+ * **Parameters:** data - `PlainObject` - (optional)
  * **Description:** Create a new MyObject object and initialize it using either defaults or any provided key/value pairs in the plain object `data`.  Keys can either be equal to the name of a property, or they can be have an underscore before the name of a property, as would be the case if you were to JSON.stringify() and then JSON.parse() an EZ Object.  This allows for easy transferability in cases where JSON is used as the transfer medium.
 
 ### new MyObject([data])
- * **Parameters:** data string (optional)
+ * **Parameters:** data - `string` - (optional)
  * **Description:** Create a new MyObject object and initialize it using either defaults or any provided key/value pairs in the JSON encoded string `data`.  Keys can either be equal to the name of a property, or they can be have an underscore before the name of a property, as would be the case if you were to JSON.stringify() an EZ Object.  This allows for easy transferability in cases where JSON is used as the transfer medium.
 
 ### MyObject.init([data])
- * **Parameters:** data PlainObject 
+ * **Parameters:** data - `PlainObject`
  * **Description:** Initialize this object using either defaults or any provided key/value pairs in the plain object `data`.  This is also the method used by the constructor.
  
 In addition, each property you define will have a single method that is a getter and setter, and 
 it will have the following signatures:
 
 ### MyObject.myProperty()
- * **Returns:** mixed
+ * **Returns:** `mixed`
  * **Description:** Get the value of the property.
  
 ### MyObject.myProperty(value)
- * **Parameters:** value mixed
- * **Throws:** TypeError if `value` is not of the correct javascript data type for myProperty
+ * **Parameters:** value - `mixed`
+ * **Throws:** `TypeError` if `value` is not of the correct javascript data type for myProperty
  * **Returns:** this
- * **Description:** Set the value of the property, throwing an error if the javascript data type does not match the configuration, this is howthe strict typing is implemented.  This signature returns `this` to allow for set call chaining.
+ * **Description:** Set the value of the property, throwing an error if the javascript data type does not match the configuration, this is how the strict typing is implemented.  This signature returns `this` to allow for set call chaining.
 
 ## MySQL EZ Object Method Signatures
 
@@ -264,30 +264,30 @@ These are the object method signatures that will additionally be provided if you
 meaning it's intended to be linked to a MySQL table:
 
 ### MyObject.delete(db)
- * **Parameters:** db MySQLConnection
+ * **Parameters:** db - `MySQLConnection`
  * **Description:** Delete the record in database `db`, table `tableName`, that has its `id` field equal to the `id` property of this object.
 
 ### MyObject.insert(db)
- * **Parameters:** db MySQLConnection
+ * **Parameters:** db - `MySQLConnection`
  * **Description:** Insert this object's property values into the database `db`, table `tableName`, and store the resulting insertId in the `id` property of this object.
 
 ### MyObject.load(db, id)
- * **Parameters:** db MySQLConnection
+ * **Parameters:** db - `MySQLConnection`
  * **Parameters:** id number The value of the `id` property of the record you wish to load
  * **Description:** Load the record in database `db`, table `tableName`, that has its `id` field equal to provided `id` parameter.
 
 ### MyObject.load(db, fieldValue)
- * **Parameters:** db MySQLConnection
- * **Parameters:** fieldValue mixed The value of the `stringSearchField` property of the record you wish to load
- * **Description:** Load the record in database `db`, table `tableName`, that has its `stringSearchField` field equal to provided `id` parameter.  Here, the actual field name of `stringSearchField` is provided in the object configuration, see the more detailed specifications below.
+ * **Parameters:** db - `MySQLConnection`
+ * **Parameters:** fieldValue - `mixed` - The value of the `stringSearchField` property of the record you wish to load
+ * **Description:** Load the record in database `db`, table `tableName`, that has its `stringSearchField` field equal to provided `fieldValue` parameter.  Here, the actual field name of `stringSearchField` is provided in the object configuration, see the configuration section below.
 
 ### MyObject.load(url)
- * **Parameters:** url The URL of a back-end that provides JSON data compatible with this object's initializer
+ * **Parameters:** url - `string` - The URL of a back-end that provides JSON data compatible with this object's initializer
  * **Description:** Load the JSON-encoded data obtained from `url` using this object's initializer.  
  * **Note:** This signature is useful only when your classes are standalone browserify'd and requires you to implement a backend at `url` that will output the JSON.  This signature also requires you have jQuery loaded prior to use.
 
 ### MyObject.update(db)
- * **Parameters:** db MySQLConnection
+ * **Parameters:** db - `MySQLConnection`
  * **Description:** Update the record in database `db`, table `tableName`, with its `id` field equal to the `id` property of this object, using this object's property values.
 
 ## Module Exports
