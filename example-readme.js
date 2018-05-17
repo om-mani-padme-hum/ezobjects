@@ -40,7 +40,7 @@ const configDatabaseRecord = {
 
 /** 
  * Create the DatabaseRecord object -- Note: This object is not 
- * linked to a MySQL table directory, and therefore has no tableName
+ * linked to a MySQL table directory, and therefore has no `tableName`
  * property, but it has the MySQL configuration properties on `id` 
  * because it will be extended by another object that is linked to 
  * a MySQL table and therefore it will need the MySQL configuration 
@@ -58,7 +58,6 @@ const configUser = {
   className: 'User',
   extends: DatabaseRecord,
   extendsConfig: configDatabaseRecord,
-  stringSearchField: 'username',
   properties: [
     {
       name: 'username',

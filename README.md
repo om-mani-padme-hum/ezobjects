@@ -1,4 +1,4 @@
-# EZ Objects v2.5.3
+# EZ Objects v2.5.4
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects.  All you have to do is create simple configurations for each of your objects and then call
@@ -30,6 +30,40 @@ console.log(record);
 
 ```
 DatabaseRecord { _id: 0 }
+```
+
+## Extending the Basic Example
+
+```javascript
+ezobjects.createObject({
+  className: 'User',
+  extends: DatabaseRecord,
+  properties: [
+    { name: 'username', type: 'string' },
+    { name: 'firstName', type: 'string' },
+    { name: 'lastName', type: 'string' },
+    { name: 'checkingBalance', type: 'number', setTransform: x => parseFloat(x) },
+    { name: 'permissions', type: 'Array' },
+    { name: 'favoriteDay', type: 'Date' }
+  ]
+});
+
+const user = new User();
+
+console.log(user);
+```
+
+### Expected Output
+
+```
+User {
+  _id: 0,
+  _username: '',
+  _firstName: '',
+  _lastName: '',
+  _checkingBalance: 0,
+  _permissions: [],
+  _favoriteDay: null }
 ```
 
 ## MySQL Example w/ Extended Object
@@ -233,15 +267,15 @@ User {
 These are the object method signatures even the most basic of EZ Objects will have:
 
 ### new MyObject([data])
- * **Parameters:** data - `PlainObject` - (optional)
+ * **Parameter:** data - `PlainObject` - (optional)
  * **Description:** Create a new MyObject object and initialize it using either defaults or any provided key/value pairs in the plain object `data`.  Keys can either be equal to the name of a property, or they can be have an underscore before the name of a property, as would be the case if you were to JSON.stringify() and then JSON.parse() an EZ Object.  This allows for easy transferability in cases where JSON is used as the transfer medium.
 
 ### new MyObject([data])
- * **Parameters:** data - `string` - (optional)
+ * **Parameter:** data - `string` - (optional)
  * **Description:** Create a new MyObject object and initialize it using either defaults or any provided key/value pairs in the JSON encoded string `data`.  Keys can either be equal to the name of a property, or they can be have an underscore before the name of a property, as would be the case if you were to JSON.stringify() an EZ Object.  This allows for easy transferability in cases where JSON is used as the transfer medium.
 
 ### MyObject.init([data])
- * **Parameters:** data - `PlainObject`
+ * **Parameter:** data - `PlainObject`
  * **Description:** Initialize this object using either defaults or any provided key/value pairs in the plain object `data`.  This is also the method used by the constructor.
  
 In addition, each property you define will have a single method that is a getter and setter, and 
@@ -252,7 +286,7 @@ it will have the following signatures:
  * **Description:** Get the value of the property.
  
 ### MyObject.myProperty(value)
- * **Parameters:** value - `mixed`
+ * **Parameter:** value - `mixed`
  * **Throws:** `TypeError` if `value` is not of the correct javascript data type for myProperty
  * **Returns:** this
  * **Description:** Set the value of the property, throwing an error if the javascript data type does not match the configuration, this is how the strict typing is implemented.  This signature returns `this` to allow for set call chaining.
@@ -263,30 +297,30 @@ These are the object method signatures that will additionally be provided if you
 meaning it's intended to be linked to a MySQL table:
 
 ### MyObject.delete(db)
- * **Parameters:** db - `MySQLConnection`
+ * **Parameter:** db - `MySQLConnection`
  * **Description:** Delete the record in database `db`, table `tableName`, that has its `id` field equal to the `id` property of this object.
 
 ### MyObject.insert(db)
- * **Parameters:** db - `MySQLConnection`
+ * **Parameter:** db - `MySQLConnection`
  * **Description:** Insert this object's property values into the database `db`, table `tableName`, and store the resulting insertId in the `id` property of this object.
 
 ### MyObject.load(db, id)
- * **Parameters:** db - `MySQLConnection`
- * **Parameters:** id number The value of the `id` property of the record you wish to load
+ * **Parameter:** db - `MySQLConnection`
+ * **Parameter:** id number The value of the `id` property of the record you wish to load
  * **Description:** Load the record in database `db`, table `tableName`, that has its `id` field equal to provided `id` parameter.
 
 ### MyObject.load(db, fieldValue)
- * **Parameters:** db - `MySQLConnection`
- * **Parameters:** fieldValue - `mixed` - The value of the `stringSearchField` property of the record you wish to load
+ * **Parameter:** db - `MySQLConnection`
+ * **Parameter:** fieldValue - `mixed` - The value of the `stringSearchField` property of the record you wish to load
  * **Description:** Load the record in database `db`, table `tableName`, that has its `stringSearchField` field equal to provided `fieldValue` parameter.  Here, the actual field name of `stringSearchField` is provided in the object configuration, see the configuration section below.
 
 ### MyObject.load(url)
- * **Parameters:** url - `string` - The URL of a back-end that provides JSON data compatible with this object's initializer
+ * **Parameter:** url - `string` - The URL of a back-end that provides JSON data compatible with this object's initializer
  * **Description:** Load the JSON-encoded data obtained from `url` using this object's initializer.  
  * **Note:** This signature is useful only when your classes are standalone browserify'd and requires you to implement a backend at `url` that will output the JSON.  This signature also requires you have jQuery loaded prior to use.
 
 ### MyObject.update(db)
- * **Parameters:** db - `MySQLConnection`
+ * **Parameter:** db - `MySQLConnection`
  * **Description:** Update the record in database `db`, table `tableName`, with its `id` field equal to the `id` property of this object, using this object's property values.
 
 ## Module Exports
