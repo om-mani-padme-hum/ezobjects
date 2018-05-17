@@ -1,4 +1,4 @@
-# EZ Objects v2.4.2
+# EZ Objects v2.4.3
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects.  All you have to do is create simple configurations for each of your objects and then call
@@ -26,7 +26,7 @@ ezobjects.createObject({
  * 
  * @signature new DatabaseRecord([data])
  * @param data PlainObject 
- * @description Create a new DatabaseRecord object and initialize 
+ * @description Create a new DatabaseRecord object and initialize it
  * using either defaults or any provided key/value pairs in the plain 
  * object `data`.  Keys can either be equal to the name of a property, 
  * or they can be have an underscore before the name of a property, as 
@@ -36,13 +36,13 @@ ezobjects.createObject({
  *
  * @signature new DatabaseRecord([data])
  * @param data string 
- * @description Create a new DatabaseRecord object and initialize using 
- * either defaults or any provided key/value pairs in the JSON encoded 
- * string `data`.  Keys can either be equal to the name of a property, 
- * or they can be have an underscore before the name of a property, as 
- * would be the case if you were to JSON.stringify() an EZ Object.  This 
- * allows for easy transferability in cases where JSON is used as the 
- * transfer medium.
+ * @description Create a new DatabaseRecord object and initialize it 
+ * using either defaults or any provided key/value pairs in the JSON 
+ * encoded string `data`.  Keys can either be equal to the name of a 
+ * property, or they can be have an underscore before the name of a 
+ * property, as would be the case if you were to JSON.stringify() an 
+ * EZ Object.  This allows for easy transferability in cases where 
+ * JSON is used as the transfer medium.
  *
  * @signature init([data])
  * @param data PlainObject 
@@ -50,8 +50,9 @@ ezobjects.createObject({
  * provided key/value pairs in the plain object `data`.  This is also 
  * the method used by the constructor.
  *
- * In addition, each property you define will have a single method that 
- * is a getter and setter, and it will have the following signatures:
+ * In addition, each property you define will have a single method 
+ * that is a getter and setter, and it will have the following 
+ * signatures:
  *
  * @signature myProperty()
  * @returns mixed
