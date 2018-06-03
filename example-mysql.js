@@ -59,6 +59,9 @@ const configPerson = {
     /** Log the current value of the person */
     console.log(person);
 
+    /** Test if person is an instance of DatabaseRecord */
+    console.log(ezobjects.instanceOf(person, 'DatabaseRecord'));
+    
     /** Await the insertion of that Person object into the database */
     await person.insert(db);
 

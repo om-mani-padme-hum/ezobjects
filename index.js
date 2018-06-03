@@ -46,6 +46,10 @@ module.exports.createTable = async (db, obj) => {
 
     /** Loop through each property */
     obj.properties.forEach((property) => {
+      /** Ignore properties that don't have MySQL types */
+      if ( typeof property.mysqlType == 'undefined' )
+        return;
+
       /** Convert the type to upper case for reliable string comparison */
       property.mysqlType = property.mysqlType.toUpperCase();
 
@@ -192,6 +196,29 @@ module.exports.createTable = async (db, obj) => {
 
   /** Await query execution and return result */
   return await db.query(createQuery);
+};
+
+/**
+ * @signature ezobjects.instanceof(obj, constructorName)
+ * @param obj Object
+ * @param constructorName string
+ * @description A function for determining if an object instance's
+ * prototype chain includes a constructor named `constructorName`.
+ */
+module.exports.instanceOf = (obj, constructorName) => {
+  let found = false;
+  
+  const isInstance = (obj) => {
+    if ( obj.constructor.name == constructorName )
+      found = true;
+    
+    if ( obj.__proto__ )
+      isInstance(obj.__proto__);
+  };
+  
+  isInstance(obj);
+  
+  return found;
 };
 
 /**
@@ -379,7 +406,7 @@ module.exports.createObject = (obj) => {
           return property.getTransform(this[`_${property.name}`]); 
 
         /** Setter */
-        else if ( arg === null || ( typeof arg == 'object' && arg.constructor.name == property.type ) ) 
+        else if ( arg === null || ( typeof arg == 'object' && arg.constructor.name == property.type ) || ( typeof property.instanceOf == 'string' && module.exports.instanceof(arg, property.instanceOf) ) ) 
           this[`_${property.name}`] = property.setTransform(arg); 
 
         /** Handle type errors */
@@ -444,6 +471,10 @@ module.exports.createObject = (obj) => {
               if ( property.name == 'id' )
                 return;
 
+              /** Ignore properties that don't have MySQL types */
+              if ( typeof property.mysqlType == 'undefined' )
+                return;
+              
               /** Add property to params array after performing the save transform */
               params.push(property.saveTransform(this[property.name]()));
             });
@@ -465,6 +496,10 @@ module.exports.createObject = (obj) => {
             obj.properties.forEach((property) => {
               /** Ignore ID since we'll get that from the insert */
               if ( property.name == 'id' )
+                return;
+              
+              /** Ignore properties that don't have MySQL types */
+              if ( typeof property.mysqlType == 'undefined' )
                 return;
               
               /** Append property name to query */
@@ -493,6 +528,10 @@ module.exports.createObject = (obj) => {
               if ( property.name == 'id' )
                 return;
 
+              /** Ignore properties that don't have MySQL types */
+              if ( typeof property.mysqlType == 'undefined' )
+                return;
+              
               /** Append placeholder to query */
               query += `?, `;
             });
@@ -553,6 +592,10 @@ module.exports.createObject = (obj) => {
 
             /** Loop through each property */
             obj.properties.forEach((property) => {
+              /** Ignore properties that don't have MySQL types */
+              if ( typeof property.mysqlType == 'undefined' )
+                return;
+              
               /** Append property name to query */
               query += `${property.name}, `;
             });
@@ -587,6 +630,10 @@ module.exports.createObject = (obj) => {
 
             /** Loop through each property */
             obj.properties.forEach((property) => {
+              /** Ignore properties that don't have MySQL types */
+              if ( typeof property.mysqlType == 'undefined' )
+                return;
+              
               /** Append property in object */
               this[property.name](property.loadTransform(result[0][property.name]));
             });
@@ -657,6 +704,10 @@ module.exports.createObject = (obj) => {
               /** Ignore ID since we will use that to locate the record, and will never update it */
               if ( property.name == 'id' )
                 return;
+              
+              /** Ignore properties that don't have MySQL types */
+              if ( typeof property.mysqlType == 'undefined' )
+                return;
 
               /** Add property to params array after performing the save transform */
               params.push(property.saveTransform(this[property.name]()));
@@ -684,6 +735,10 @@ module.exports.createObject = (obj) => {
               if ( property.name == 'id' )
                 return;
 
+              /** Ignore properties that don't have MySQL types */
+              if ( typeof property.mysqlType == 'undefined' )
+                return;
+              
               /** Append property update to query */
               query += `${property.name} = ?, `;
             });
