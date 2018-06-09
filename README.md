@@ -1,4 +1,4 @@
-# EZ Objects v2.8.2
+# EZ Objects v2.8.3
 
 EZ Objects is a Node.js module (that can also be usefully browserify`d) that aims to save you lots of time 
 writing class objects.  All you have to do is create simple configurations for each of your objects and then call
