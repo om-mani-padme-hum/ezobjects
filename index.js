@@ -217,7 +217,7 @@ module.exports.instanceOf = (obj, constructorName) => {
     if ( obj && obj.constructor && obj.constructor.name == constructorName )
       found = true;
     
-    if ( obj.__proto__ )
+    if ( obj && obj.__proto__ )
       isInstance(obj.__proto__);
   };
   
