@@ -1,4 +1,4 @@
-# EZ Objects v2.7.0
+# EZ Objects v2.7.1
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects.  All you have to do is create simple configurations for each of your objects and then call
@@ -114,7 +114,7 @@ const configDatabaseRecord = {
 
 /** 
  * Create the DatabaseRecord object -- Note: This object is not 
- * linked to a MySQL table directory, and therefore has no `tableName`
+ * linked to a MySQL table directory, as therefore has no `tableName`
  * property, but it has the MySQL configuration properties on `id` 
  * because it will be extended by another object that is linked to 
  * a MySQL table and therefore it will need the MySQL configuration 
