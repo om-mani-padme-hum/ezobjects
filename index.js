@@ -1,8 +1,8 @@
 /** Require external modules */
-const url = require('url');
+const url = require(`url`);
 
 /** Require local modules */
-const mysqlConnection = require('./mysql-connection');
+const mysqlConnection = require(`./mysql-connection`);
 
 /**
  * @module ezobjects
@@ -20,9 +20,9 @@ const mysqlConnection = require('./mysql-connection');
  * exist, based on the values in the provided configuration object.
  */
 module.exports.createTable = async (db, obj) => {
-  if ( typeof db != 'object' || db.constructor.name != 'MySQLConnection' )
+  if ( typeof db != `object` || db.constructor.name != `MySQLConnection` )
     throw new Error(`ezobjects.createTable(): Invalid database argument.`);
-  else if ( typeof obj != 'object' )
+  else if ( typeof obj != `object` )
     throw new Error(`ezobjects.createTable(): Invalid table configuration argument.`);
     
   /** Create some helpful arrays for identifying MySQL types that have certain features */
@@ -51,8 +51,8 @@ module.exports.createTable = async (db, obj) => {
 
     /** Loop through each property */
     obj.properties.forEach((property) => {
-      /** Ignore properties that don't have MySQL types */
-      if ( typeof property.mysqlType == 'undefined' )
+      /** Ignore properties that don`t have MySQL types */
+      if ( typeof property.mysqlType == `undefined` )
         return;
 
       /** Convert the type to upper case for reliable string comparison */
@@ -62,9 +62,9 @@ module.exports.createTable = async (db, obj) => {
       createQuery += `${property.name} ${property.mysqlType}`;
 
       /** Types where length is required, throw error if missing */
-      if ( property.mysqlType == 'VARCHAR' && isNaN(property.length) )
+      if ( property.mysqlType == `VARCHAR` && isNaN(property.length) )
         throw new Error(`Property of type VARCHAR used without required length.`);
-      else if ( property.mysqlType == 'VARBINARY' && isNaN(property.length) )
+      else if ( property.mysqlType == `VARBINARY` && isNaN(property.length) )
         throw new Error(`Property of type VARBINARY used without required length.`);
       else if ( mysqlTypesWithLengthRequiringDecimals.includes(property.type) && !isNaN(property.length) && isNaN(property.decimals) )
         throw new Error(`Property of type REAL, DOUBLE, or FLOAT used with length, but without decimals.`);
@@ -117,7 +117,7 @@ module.exports.createTable = async (db, obj) => {
         createQuery += ` KEY`;
 
       /** Properties with COMMENT */
-      if ( property.comment && typeof property.comment == 'string' )
+      if ( property.comment && typeof property.comment == `string` )
         createQuery += ` COMMENT '${property.comment.replace(`'`, ``)}'`;
 
       createQuery += `, `;
@@ -138,11 +138,11 @@ module.exports.createTable = async (db, obj) => {
         index.type = index.type.toUpperCase();
         
         /** If type is not defined, default to BTREE */
-        if ( typeof index.type !== 'string' )
-          index.type = 'BTREE';
+        if ( typeof index.type !== `string` )
+          index.type = `BTREE`;
 
         /** Validate index settings */
-        if ( index.type != 'BTREE' && index.type != 'HASH' )
+        if ( index.type != `BTREE` && index.type != `HASH` )
           throw new Error(`Invalid index type '${index.type}'.`);
         else if ( index.visible && index.invisible )
           throw new Error(`Index cannot have both VISIBLE and INVISIBLE options set.`);
@@ -162,23 +162,23 @@ module.exports.createTable = async (db, obj) => {
         createQuery += `)`;
 
         /** Indexes with KEY_BLOCK_SIZE */
-        if ( typeof index.keyBlockSize === 'number' )
+        if ( typeof index.keyBlockSize === `number` )
           createQuery += ` KEY_BLOCK_SIZE ${index.keyBlockSize}`;
 
         /** Indexes with WITH PARSER */
-        if ( typeof index.parserName === 'string' )
+        if ( typeof index.parserName === `string` )
           createQuery += ` WITH PARSER ${index.parserName}`;
 
         /** Indexes with COMMENT */
-        if ( typeof index.comment === 'string' )
+        if ( typeof index.comment === `string` )
           createQuery += ` COMMENT '${index.comment.replace(`'`, ``)}'`;
 
         /** Indexes with VISIBLE */
-        if ( typeof index.visible === 'boolean' && index.visible )
+        if ( typeof index.visible === `boolean` && index.visible )
           createQuery += ` VISIBLE`;
 
         /** Indexes with INVISIBLE */
-        if ( typeof index.visible === 'boolean' && index.invisible )
+        if ( typeof index.visible === `boolean` && index.invisible )
           createQuery += ` INVISIBLE`;
 
         createQuery += `, `;
@@ -239,7 +239,7 @@ module.exports.createObject = (obj) => {
   let parent;
   
   /** Figure out proper global scope between node (global) and browser (window) */
-  if ( typeof window !== 'undefined' )
+  if ( typeof window !== `undefined` )
     parent = window;
   else
     parent = global;
@@ -256,11 +256,11 @@ module.exports.createObject = (obj) => {
     /** Create initializer */
     init(data = {}) {
       /** If there is an 'init' function on super, call it */
-      if ( typeof super.init === 'function' )
+      if ( typeof super.init === `function` )
         super.init(data);
     
       /** If data is a string, assume it's JSON encoded and parse */
-      if ( typeof data == 'string' )
+      if ( typeof data == `string` )
         data = JSON.parse(data);
 
       /** Loop through each key/val pair in data */
@@ -268,7 +268,7 @@ module.exports.createObject = (obj) => {
         /** If key begins with '_' */
         if ( key.match(/^_/) ) {
           /** Create a new key with the '_' character stripped from the beginning */
-          Object.defineProperty(data, key.replace(/^_/, ''), Object.getOwnPropertyDescriptor(data, key));
+          Object.defineProperty(data, key.replace(/^_/, ``), Object.getOwnPropertyDescriptor(data, key));
           
           /** Delete the old key that has '_' */
           delete data[key];
@@ -281,23 +281,23 @@ module.exports.createObject = (obj) => {
       /** Loop through each property in the obj */
       obj.properties.forEach((property) => {
         /** Initialize 'number' types to zero */
-        if ( property.type == 'number' )
+        if ( property.type == `number` )
           this[property.name](data[property.name] || property.default || 0);
 
         /** Initialize 'boolean' types to false */
-        else if ( property.type == 'boolean' )
+        else if ( property.type == `boolean` )
           this[property.name](data[property.name] || property.default || false);
         
         /** Initialize 'string' types to empty */
-        else if ( property.type == 'string' )
-          this[property.name](data[property.name] || property.default || '');
+        else if ( property.type == `string` )
+          this[property.name](data[property.name] || property.default || ``);
 
         /** Initialize 'function' types to empty function */
-        else if ( property.type == 'function' )
+        else if ( property.type == `function` )
           this[property.name](data[property.name] || property.default || emptyFunction);
         
         /** Initialize 'Array' types to empty */
-        else if ( property.type == 'Array' )
+        else if ( property.type == `Array` )
           this[property.name](data[property.name] || property.default || []);
 
         /** Initialize all other types to null */
@@ -305,28 +305,28 @@ module.exports.createObject = (obj) => {
           this[property.name](data[property.name] || property.default || null);
       });
     }
-  }
+  };
   
   /** Loop through each property in the obj */
   obj.properties.forEach((property) => {
     /** If there is no getter transform, set to default */
-    if ( typeof property.getTransform !== 'function' )
+    if ( typeof property.getTransform !== `function` )
       property.getTransform = defaultTransform;
     
     /** If there is no setter transform, set to default */
-    if ( typeof property.setTransform !== 'function' )
+    if ( typeof property.setTransform !== `function` )
       property.setTransform = defaultTransform;
     
     /** If there is no save transform, set to default */
-    if ( typeof property.saveTransform !== 'function' )
+    if ( typeof property.saveTransform !== `function` )
       property.saveTransform = defaultTransform;
     
     /** If there is no load transform, set to default */
-    if ( typeof property.loadTransform !== 'function' )
+    if ( typeof property.loadTransform !== `function` )
       property.loadTransform = defaultTransform;
     
-    /** For 'number' type properties */
-    if ( property.type == 'number' ) {
+    /** For `number` type properties */
+    if ( property.type == `number` ) {
       /** Create class method on prototype */
       parent[obj.className].prototype[property.name] = function (arg) { 
         /** Getter */
@@ -334,7 +334,7 @@ module.exports.createObject = (obj) => {
           return property.getTransform(this[`_${property.name}`]); 
 
         /** Setter */
-        else if ( typeof arg == 'number' ) 
+        else if ( typeof arg == `number` ) 
           this[`_${property.name}`] = property.setTransform(arg); 
 
         /** Handle type errors */
@@ -346,8 +346,8 @@ module.exports.createObject = (obj) => {
       };
     }
 
-    /** For 'boolean' type properties */
-    else if ( property.type == 'boolean' ) {
+    /** For `boolean` type properties */
+    else if ( property.type == `boolean` ) {
       /** Create class method on prototype */
       parent[obj.className].prototype[property.name] = function (arg) { 
         /** Getter */
@@ -355,7 +355,7 @@ module.exports.createObject = (obj) => {
           return property.getTransform(this[`_${property.name}`]); 
 
         /** Setter */
-        else if ( typeof arg == 'boolean' ) 
+        else if ( typeof arg == `boolean` ) 
           this[`_${property.name}`] = property.setTransform(arg); 
 
         /** Handle type errors */
@@ -367,8 +367,8 @@ module.exports.createObject = (obj) => {
       };
     }
     
-    /** For 'string' type properties */
-    else if ( property.type == 'string' ) {
+    /** For `string` type properties */
+    else if ( property.type == `string` ) {
       /** Create class method on prototype */
       parent[obj.className].prototype[property.name] = function (arg) { 
         /** Getter */
@@ -376,7 +376,7 @@ module.exports.createObject = (obj) => {
           return property.getTransform(this[`_${property.name}`]); 
 
         /** Setter */
-        else if ( typeof arg == 'string' ) 
+        else if ( typeof arg == `string` ) 
           this[`_${property.name}`] = property.setTransform(arg); 
 
         /** Handle type errors */
@@ -388,8 +388,8 @@ module.exports.createObject = (obj) => {
       };
     } 
     
-    /** For 'function' type properties */
-    else if ( property.type == 'function' ) {
+    /** For `function` type properties */
+    else if ( property.type == `function` ) {
       /** Create class method on prototype */
       parent[obj.className].prototype[property.name] = function (arg) { 
         /** Getter */
@@ -397,7 +397,7 @@ module.exports.createObject = (obj) => {
           return property.getTransform(this[`_${property.name}`]); 
 
         /** Setter */
-        else if ( typeof arg == 'function' ) 
+        else if ( typeof arg == `function` ) 
           this[`_${property.name}`] = property.setTransform(arg); 
 
         /** Handle type errors */
@@ -409,8 +409,8 @@ module.exports.createObject = (obj) => {
       };
     } 
 
-    /** For 'Array' type properties */
-    else if ( property.type == 'Array' ) {
+    /** For `Array` type properties */
+    else if ( property.type == `Array` ) {
       /** Create class method on prototype */
       parent[obj.className].prototype[property.name] = function (arg) { 
         /** Getter */
@@ -418,7 +418,7 @@ module.exports.createObject = (obj) => {
           return property.getTransform(this[`_${property.name}`]); 
 
         /** Setter */
-        else if ( typeof arg == 'object' && arg.constructor.name == property.type )
+        else if ( typeof arg == `object` && arg.constructor.name == property.type )
           this[`_${property.name}`] = property.setTransform(arg); 
 
         /** Handle type errors */
@@ -439,7 +439,7 @@ module.exports.createObject = (obj) => {
           return property.getTransform(this[`_${property.name}`]); 
 
         /** Setter */
-        else if ( arg === null || ( typeof arg == 'object' && arg.constructor.name == property.type ) || ( typeof property.instanceOf == 'string' && module.exports.instanceof(arg, property.instanceOf) ) ) 
+        else if ( arg === null || ( typeof arg == `object` && arg.constructor.name == property.type ) || ( typeof property.instanceOf == `string` && module.exports.instanceof(arg, property.instanceOf) ) ) 
           this[`_${property.name}`] = property.setTransform(arg); 
 
         /** Handle type errors */
@@ -451,11 +451,11 @@ module.exports.createObject = (obj) => {
       };
     }
     
-    if ( typeof obj.tableName == 'string' ) {
+    if ( typeof obj.tableName == `string` ) {
       /** Create MySQL delete method on prototype */
       parent[obj.className].prototype.delete = async function (db) { 
         /** If the argument is a valid database, delete the record */
-        if ( typeof db == 'object' && db.constructor.name == 'MySQLConnection' ) {
+        if ( typeof db == `object` && db.constructor.name == `MySQLConnection` ) {
           /** Execute query to delete record from database */
           await db.query(`DELETE FROM ${obj.tableName} WHERE id = ?`, [this.id()]);
         } 
@@ -472,13 +472,13 @@ module.exports.createObject = (obj) => {
       /** Create MySQL insert method on prototype */
       parent[obj.className].prototype.insert = async function (arg1) { 
         /** Provide option for inserting record from browser if developer implements ajax backend */
-        if ( typeof window !== 'undefined' && typeof arg1 == 'string' ) {
+        if ( typeof window !== `undefined` && typeof arg1 == `string` ) {
           const url = new URL(arg1);
 
           const result = await $.get({
             url: url.href,
             data: JSON.stringify(this),
-            dataType: 'json'
+            dataType: `json`
           });
 
           if ( result && result.insertId )
@@ -488,7 +488,7 @@ module.exports.createObject = (obj) => {
         }
         
         /** If the argument is a valid database, insert record into database and capture ID */
-        else if ( typeof arg1 == 'object' && arg1.constructor.name == 'MySQLConnection' ) {
+        else if ( typeof arg1 == `object` && arg1.constructor.name == `MySQLConnection` ) {
           /** Create array for storing values to insert */
           const params = [];
 
@@ -500,12 +500,12 @@ module.exports.createObject = (obj) => {
 
             /** Loop through each property */
             obj.properties.forEach((property) => {
-              /** Ignore ID since we'll get that from the insert */
-              if ( property.name == 'id' )
+              /** Ignore ID since we`ll get that from the insert */
+              if ( property.name == `id` )
                 return;
 
-              /** Ignore properties that don't have MySQL types */
-              if ( typeof property.mysqlType == 'undefined' )
+              /** Ignore properties that don`t have MySQL types */
+              if ( typeof property.mysqlType == `undefined` )
                 return;
               
               /** Add property to params array after performing the save transform */
@@ -527,12 +527,12 @@ module.exports.createObject = (obj) => {
 
             /** Loop through each property */
             obj.properties.forEach((property) => {
-              /** Ignore ID since we'll get that from the insert */
-              if ( property.name == 'id' )
+              /** Ignore ID since we`ll get that from the insert */
+              if ( property.name == `id` )
                 return;
               
-              /** Ignore properties that don't have MySQL types */
-              if ( typeof property.mysqlType == 'undefined' )
+              /** Ignore properties that don`t have MySQL types */
+              if ( typeof property.mysqlType == `undefined` )
                 return;
               
               /** Append property name to query */
@@ -543,7 +543,7 @@ module.exports.createObject = (obj) => {
           /** Add property names to query */
           propertyNames(obj);
 
-          /** Trim extra ', ' from property list */
+          /** Trim extra `, ` from property list */
           query = query.substr(0, query.length - 2);
           
           /** Continue query */
@@ -557,12 +557,12 @@ module.exports.createObject = (obj) => {
 
             /** Loop through each property */
             obj.properties.forEach((property) => {
-              /** Ignore ID since we'll get that from the insert */
-              if ( property.name == 'id' )
+              /** Ignore ID since we`ll get that from the insert */
+              if ( property.name == `id` )
                 return;
 
-              /** Ignore properties that don't have MySQL types */
-              if ( typeof property.mysqlType == 'undefined' )
+              /** Ignore properties that don`t have MySQL types */
+              if ( typeof property.mysqlType == `undefined` )
                 return;
               
               /** Append placeholder to query */
@@ -573,7 +573,7 @@ module.exports.createObject = (obj) => {
           /** Add property placeholders to query */
           propertyPlaceholders(obj);
 
-          /** Trim extra ', ' from placeholder list */
+          /** Trim extra `, ` from placeholder list */
           query = query.substr(0, query.length - 2);
           
           /** Finish query */
@@ -598,12 +598,12 @@ module.exports.createObject = (obj) => {
       /** Create MySQL load method on prototype */
       parent[obj.className].prototype.load = async function (arg1, arg2) {
         /** Provide option for loading record from browser if developer implements ajax backend */
-        if ( typeof window !== 'undefined' && typeof arg1 == 'string' ) {
+        if ( typeof window !== `undefined` && typeof arg1 == `string` ) {
           const url = new URL(arg1);
 
           const result = await $.get({
             url: url.href,
-            dataType: 'json'
+            dataType: `json`
           });
 
           if ( result )
@@ -613,7 +613,7 @@ module.exports.createObject = (obj) => {
         }
 
         /** If the first argument is a valid database and the second is a number, load record from database by ID */
-        else if ( typeof arg1 == 'object' && arg1.constructor.name == 'MySQLConnection' && ( typeof arg2 == 'number' || ( typeof arg2 == 'string' && typeof obj.stringSearchField == 'string' ) ) ) {
+        else if ( typeof arg1 == `object` && arg1.constructor.name == `MySQLConnection` && ( typeof arg2 == `number` || ( typeof arg2 == `string` && typeof obj.stringSearchField == `string` ) ) ) {
           /** Begin SELECT query */
           let query = `SELECT `;
 
@@ -625,8 +625,8 @@ module.exports.createObject = (obj) => {
 
             /** Loop through each property */
             obj.properties.forEach((property) => {
-              /** Ignore properties that don't have MySQL types */
-              if ( typeof property.mysqlType == 'undefined' )
+              /** Ignore properties that don`t have MySQL types */
+              if ( typeof property.mysqlType == `undefined` )
                 return;
               
               /** Append property name to query */
@@ -637,13 +637,13 @@ module.exports.createObject = (obj) => {
           /** Add property names to query */
           propertyNames(obj);
 
-          /** Trim extra ', ' from property list */
+          /** Trim extra `, ` from property list */
           query = query.substr(0, query.length - 2);
           
           /** Finish query */
           query += ` FROM ${obj.tableName} `;
           
-          if ( typeof arg2 === 'string' && typeof obj.stringSearchField === 'string' )
+          if ( typeof arg2 === `string` && typeof obj.stringSearchField === `string` )
             query += `WHERE ${obj.stringSearchField} = ?`;
           else
             query += `WHERE id = ?`;
@@ -651,7 +651,7 @@ module.exports.createObject = (obj) => {
           /** Execute query to load record properties from the database */
           const result = await arg1.query(query, [arg2]);
 
-          /** If a record with that ID doesn't exist, throw error */
+          /** If a record with that ID doesn`t exist, throw error */
           if ( !result[0] )
             throw new ReferenceError(`${this.constructor.name}.load(): Record ${arg2} in ${obj.tableName} does not exist.`);
 
@@ -663,8 +663,8 @@ module.exports.createObject = (obj) => {
 
             /** Loop through each property */
             obj.properties.forEach((property) => {
-              /** Ignore properties that don't have MySQL types */
-              if ( typeof property.mysqlType == 'undefined' )
+              /** Ignore properties that don`t have MySQL types */
+              if ( typeof property.mysqlType == `undefined` )
                 return;
               
               /** Append property in object */
@@ -677,7 +677,7 @@ module.exports.createObject = (obj) => {
         } 
         
         /** If the first argument is a MySQL RowDataPacket, load from row data */
-        else if ( typeof arg1 == 'object' && ( arg1.constructor.name == 'RowDataPacket' || arg1.constructor.name == 'Array' ) ) {
+        else if ( typeof arg1 == `object` && ( arg1.constructor.name == `RowDataPacket` || arg1.constructor.name == `Array` ) ) {
           /** Create helper method for recursively loading property values into object */
           const loadProperties = (obj) => {
             /** If this object extends another, recursively add extended property values into objecct */
@@ -687,7 +687,7 @@ module.exports.createObject = (obj) => {
             /** Loop through each property */
             obj.properties.forEach((property) => {
               /** Append property in object */
-              if ( typeof arg1[property.name] !== 'undefined' )
+              if ( typeof arg1[property.name] !== `undefined` )
                 this[property.name](property.loadTransform(arg1[property.name]));
             });
           };
@@ -708,13 +708,13 @@ module.exports.createObject = (obj) => {
       /** Create MySQL update method on prototype */
       parent[obj.className].prototype.update = async function (arg1) { 
         /** Provide option for inserting record from browser if developer implements ajax backend */
-        if ( typeof window !== 'undefined' && typeof arg1 == 'string' ) {
+        if ( typeof window !== `undefined` && typeof arg1 == `string` ) {
           const url = new URL(arg1);
 
           const result = await $.get({
             url: url.href,
             data: JSON.stringify(this),
-            dataType: 'json'
+            dataType: `json`
           });
 
           if ( !result )
@@ -722,7 +722,7 @@ module.exports.createObject = (obj) => {
         }
         
         /** If the argument is a valid database, update database record */
-        else if ( typeof arg1 == 'object' && arg1.constructor.name == 'MySQLConnection' ) {
+        else if ( typeof arg1 == `object` && arg1.constructor.name == `MySQLConnection` ) {
           /** Create array for storing values to update */
           const params = [];
 
@@ -735,11 +735,11 @@ module.exports.createObject = (obj) => {
             /** Loop through each property */
             obj.properties.forEach((property) => {
               /** Ignore ID since we will use that to locate the record, and will never update it */
-              if ( property.name == 'id' )
+              if ( property.name == `id` )
                 return;
               
-              /** Ignore properties that don't have MySQL types */
-              if ( typeof property.mysqlType == 'undefined' )
+              /** Ignore properties that don`t have MySQL types */
+              if ( typeof property.mysqlType == `undefined` )
                 return;
 
               /** Add property to params array after performing the save transform */
@@ -765,11 +765,11 @@ module.exports.createObject = (obj) => {
             /** Loop through each property */
             obj.properties.forEach((property) => {
               /** Ignore ID since we will use that to locate the record, and will never update it */
-              if ( property.name == 'id' )
+              if ( property.name == `id` )
                 return;
 
-              /** Ignore properties that don't have MySQL types */
-              if ( typeof property.mysqlType == 'undefined' )
+              /** Ignore properties that don`t have MySQL types */
+              if ( typeof property.mysqlType == `undefined` )
                 return;
               
               /** Append property update to query */
@@ -780,7 +780,7 @@ module.exports.createObject = (obj) => {
           /** Add property updates to query */
           propertyUpdates(obj);
 
-          /** Trim extra ', ' from property list */
+          /** Trim extra `, ` from property list */
           query = query.substr(0, query.length - 2);
 
           /** Finish query */
@@ -802,11 +802,11 @@ module.exports.createObject = (obj) => {
   });
   
   /** 
-   * Because we're creating this object dynamically, we need to manually give it a name 
+   * Because we`re creating this object dynamically, we need to manually give it a name 
    * attribute so we can identify it by its type when we want to.
    */
-  Object.defineProperty(parent[obj.className], 'name', { value: obj.className });
-}
+  Object.defineProperty(parent[obj.className], `name`, { value: obj.className });
+};
 
 /** Re-export MySQLConnection */
 module.exports.MySQLConnection = mysqlConnection.MySQLConnection;

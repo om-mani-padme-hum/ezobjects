@@ -1,5 +1,5 @@
 /** Require external modules */
-const mysql = require('mysql');
+const mysql = require(`mysql`);
 
 /**
  * @class ezobjects.MySQLConnection
@@ -121,7 +121,7 @@ class MySQLConnection {
       return this._config;
     
     /** Setter */
-    else if ( typeof arg1 == 'object' )
+    else if ( typeof arg1 == `object` )
       this._config = arg1; 
     
     /** Handle errors */
@@ -149,7 +149,7 @@ class MySQLConnection {
       return this._conn;
     
     /** Setter */
-    else if ( arg1 === null || ( typeof arg1 == 'object' && arg1.constructor.name == 'Connection' ) )
+    else if ( arg1 === null || ( typeof arg1 == `object` && arg1.constructor.name == `Connection` ) )
       this._conn = arg1; 
     
     /** Handle errors */
@@ -169,7 +169,7 @@ class MySQLConnection {
     return new Promise((resolve, reject) => {
       /** Verify configuration exists */
       if ( !this.config() )
-        reject('MySQL configuration not set, aborting connection.');
+        reject(`MySQL configuration not set, aborting connection.`);
 
       /** Set MySQL connection info */
       this.conn(mysql.createConnection(this.config()));
@@ -209,7 +209,7 @@ class MySQLConnection {
       return this._inTransaction;
     
     /** Setter */
-    else if ( typeof arg1 == 'boolean' )
+    else if ( typeof arg1 == `boolean` )
       this._inTransaction = arg1; 
     
     /** Handle errors */
@@ -223,7 +223,7 @@ class MySQLConnection {
   /**
    * @signature query(query, params)
    * @param query string Valid MySQL query
-   * @param params Array Ordered array with values matching the parameters marked by '?' in the `query`
+   * @param params Array Ordered array with values matching the parameters marked by `?` in the `query`
    * @returns Promise
    * @description Queries the MySQL database, returning a [Promise] that resolves when finished or rejects on error.  If the database has not
    * yet established a connection, it is automatically done prior to query execution.
@@ -241,7 +241,7 @@ class MySQLConnection {
   /**
    * @signature execute(query, params)
    * @param query string Valid MySQL query
-   * @param params Array Ordered array with values matching the parameters marked by '?' int he `query`
+   * @param params Array Ordered array with values matching the parameters marked by `?` int he `query`
    * @returns Promise
    * @description Queries the MySQL database, returning a [Promise] that resolves when finished or rejects on error.  Rejected query executions
    * in the middle of transactions have their transactions automatically rolled back.

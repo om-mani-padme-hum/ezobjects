@@ -1,24 +1,24 @@
 /** Require external modules */
-const fs = require('fs');
-const moment = require('moment');
+const fs = require(`fs`);
+const moment = require(`moment`);
 
 /** Require internal modules */
-const ezobjects = require('./index');
+const ezobjects = require(`./index`);
 
 /** Connect to the MySQL database using login info stored externally */
-const db = new ezobjects.MySQLConnection(JSON.parse(fs.readFileSync('mysql-config.json')));
+const db = new ezobjects.MySQLConnection(JSON.parse(fs.readFileSync(`mysql-config.json`)));
 
 /** 
- * Configure a new EZ Object called DatabaseRecord with one 'id' 
+ * Configure a new EZ Object called DatabaseRecord with one `id` 
  * property that contains additional MySQL configuration settings.
  */
 const configDatabaseRecord = {
-  className: 'DatabaseRecord',
+  className: `DatabaseRecord`,
   properties: [
     { 
-      name: 'id', 
-      type: 'number', 
-      mysqlType: 'int', 
+      name: `id`, 
+      type: `number`, 
+      mysqlType: `int`, 
       autoIncrement: true, 
       primary: true, 
       setTransform: x => parseInt(x) 
@@ -42,52 +42,52 @@ ezobjects.createObject(configDatabaseRecord);
  * a MySQL index.
  */
 const configUser = {
-  tableName: 'users',
-  className: 'User',
+  tableName: `users`,
+  className: `User`,
   extends: DatabaseRecord,
   extendsConfig: configDatabaseRecord,
   properties: [
     {
-      name: 'username',
-      type: 'string',
-      mysqlType: 'varchar',
+      name: `username`,
+      type: `string`,
+      mysqlType: `varchar`,
       length: 20
     },
     { 
-      name: 'firstName', 
-      type: 'string', 
-      mysqlType: 'varchar', 
+      name: `firstName`, 
+      type: `string`, 
+      mysqlType: `varchar`, 
       length: 20 
     },
     { 
-      name: 'lastName', 
-      type: 'string', 
-      mysqlType: 'varchar', 
+      name: `lastName`, 
+      type: `string`, 
+      mysqlType: `varchar`, 
       length: 20 
     },
     { 
-      name: 'checkingBalance', 
-      type: 'number', 
-      mysqlType: 'double', 
+      name: `checkingBalance`, 
+      type: `number`, 
+      mysqlType: `double`, 
       setTransform: x => parseFloat(x) 
     },
     { 
-      name: 'permissions', 
-      type: 'Array', 
-      mysqlType: 'text', 
-      saveTransform: x => x.join(','), 
-      loadTransform: x => x.split(',').map(x => parseInt(x))
+      name: `permissions`, 
+      type: `Array`, 
+      mysqlType: `text`, 
+      saveTransform: x => x.join(`,`), 
+      loadTransform: x => x.split(`,`).map(x => parseInt(x))
     },
     { 
-      name: 'favoriteDay', 
-      type: 'Date', 
-      mysqlType: 'datetime', 
-      saveTransform: x => moment(x).format('Y-MM-DD HH:mm:ss'), 
+      name: `favoriteDay`, 
+      type: `Date`, 
+      mysqlType: `datetime`, 
+      saveTransform: x => moment(x).format(`Y-MM-DD HH:mm:ss`), 
       loadTransform: x => new Date(x) 
     }
   ],
   indexes: [
-    { name: 'lastName', type: 'BTREE', columns: [ 'lastName' ] }
+    { name: `lastName`, type: `BTREE`, columns: [ `lastName` ] }
   ]
 };
 
@@ -96,21 +96,21 @@ ezobjects.createObject(configUser);
 
 /** Create new user, initializing with object passed to constructor */
 const user = new User({
-  username: 'richlowe',
-  firstName: 'Rich',
-  lastName: 'Lowe',
+  username: `richlowe`,
+  firstName: `Rich`,
+  lastName: `Lowe`,
   checkingBalance: 4.32,
   permissions: [1, 3, 5],
-  favoriteDay: new Date('01-01-2018')
+  favoriteDay: new Date(`01-01-2018`)
 });
 
 /** Test if user is an instance of DatabaseRecord */
-console.log(ezobjects.instanceOf(user, 'DatabaseRecord'));
+console.log(ezobjects.instanceOf(user, `DatabaseRecord`));
 
 /** Self-executing async wrapper so we can await results */
 (async () => {
   try {
-    /** Create table if it doesn't already exist */
+    /** Create table if it doesn`t already exist */
     await ezobjects.createTable(db, configUser);
 
     /** Insert user into the database */
@@ -121,8 +121,8 @@ console.log(ezobjects.instanceOf(user, 'DatabaseRecord'));
 
     /** Change the property values a bit */
     user.checkingBalance(50.27);
-    user.firstName('Richard');
-    user.favoriteDay(new Date('09-01-2019'));
+    user.firstName(`Richard`);
+    user.favoriteDay(new Date(`09-01-2019`));
 
     /** Update user in the database */
     await user.update(db);
