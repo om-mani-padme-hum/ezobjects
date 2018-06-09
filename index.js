@@ -20,6 +20,11 @@ const mysqlConnection = require('./mysql-connection');
  * exist, based on the values in the provided configuration object.
  */
 module.exports.createTable = async (db, obj) => {
+  if ( typeof db != 'object' || db.constructor.name != 'MySQLConnection' )
+    throw new Error(`ezobjects.createTable(): Invalid database argument.`);
+  else if ( typeof obj != 'object' )
+    throw new Error(`ezobjects.createTable(): Invalid table configuration argument.`);
+    
   /** Create some helpful arrays for identifying MySQL types that have certain features */
   const mysqlTypesAllowed = [`BIT`, `TINYINT`, `SMALLINT`, `MEDIUMINT`, `INT`, `INTEGER`, `BIGINT`, `REAL`, `DOUBLE`, `FLOAT`,
                              `DECIMAL`, `NUMERIC`, `DATE`, `TIME`, `TIMESTAMP`, `DATETIME`, `YEAR`, `CHAR`, `VARCHAR`, `BINARY`,
