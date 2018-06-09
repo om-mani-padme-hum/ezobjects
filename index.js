@@ -275,6 +275,9 @@ module.exports.createObject = (obj) => {
         }
       });
       
+      const emptyFunction = function () {
+      };
+      
       /** Loop through each property in the obj */
       obj.properties.forEach((property) => {
         /** Initialize 'number' types to zero */
@@ -289,6 +292,10 @@ module.exports.createObject = (obj) => {
         else if ( property.type == 'string' )
           this[property.name](data[property.name] || property.default || '');
 
+        /** Initialize 'function' types to empty function */
+        else if ( property.type == 'function' )
+          this[property.name](data[property.name] || property.default || emptyFunction);
+        
         /** Initialize 'Array' types to empty */
         else if ( property.type == 'Array' )
           this[property.name](data[property.name] || property.default || []);
@@ -370,6 +377,27 @@ module.exports.createObject = (obj) => {
 
         /** Setter */
         else if ( typeof arg == 'string' ) 
+          this[`_${property.name}`] = property.setTransform(arg); 
+
+        /** Handle type errors */
+        else 
+          throw new TypeError(`${this.constructor.name}.${property.name}(${typeof arg}): Invalid signature.`); 
+
+        /** Return this object for set call chaining */
+        return this; 
+      };
+    } 
+    
+    /** For 'function' type properties */
+    else if ( property.type == 'function' ) {
+      /** Create class method on prototype */
+      parent[obj.className].prototype[property.name] = function (arg) { 
+        /** Getter */
+        if ( arg === undefined ) 
+          return property.getTransform(this[`_${property.name}`]); 
+
+        /** Setter */
+        else if ( typeof arg == 'function' ) 
           this[`_${property.name}`] = property.setTransform(arg); 
 
         /** Handle type errors */

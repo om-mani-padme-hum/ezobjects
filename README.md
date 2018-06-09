@@ -1,4 +1,4 @@
-# EZ Objects v2.7.1
+# EZ Objects v2.8.0
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects.  All you have to do is create simple configurations for each of your objects and then call
@@ -398,6 +398,7 @@ See the following for how to configure your EZ Objects:
 * `number` - 0
 * `string` - ''
 * `boolean` - false
+* `function` - function () { }
 * `Array` - []
 * Everything else - null
 
