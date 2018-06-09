@@ -214,7 +214,7 @@ module.exports.instanceOf = (obj, constructorName) => {
   let found = false;
   
   const isInstance = (obj) => {
-    if ( obj.constructor.name == constructorName )
+    if ( typeof obj.constructor !== 'undefined' && obj.constructor.name == constructorName )
       found = true;
     
     if ( obj.__proto__ )
