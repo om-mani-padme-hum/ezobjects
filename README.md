@@ -1,4 +1,4 @@
-# EZ Objects v2.8.6
+# EZ Objects v2.8.7
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects.  All you have to do is create simple configurations for each of your objects and then call
@@ -360,7 +360,8 @@ See the following for how to configure your EZ Objects:
 ### A basic property configuration can have the following:
 
 * **name** - `string` - (required) Name of the property, must conform to both JavaScript and MySQL rules
-* **type** - `string` - (required) JavaScript data type for the property
+* **type** - `string` - (optional) JavaScript data type that the property must be equal to \[either **type** or **instanceOf** is required]
+* **instanceOf** - `string` - (optional) JavaScript class constructor name that the property must be an instance of \[either **type** or **instanceOf** is required]
 * **default** - `mixed` - (optional) Sets the default value for the property in the class object
 * **getTransform** - `function` - (optional) Function that transforms and returns the property value prior to getting
 * **setTransform** - `function` - (optional) Function that transforms and returns the property value prior to setting
