@@ -280,35 +280,39 @@ module.exports.createObject = (obj) => {
       
       /** Loop through each property in the obj */
       obj.properties.forEach((property) => {
+        /** If there is no init transform, set to default */
+        if ( typeof property.initTransform !== `function` )
+          property.initTransform = defaultTransform;
+
         /** Initialize 'number' types to zero */
         if ( property.type == `number` )
-          this[property.name](data[property.name] || property.default || 0);
+          this[property.name](property.initTransform(data[property.name]) || property.default || 0);
 
         /** Initialize 'boolean' types to false */
         else if ( property.type == `boolean` )
-          this[property.name](data[property.name] || property.default || false);
+          this[property.name](property.initTransform(data[property.name]) || property.default || false);
         
         /** Initialize 'string' types to empty */
         else if ( property.type == `string` )
-          this[property.name](data[property.name] || property.default || ``);
+          this[property.name](property.initTransform(data[property.name]) || property.default || ``);
 
         /** Initialize 'function' types to empty function */
         else if ( property.type == `function` )
-          this[property.name](data[property.name] || property.default || emptyFunction);
+          this[property.name](property.initTransform(data[property.name]) || property.default || emptyFunction);
         
         /** Initialize 'Array' types to empty */
         else if ( property.type == `Array` )
-          this[property.name](data[property.name] || property.default || []);
+          this[property.name](property.initTransform(data[property.name]) || property.default || []);
 
         /** Initialize all other types to null */
         else
-          this[property.name](data[property.name] || property.default || null);
+          this[property.name](property.initTransform(data[property.name]) || property.default || null);
       });
     }
   };
   
   /** Loop through each property in the obj */
-  obj.properties.forEach((property) => {
+  obj.properties.forEach((property) => {    
     /** If there is no getter transform, set to default */
     if ( typeof property.getTransform !== `function` )
       property.getTransform = defaultTransform;
