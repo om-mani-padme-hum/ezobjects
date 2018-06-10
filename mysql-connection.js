@@ -174,6 +174,11 @@ class MySQLConnection {
       /** Set MySQL connection info */
       this.conn(mysql.createConnection(this.config()));
 
+      this.conn().on('error', function(err) {
+        console.log(`MySQL received ${err.code}, closing db connection.`);
+        this.close();
+      });
+      
       /** Attempt to connect to the database */
       this.conn().connect((err) => {
         /** Handle errors */
