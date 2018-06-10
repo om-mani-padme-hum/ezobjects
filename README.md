@@ -1,6 +1,6 @@
-# EZ Objects v2.8.5
+# EZ Objects v2.8.6
 
-EZ Objects is a Node.js module (that can also be usefully browserify`d) that aims to save you lots of time 
+EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects.  All you have to do is create simple configurations for each of your objects and then call
 the library function(s).  Let`s start by showing a basic example:
 
@@ -69,7 +69,7 @@ User {
 ## MySQL Example w/ Extended Object
 
 **Important Notes:** Your object must have a unique integer property named `id` to be able to use the MySQL 
-functionality of EZ Objects.  You must also use EZ Object`s MySQLConnection class for your database connection.
+functionality of EZ Objects.  You must also use EZ Object's MySQLConnection class for your database connection.
 
 ```javascript
 const ezobjects = require(`ezobjects`);
@@ -298,7 +298,7 @@ it will have the following signatures:
 ## MySQL EZ Object Method Signatures
 
 These are the object method signatures that will additionally be provided if your configuration contains a `tableName`,
-meaning it`s intended to be linked to a MySQL table:
+meaning it's intended to be linked to a MySQL table:
 
 ### MyObject.delete(db)
  * **Parameter:** db - `MySQLConnection`
@@ -306,7 +306,7 @@ meaning it`s intended to be linked to a MySQL table:
 
 ### MyObject.insert(db)
  * **Parameter:** db - `MySQLConnection`
- * **Description:** Insert this object`s property values into the database `db`, table `tableName`, and store the resulting insertId in the `id` property of this object.
+ * **Description:** Insert this object's property values into the database `db`, table `tableName`, and store the resulting insertId in the `id` property of this object.
 
 ### MyObject.load(db, id)
  * **Parameter:** db - `MySQLConnection`
@@ -319,20 +319,20 @@ meaning it`s intended to be linked to a MySQL table:
  * **Description:** Load the record in database `db`, table `tableName`, that has its `stringSearchField` field equal to provided `fieldValue` parameter.  Here, the actual field name of `stringSearchField` is provided in the object configuration, see the configuration section below.
 
 ### MyObject.load(url)
- * **Parameter:** url - `string` - The URL of a back-end that provides JSON data compatible with this object`s initializer
- * **Description:** Load the JSON-encoded data obtained from `url` using this object`s initializer.  
- * **Note:** This signature is useful only when your classes are standalone browserify`d and requires you to implement a backend at `url` that will output the JSON.  This signature also requires you have jQuery loaded prior to use.
+ * **Parameter:** url - `string` - The URL of a back-end that provides JSON data compatible with this object's initializer
+ * **Description:** Load the JSON-encoded data obtained from `url` using this object's initializer.  
+ * **Note:** This signature is useful only when your classes are standalone browserify'd and requires you to implement a backend at `url` that will output the JSON.  This signature also requires you have jQuery loaded prior to use.
 
 ### MyObject.update(db)
  * **Parameter:** db - `MySQLConnection`
- * **Description:** Update the record in database `db`, table `tableName`, with its `id` field equal to the `id` property of this object, using this object`s property values.
+ * **Description:** Update the record in database `db`, table `tableName`, with its `id` field equal to the `id` property of this object, using this object's property values.
 
 ## Module Exports
 
 The EZ Objects module exports two functions and a MySQL class object:
 
 ### ezobjects.createTable(db, objectConfig)
-A function that creates a MySQL table corresponding to the configuration outlined in `objectConfig`, if it doesn`t already exist
+A function that creates a MySQL table corresponding to the configuration outlined in `objectConfig`, if it doesn't already exist
 
 ### ezobjects.createObject(objectConfig)
 A function that creates an ES6 class corresponding to the configuration outlined in `objectConfig`, with constructor, initializer, getters, setters, and also delete, insert, load, and update if `tableName` is configured
@@ -348,11 +348,11 @@ See the following for how to configure your EZ Objects:
 
 * **className** - `string` - (required) Name of the class
 * **properties** - `Array` - (required) An array of property configurations that the object (and MySQL table, if applicable) should have corresponding properties for
-* **extends** - `mixed` - (optional) The object that the new object should be extended from [required to extend object]
+* **extends** - `mixed` - (optional) The object that the new object should be extended from \[required to extend object]
 
 ### A MySQL object configuration can also have the following:
 
-* **extendsConfig** - `object` - (optional) The EZ Object configuration for the object that is being extended from [required to extend object for use with MySQL table link]
+* **extendsConfig** - `object` - (optional) The EZ Object configuration for the object that is being extended from \[required to extend object for use with MySQL table link]
 * **tableName** - `string` - (optional) Provide if object should be linked with MySQL database table
 * **stringSearchField** - `string` - (optional) The name of a unique property of type `string` that you want to be able to load with as an alternative to `id`
 * **indexes** - `Array` - (optional) An array of MySQL index configurations that should be created in the MySQL table
@@ -367,12 +367,12 @@ See the following for how to configure your EZ Objects:
 
 ### A MySQL property configuration can also have the following:
 
-* **mysqlType** - `string` - (optional) MySQL data type for the property [required for MySQL table association]
-* **length** - `number` - (optional) MySQL data length for the property [required for MySQL table association on some data types like VARCHAR]
-* **decimals** - `number` - (optional) Number of decimals that should be provided for certain data types when SELECT`ed from the MySQL table
-* **primary** - `boolean` - (optional) Indicates the property is a PRIMARY KEY in the MySQL table [required for MySQL table association on at least one property in the table]
+* **mysqlType** - `string` - (optional) MySQL data type for the property \[required for MySQL table association]
+* **length** - `number` - (optional) MySQL data length for the property \[required for MySQL table association on some data types like VARCHAR]
+* **decimals** - `number` - (optional) Number of decimals that should be provided for certain data types when SELECT'ed from the MySQL table
+* **primary** - `boolean` - (optional) Indicates the property is a PRIMARY KEY in the MySQL table \[required for MySQL table association on at least one property in the table]
 * **unique** - `boolean` - (optional) Indicates the property is a UNIQUE KEY in the MySQL table
-* **null** - `boolean` - (optional) Indicates the property can be NULL [default is properties must be NOT NULL]
+* **null** - `boolean` - (optional) Indicates the property can be NULL \[default is properties must be NOT NULL]
 * **mysqlDefault** - `mixed` - (optional) Sets the default value for the property in the MySQL table, assuming its of the correct type
 * **unsigned** - `boolean` - (optional) Indicates the property should be unsigned in the MySQL table
 * **zerofill** - `boolean` - (optional) Indicates the property should be zero-filled in the MySQL table
