@@ -439,7 +439,7 @@ module.exports.createObject = (obj) => {
           return property.getTransform(this[`_${property.name}`]); 
 
         /** Setter */
-        else if ( arg === null || ( typeof arg == `object` && arg.constructor.name == property.type ) || ( typeof property.instanceOf == `string` && module.exports.instanceof(arg, property.instanceOf) ) ) 
+        else if ( arg === null || ( typeof arg == `object` && arg.constructor.name == property.type ) || ( typeof property.instanceOf == `string` && module.exports.instanceOf(arg, property.instanceOf) ) ) 
           this[`_${property.name}`] = property.setTransform(arg); 
 
         /** Handle type errors */
