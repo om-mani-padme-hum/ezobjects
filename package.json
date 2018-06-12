@@ -1,6 +1,6 @@
 {
   "name": "ezobjects",
-  "version": "2.10.3",
+  "version": "2.10.4",
   "description": "Easy dynamic object generation with optional MySQL table linking",
   "main": "index.js",
   "scripts": {
