@@ -1,10 +1,10 @@
-# EZ Objects v2.10.3
+# EZ Objects v2.10.4
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects that are strictly typed in JavaScript, and can be tied directly to MySQL database tables
-by way of a mix of insert/update/load class method signatures.  All you have to do is create simple configurations 
-for each of your objects and then create them using the createObject() function.  Let's start by showing a basic 
-example:
+by way of a mix of insert/update/load/delete class method signatures.  All you have to do is create simple 
+configurations for each of your objects and then create them using the createObject() function.  Let's start 
+by showing a basic example:
 
 ## Basic Example
 
