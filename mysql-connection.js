@@ -175,7 +175,7 @@ class MySQLConnection {
       this.conn(mysql.createConnection(this.config()));
 
       /** If there's an error that's not part of a callback, just close the connection */
-      this.conn().on('error', (function (err) {
+      this.conn().on(`error`, (function (err) {
         this.close();
       }).bind(this));
       
