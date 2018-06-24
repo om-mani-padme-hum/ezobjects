@@ -234,7 +234,7 @@ module.exports.instanceOf = (obj, constructorName) => {
  */
 module.exports.createObject = (obj) => {
   /** Add properties array if one wasn't set */
-  if ( typeof obj.properties != 'Array' )
+  if ( !obj.properties )
     obj.properties = [];
     
   /** Create default transform function that doesn't change the input */
