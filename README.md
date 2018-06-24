@@ -1,4 +1,4 @@
-# EZ Objects v2.11.0
+# EZ Objects v2.11.1
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects that are strictly typed in JavaScript, and can be tied directly to MySQL database tables
@@ -362,8 +362,8 @@ See the following for how to configure your EZ Objects:
 ### A basic property configuration can have the following:
 
 * **name** - `string` - (required) Name of the property, must conform to both JavaScript and MySQL rules
-* **type** - `string` - (optional) JavaScript data type that the property must be equal to \[either **type** or **instanceOf** is required]
-* **instanceOf** - `string` - (optional) JavaScript class constructor name that the property must be an instance of \[either **type** or **instanceOf** is required]
+* **type** - `string` - (optional) JavaScript data type, or types if separated by the pipe `|` character, that the property must be equal to -- types can be `string`, `number`, `boolean`, `function`, `Array`, or any valid object constructor name \[either **type** and/or **instanceOf** is required]
+* **instanceOf** - `string` - (optional) JavaScript class constructor name, or names if separated by the pipe `|` character, that the property must be an instance of \[either **type** and/or **instanceOf** is required]
 * **default** - `mixed` - (optional) Sets the default value for the property in the class object
 * **initTransform** - `function` - (optional) Function that transforms and returns the property value prior to initializing (does not affect ezobjects defaults or custom defaults)
 * **getTransform** - `function` - (optional) Function that transforms and returns the property value prior to getting
