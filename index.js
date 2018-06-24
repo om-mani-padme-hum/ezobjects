@@ -66,7 +66,7 @@ module.exports.createTable = async (db, obj) => {
         throw new Error(`Property of type VARCHAR used without required length.`);
       else if ( property.mysqlType == `VARBINARY` && isNaN(property.length) )
         throw new Error(`Property of type VARBINARY used without required length.`);
-      else if ( mysqlTypesWithLengthRequiringDecimals.includes(property.type) && !isNaN(property.length) && isNaN(property.decimals) )
+      else if ( mysqlTypesWithLengthRequiringDecimals.includes(property.mysqlType) && !isNaN(property.length) && isNaN(property.decimals) )
         throw new Error(`Property of type REAL, DOUBLE, or FLOAT used with length, but without decimals.`);
 
       /** Properties with length and/or decimals */
@@ -289,23 +289,23 @@ module.exports.createObject = (obj) => {
           property.initTransform = defaultTransform;
 
         /** Initialize 'number' types to zero */
-        if ( property.type == `number` )
+        if ( property.type && property.type.split(`|`).includes(`number`) )
           this[property.name](property.initTransform(data[property.name]) || property.default || 0);
 
         /** Initialize 'boolean' types to false */
-        else if ( property.type == `boolean` )
+        else if ( property.type && property.type.split(`|`).includes(`boolean`) )
           this[property.name](property.initTransform(data[property.name]) || property.default || false);
         
         /** Initialize 'string' types to empty */
-        else if ( property.type == `string` )
+        else if ( property.type && property.type.split(`|`).includes(`string`) )
           this[property.name](property.initTransform(data[property.name]) || property.default || ``);
 
         /** Initialize 'function' types to empty function */
-        else if ( property.type == `function` )
+        else if ( property.type && property.type.split(`|`).includes(`function`) )
           this[property.name](property.initTransform(data[property.name]) || property.default || emptyFunction);
         
         /** Initialize 'Array' types to empty */
-        else if ( property.type == `Array` )
+        else if ( property.type && property.type.split(`|`).includes(`Array`) )
           this[property.name](property.initTransform(data[property.name]) || property.default || []);
 
         /** Initialize all other types to null */
@@ -333,131 +333,45 @@ module.exports.createObject = (obj) => {
     if ( typeof property.loadTransform !== `function` )
       property.loadTransform = defaultTransform;
     
-    /** For `number` type properties */
-    if ( property.type == `number` ) {
-      /** Create class method on prototype */
-      parent[obj.className].prototype[property.name] = function (arg) { 
-        /** Getter */
-        if ( arg === undefined ) 
-          return property.getTransform(this[`_${property.name}`]); 
+    /** Create class method on prototype */
+    parent[obj.className].prototype[property.name] = function (arg) { 
+      /** Getter */
+      if ( arg === undefined ) 
+        return property.getTransform(this[`_${property.name}`]); 
 
-        /** Setter */
-        else if ( typeof arg == `number` ) 
-          this[`_${property.name}`] = property.setTransform(arg); 
+      /** Setters */
+      
+      /** For `number` type properties */
+      else if ( property.type && property.type.split(`|`).includes(`number`) && typeof arg == `number` )
+        this[`_${property.name}`] = property.setTransform(arg); 
+      
+      /** For `boolean` type properties */
+      else if ( property.type && property.type.split(`|`).includes(`boolean`) && typeof arg == `boolean` )
+        this[`_${property.name}`] = property.setTransform(arg); 
 
-        /** Handle type errors */
-        else 
-          throw new TypeError(`${this.constructor.name}.${property.name}(${typeof arg}): Invalid signature.`); 
+      /** For `string` type properties */
+      else if ( property.type && property.type.split(`|`).includes(`string`) && typeof arg == `string` )
+        this[`_${property.name}`] = property.setTransform(arg); 
+      
+      /** For `function` type properties */
+      else if ( property.type && property.type.split(`|`).includes(`function`) && typeof arg == `function` )
+        this[`_${property.name}`] = property.setTransform(arg); 
+      
+      /** For `Array` type propeties */
+      else if ( property.type && property.type.split(`|`).includes(`Array`) && typeof arg == `object` && arg.constructor.name == `Array` )
+        this[`_${property.name}`] = property.setTransform(arg); 
 
-        /** Return this object for set call chaining */
-        return this; 
-      };
-    }
+      /** For all other property types */
+      else if ( arg === null || ( typeof arg == `object` && property.type && property.type.split(`|`).includes(arg.constructor.name) ) || ( typeof property.instanceOf == `string` && property.instanceOf.split(`|`).some(x => module.exports.instanceOf(arg, x)) ) )
+        this[`_${property.name}`] = property.setTransform(arg); 
 
-    /** For `boolean` type properties */
-    else if ( property.type == `boolean` ) {
-      /** Create class method on prototype */
-      parent[obj.className].prototype[property.name] = function (arg) { 
-        /** Getter */
-        if ( arg === undefined ) 
-          return property.getTransform(this[`_${property.name}`]); 
+      /** Handle type errors */
+      else 
+        throw new TypeError(`${this.constructor.name}.${property.name}(${typeof arg}): Invalid signature.`); 
 
-        /** Setter */
-        else if ( typeof arg == `boolean` ) 
-          this[`_${property.name}`] = property.setTransform(arg); 
-
-        /** Handle type errors */
-        else 
-          throw new TypeError(`${this.constructor.name}.${property.name}(${typeof arg}): Invalid signature.`); 
-
-        /** Return this object for set call chaining */
-        return this; 
-      };
-    }
-    
-    /** For `string` type properties */
-    else if ( property.type == `string` ) {
-      /** Create class method on prototype */
-      parent[obj.className].prototype[property.name] = function (arg) { 
-        /** Getter */
-        if ( arg === undefined ) 
-          return property.getTransform(this[`_${property.name}`]); 
-
-        /** Setter */
-        else if ( typeof arg == `string` ) 
-          this[`_${property.name}`] = property.setTransform(arg); 
-
-        /** Handle type errors */
-        else 
-          throw new TypeError(`${this.constructor.name}.${property.name}(${typeof arg}): Invalid signature.`); 
-
-        /** Return this object for set call chaining */
-        return this; 
-      };
-    } 
-    
-    /** For `function` type properties */
-    else if ( property.type == `function` ) {
-      /** Create class method on prototype */
-      parent[obj.className].prototype[property.name] = function (arg) { 
-        /** Getter */
-        if ( arg === undefined ) 
-          return property.getTransform(this[`_${property.name}`]); 
-
-        /** Setter */
-        else if ( typeof arg == `function` ) 
-          this[`_${property.name}`] = property.setTransform(arg); 
-
-        /** Handle type errors */
-        else 
-          throw new TypeError(`${this.constructor.name}.${property.name}(${typeof arg}): Invalid signature.`); 
-
-        /** Return this object for set call chaining */
-        return this; 
-      };
-    } 
-
-    /** For `Array` type properties */
-    else if ( property.type == `Array` ) {
-      /** Create class method on prototype */
-      parent[obj.className].prototype[property.name] = function (arg) { 
-        /** Getter */
-        if ( arg === undefined ) 
-          return property.getTransform(this[`_${property.name}`]); 
-
-        /** Setter */
-        else if ( typeof arg == `object` && arg.constructor.name == property.type )
-          this[`_${property.name}`] = property.setTransform(arg); 
-
-        /** Handle type errors */
-        else 
-          throw new TypeError(`${this.constructor.name}.${property.name}(${typeof arg}): Invalid signature.`); 
-
-        /** Return this object for set call chaining */
-        return this; 
-      };
-    }
-
-    /** For all other property types */
-    else {
-      /** Create class method on prototype */
-      parent[obj.className].prototype[property.name] = function (arg) { 
-        /** Getter */
-        if ( arg === undefined ) 
-          return property.getTransform(this[`_${property.name}`]); 
-
-        /** Setter */
-        else if ( arg === null || ( typeof arg == `object` && arg.constructor.name == property.type ) || ( typeof property.instanceOf == `string` && module.exports.instanceOf(arg, property.instanceOf) ) ) 
-          this[`_${property.name}`] = property.setTransform(arg); 
-
-        /** Handle type errors */
-        else 
-          throw new TypeError(`${this.constructor.name}.${property.name}(${typeof arg}): Invalid signature.`); 
-
-        /** Return this object for set call chaining */
-        return this; 
-      };
-    }
+      /** Return this object for set call chaining */
+      return this; 
+    };
     
     if ( typeof obj.tableName == `string` ) {
       /** Create MySQL delete method on prototype */
