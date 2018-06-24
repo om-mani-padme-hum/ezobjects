@@ -233,6 +233,10 @@ module.exports.instanceOf = (obj, constructorName) => {
  * the values in the provided configuration object.
  */
 module.exports.createObject = (obj) => {
+  /** Add properties array if one wasn't set */
+  if ( typeof obj.properties != 'Array' )
+    obj.properties = [];
+    
   /** Create default transform function that doesn't change the input */
   const defaultTransform = x => x;
   
@@ -249,7 +253,7 @@ module.exports.createObject = (obj) => {
     /** Create constructor */
     constructor(data = {}) {
       super(data);
-
+      
       this.init(data);
     }
     
