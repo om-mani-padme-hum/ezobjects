@@ -143,7 +143,7 @@ const user = new User({
     const anotherUser = new User();
     
     /** Assuming ID of last user was 1, load record from database */
-    await anotherUser.load(db, 1);
+    await anotherUser.load(1, db);
 
     /** Log anotherUser */
     console.log(anotherUser);

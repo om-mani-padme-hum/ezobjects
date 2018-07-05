@@ -204,7 +204,7 @@ module.exports.createTable = async (db, obj) => {
 };
 
 /**
- * @signature ezobjects.instanceof(obj, constructorName)
+ * @signature ezobjects.instanceOf(obj, constructorName)
  * @param obj Object
  * @param constructorName string
  * @description A function for determining if an object instance's
@@ -518,9 +518,9 @@ module.exports.createObject = (obj) => {
       };
 
       /** Create MySQL load method on prototype */
-      parent[obj.className].prototype.load = async function (arg1, arg2) {
+      parent[obj.className].prototype.load = async function (arg1, db) {        
         /** Provide option for loading record from browser if developer implements ajax backend */
-        if ( typeof window !== `undefined` && typeof arg1 == `string` ) {
+        if ( typeof window !== `undefined` && typeof arg1 == `string` && arg1.match(/^http/i) ) {
           const url = new URL(arg1);
 
           const result = await $.get({
@@ -528,14 +528,36 @@ module.exports.createObject = (obj) => {
             dataType: `json`
           });
 
-          if ( result )
-            this.init(result);
-          else
+          if ( !result )
             throw new Error(`${obj.className}.load(): Unable to load record, invalid response from remote host.`);
+          
+          /** Create helper method for recursively loading property values into object */
+          const loadProperties = (obj) => {
+            /** If this object extends another, recursively add extended property values into objecct */
+            if ( obj.extendsConfig )
+              loadProperties(obj.extendsConfig);
+
+            /** Loop through each property */
+            obj.properties.forEach((property) => {
+              /** Append property in object */
+              if ( typeof arg1[property.name] !== `undefined` ) {
+                if ( typeof db == 'object' && db.constructor.name == 'MySQLConnection' )
+                  this[property.name](property.loadTransform(result[property.name], db));
+                else
+                  this[property.name](property.loadTransform(result[property.name]));
+              }
+            });
+          };
+
+          /** Store loaded record properties into object */
+          loadProperties(obj);
         }
 
         /** If the first argument is a valid database and the second is a number, load record from database by ID */
-        else if ( typeof arg1 == `object` && arg1.constructor.name == `MySQLConnection` && ( typeof arg2 == `number` || ( typeof arg2 == `string` && typeof obj.stringSearchField == `string` ) ) ) {
+        else if ( ( typeof arg1 == `number` || typeof arg1 == `string` ) && typeof db == `object` && db.constructor.name == `MySQLConnection` ) {
+          if ( typeof arg1 == `string` && typeof obj.stringSearchField != `string` )
+            throw new Error(`${obj.className}.load(): String argument is not a URL so loading from database, but no 'stringSearchField' configured.`);
+          
           /** Begin SELECT query */
           let query = `SELECT `;
 
@@ -565,17 +587,17 @@ module.exports.createObject = (obj) => {
           /** Finish query */
           query += ` FROM ${obj.tableName} `;
           
-          if ( typeof arg2 === `string` && typeof obj.stringSearchField === `string` )
+          if ( typeof arg1 === `string` && typeof obj.stringSearchField === `string` )
             query += `WHERE ${obj.stringSearchField} = ?`;
           else
             query += `WHERE id = ?`;
 
           /** Execute query to load record properties from the database */
-          const result = await arg1.query(query, [arg2]);
+          const result = await db.query(query, [arg1]);
 
           /** If a record with that ID doesn`t exist, throw error */
           if ( !result[0] )
-            throw new ReferenceError(`${this.constructor.name}.load(): Record ${arg2} in ${obj.tableName} does not exist.`);
+            throw new ReferenceError(`${this.constructor.name}.load(): Record ${arg1} in ${obj.tableName} does not exist.`);
 
           /** Create helper method for recursively loading property values into object */
           const loadProperties = (obj) => {
@@ -590,7 +612,7 @@ module.exports.createObject = (obj) => {
                 return;
               
               /** Append property in object */
-              this[property.name](property.loadTransform(result[0][property.name]));
+              this[property.name](property.loadTransform(result[0][property.name], db));
             });
           };
 
@@ -599,7 +621,7 @@ module.exports.createObject = (obj) => {
         } 
         
         /** If the first argument is a MySQL RowDataPacket, load from row data */
-        else if ( typeof arg1 == `object` && ( arg1.constructor.name == `RowDataPacket` || arg1.constructor.name == `Array` ) ) {
+        else if ( typeof arg1 == `object` && ( arg1.constructor.name == `RowDataPacket` || arg1.constructor.name == `Object` ) ) {
           /** Create helper method for recursively loading property values into object */
           const loadProperties = (obj) => {
             /** If this object extends another, recursively add extended property values into objecct */
@@ -609,8 +631,12 @@ module.exports.createObject = (obj) => {
             /** Loop through each property */
             obj.properties.forEach((property) => {
               /** Append property in object */
-              if ( typeof arg1[property.name] !== `undefined` )
-                this[property.name](property.loadTransform(arg1[property.name]));
+              if ( typeof arg1[property.name] !== `undefined` ) {
+                if ( typeof db == 'object' && db.constructor.name == 'MySQLConnection' )
+                  this[property.name](property.loadTransform(arg1[property.name], db));
+                else
+                  this[property.name](property.loadTransform(arg1[property.name]));
+              }
             });
           };
 
@@ -620,7 +646,7 @@ module.exports.createObject = (obj) => {
         
         /** Otherwise throw TypeError */
         else {
-          throw new TypeError(`${this.constructor.name}.load(${typeof arg1}, ${typeof arg2}): Invalid signature.`);
+          throw new TypeError(`${this.constructor.name}.load(${typeof arg1}, ${typeof db}): Invalid signature.`);
         }
 
         /** Allow for call chaining */

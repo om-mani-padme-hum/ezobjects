@@ -1,4 +1,4 @@
-# EZ Objects v2.11.6
+# EZ Objects v3.0.0
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects that are strictly typed in JavaScript, and can be tied directly to MySQL database tables
@@ -236,7 +236,7 @@ console.log(ezobjects.instanceOf(user, `DatabaseRecord`));
     const anotherUser = new User();
     
     /** Assuming ID of last user was 1, load record from database */
-    await anotherUser.load(db, 1);
+    await anotherUser.load(1, db);
 
     /** Log anotherUser */
     console.log(anotherUser);
@@ -324,19 +324,31 @@ meaning it's intended to be linked to a MySQL table:
  * **Parameter:** db - `MySQLConnection`
  * **Description:** Insert this object's property values into the database `db`, table `tableName`, and store the resulting insertId in the `id` property of this object.
 
-### MyObject.load(db, id)
+### MyObject.load(mysqlRow[, db])
+ * **Parameter:** mysqlRow `RowDataPacket` A MySQL `RowDataPacket` returned as part of a MySQL result set
  * **Parameter:** db - `MySQLConnection`
+ * **Description:** Load any configured properties from key/value pairs in  `mysqlRow`.  You can optionally pass the database `db` if you need it to be provided as a second argument to any loadTransform methods on configured properties.
+
+### MyObject.load(obj[, db])
+ * **Parameter:** obj PlainObject
+ * **Parameter:** db - `MySQLConnection`
+ * **Description:** Load any configured properties from key/value pairs in `obj`.  You can optionally pass the database `db` if you need it to be provided as a second argument to any loadTransform methods on configured properties.
+
+
+### MyObject.load(id, db)
  * **Parameter:** id number The value of the `id` property of the record you wish to load
+ * **Parameter:** db - `MySQLConnection`
  * **Description:** Load the record in database `db`, table `tableName`, that has its `id` field equal to provided `id` parameter.
 
-### MyObject.load(db, fieldValue)
- * **Parameter:** db - `MySQLConnection`
+### MyObject.load(fieldValue, db)
  * **Parameter:** fieldValue - `mixed` - The value of the `stringSearchField` property of the record you wish to load
+ * **Parameter:** db - `MySQLConnection`
  * **Description:** Load the record in database `db`, table `tableName`, that has its `stringSearchField` field equal to provided `fieldValue` parameter.  Here, the actual field name of `stringSearchField` is provided in the object configuration, see the configuration section below.
 
-### MyObject.load(url)
+### MyObject.load(url[, db])
  * **Parameter:** url - `string` - The URL of a back-end that provides JSON data compatible with this object's initializer
- * **Description:** Load the JSON-encoded data obtained from `url` using this object's initializer.  
+ * **Parameter:** db - `MySQLConnection`
+ * **Description:** Load any configured properties from the JSON-encoded key/value pairs obtained from `url`.  You can optionally pass the database `db` if you need it to be provided as a second argument to any loadTransform methods on configured properties.
  * **Note:** This signature is useful only when your classes are standalone browserify'd and requires you to implement a backend at `url` that will output the JSON.  This signature also requires you have jQuery loaded prior to use.
 
 ### MyObject.update(db)
@@ -379,9 +391,9 @@ See the following for how to configure your EZ Objects:
 * **type** - `string` - (optional) JavaScript data type, or types if separated by the pipe `|` character, that the property must be equal to -- types can be `string`, `number`, `boolean`, `function`, `Array`, or any valid object constructor name \[either **type** and/or **instanceOf** is required]
 * **instanceOf** - `string` - (optional) JavaScript class constructor name, or names if separated by the pipe `|` character, that the property must be an instance of \[either **type** and/or **instanceOf** is required]
 * **default** - `mixed` - (optional) Sets the default value for the property in the class object
-* **initTransform** - `function` - (optional) Function that transforms and returns the property value prior to initializing (does not affect ezobjects defaults or custom defaults)
-* **getTransform** - `function` - (optional) Function that transforms and returns the property value prior to getting
-* **setTransform** - `function` - (optional) Function that transforms and returns the property value prior to setting
+* **initTransform(x)** - `function` - (optional) Function that transforms and returns the property value prior to initializing (does not affect ezobjects defaults or custom defaults)
+* **getTransform(x)** - `function` - (optional) Function that transforms and returns the property value prior to getting
+* **setTransform(x)** - `function` - (optional) Function that transforms and returns the property value prior to setting
 
 ### A MySQL property configuration can also have the following:
 
@@ -398,8 +410,8 @@ See the following for how to configure your EZ Objects:
 * **charsetName** - `string` - (optional) Indicates the property should use the provided charset in the MySQL table
 * **collationName** - `string` - (optional) Indicates the property should use the provided collation in the MySQL table
 * **autoIncrement** - `boolean` - (optional) Indicates the property should be auto-incremented in the MySQL table
-* **saveTransform** - `function` - (optional) Function that transforms and returns the property value prior to saving in the database
-* **loadTransform** - `function` - (optional) Function that transforms and returns the property value after loading from the database
+* **saveTransform(x)** - `function` - (optional) Function that transforms and returns the property value prior to saving in the database
+* **loadTransform(x[, db])** - `function` - (optional) Function that transforms and returns the property value after loading from the database.  The handler for this transform will be passed the MySQL connection `db` if it was provided as the second argument of the object's `load` method. 
 
 ### A MySQL index configuration can have the following (for MySQL table association only):
 
