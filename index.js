@@ -1,11 +1,126 @@
 /** Require external modules */
 const url = require(`url`);
+const moment = require(`moment`);
 
 /** Require local modules */
 const mysqlConnection = require(`./mysql-connection`);
 
+const ezobjectTypes = [
+  { name: `BIT`, type: 'number', default: 0, hasLength: true, setTransform: x => parseInt(x) },
+  { name: `TINYINT`, type: 'number', default: 0, hasLength: true, hasUnsignedAndZeroFill: true, setTransform: x => parseInt(x) },
+  { name: `SMALLINT`, type: 'number', default: 0, hasLength: true, hasUnsignedAndZeroFill: true, setTransform: x => parseInt(x) },
+  { name: `MEDIUMINT`, type: 'number', default: 0, hasLength: true, hasUnsignedAndZeroFill: true, setTransform: x => parseInt(x) },
+  { name: `INT`, type: 'number', default: 0, hasLength: true, hasUnsignedAndZeroFill: true, setTransform: x => parseInt(x) },
+  { name: `INTEGER`, type: 'number', default: 0, hasLength: true, hasUnsignedAndZeroFill: true, setTransform: x => parseInt(x) },
+  { name: `BIGINT`, type: 'string', default: 0, hasLength: true, hasUnsignedAndZeroFill: true, setTransform: x => parseInt(x) },
+  { name: `REAL`, type: 'number', default: 0, hasLength: true, hasDecimals: true, hasUnsignedAndZeroFill: true, lengthRequiresDecimals: true, setTransform: x => parseFloat(x) },
+  { name: `DOUBLE`, type: 'number', default: 0, hasLength: true, hasDecimals: true, hasUnsignedAndZeroFill: true, lengthRequiresDecimals: true, setTransform: x => parseFloat(x) },
+  { name: `FLOAT`, type: 'number', default: 0, hasLength: true, hasDecimals: true, hasUnsignedAndZeroFill: true, lengthRequiresDecimals: true, setTransform: x => parseFloat(x) },
+  { name: `DECIMAL`, type: 'number', default: 0, hasLength: true, hasDecimals: true, hasUnsignedAndZeroFill: true, setTransform: x => parseFloat(x) },
+  { name: `NUMERIC`, type: 'number', default: 0, hasLength: true, hasDecimals: true, hasUnsignedAndZeroFill: true, setTransform: x => parseFloat(x) },
+  { name: `DATE`, type: 'Date', default: new Date(0), saveTransform: x => moment(x).format(`YYYY-MM-DD`), loadTransform: x => new Date(x) },
+  { name: `TIME`, type: `string`, default: '00:00:00' },
+  { name: `TIMESTAMP`, type: 'Date', default: new Date(0), saveTransform: x => moment(x).format(`YYYY-MM-DD HH:mm:ss.SSSSSS`), loadTransform: x => new Date(x) },
+  { name: `DATETIME`, type: 'Date', default: new Date(0), saveTransform: x => moment(x).format(`YYYY-MM-DD HH:mm:ss.SSSSSS`), loadTransform: x => new Date(x) },
+  { name: `YEAR`, type: `number`, default: 1970, setTransform: x => parseInt(x) },
+  { name: `CHAR`, type: `string`, default: '', hasLength: true, hasCharacterSetAndCollate: true },
+  { name: `VARCHAR`, type: `string`, default: '', hasLength: true, lengthRequired: true, hasCharacterSetAndCollate: true },
+  { name: `BINARY`, type: `Buffer`, default: Buffer.from([]), hasLength: true },
+  { name: `VARBINARY`, type: `Buffer`, default: Buffer.from([]), lengthRequired: true, hasLength: true },
+  { name: `TINYBLOB`, type: `Buffer`, default: Buffer.from([]) },
+  { name: `BLOB`, type: `Buffer`, default: Buffer.from([]), hasLength: true },
+  { name: `MEDIUMBLOB`, type: `Buffer`, default: Buffer.from([]) },
+  { name: `LONGBLOB`, type: `Buffer`, default: Buffer.from([]) },
+  { name: `TINYTEXT`, type: `string`, default: '', hasCharacterSetAndCollate: true },
+  { name: `TEXT`, type: `string`, default: '', hasLength: true, hasCharacterSetAndCollate: true },
+  { name: `MEDIUMTEXT`, type: `string`, default: '', hasCharacterSetAndCollate: true },
+  { name: `LONGTEXT`, type: `string`, default: '', hasCharacterSetAndCollate: true },
+  { name: `ENUM`, type: `string`, default: '', hasCharacterSetAndCollate: true },
+  { name: `SET`, type: `string`, default: '', hasCharacterSetAndCollate: true },
+  { name: `BOOLEAN`, type: `boolean`, default: false },
+  { name: `FUNCTION`, type: `function`, default: function () {} },
+  { name: `ARRAY`, type: `function`, default: [] }  
+];
+
+function validateConfig(obj) {
+  if ( typeof obj != `object` || obj.constructor.name != `Object` )
+    throw new Error(`ezobjects.validateConfig(): Invalid table configuration argument, must be plain object.`);
+    
+  if ( obj.properties ) {
+    obj.properties.forEach((property) => {
+      property.type = property.type.toUpperCase();
+      
+      /** Make sure the numbers we're given are integers if they're supposed to be integers */
+      if ( !isNaN(property.length) )
+        property.length = parseInt(property.length);
+      if ( !isNaN(property.decimals) )
+        property.decimals = parseInt(property.decimals);
+
+      /** Make sure properties is array */
+      if ( typeof obj.properties != 'object' || obj.
+          properties.constructor.name != 'Array' )
+        throw new Error(`ezobjects.validateConfig(): Invalid properties configuration, properties not array.`);
+
+      /** Properties with bad or missing name */
+      else if ( typeof property.name != 'string' || !property.name.match(/a-zA-Z_0-9/) )
+        throw new Error(`ezobjects.createTable(): Property '${property.name}' has invalid name, either not a string or has characters other than 'a-zA-Z_0-9'.`);
+
+      /** Types where length is required, throw error if missing */
+      else if ( typeof property.ezobjectType.lengthRequired == `boolean` && property.ezobjectType.lengthRequired && isNaN(property.length) )
+        throw new Error(`ezobjects.createTable(): Property '${property.name}' of type ${property.type} missing required length configuration.`);
+
+      /** Types where decimals are provided, but length is missing */
+      else if ( typeof property.ezobjectType.hasDecimals == `boolean` && property.ezobjectType.hasDecimals && !isNaN(property.decimals) && isNaN(property.length) )
+        throw new Error(`ezobjects.createTable(): Property '${property.name}' of type ${property.type} provided decimals without length configuration.`);
+
+      /* If type is VARCHAR or VARBINARY, both of which require length, throw error if length out of bounds */
+      else if ( ( property.type == `VARCHAR` || property.type == `VARBINARY` ) && ( property.length <= 0 || property.length > 65535 ) )
+        throw new Error(`ezobjects.createTable(): Property '${property.name}' of type ${property.type} has length out of bounds, must be between 1 and 65535.`);
+
+      /* If type is BIT and length is provided, throw error if length out of bounds */
+      else if ( property.type == `BIT` && !isNaN(property.length) && ( property.length <= 0 || property.length > 64 ) )
+        throw new Error(`ezobjects.createTable(): Property '${property.name}' of type ${property.type} has length out of bounds, must be between 1 and 64.`);
+
+      /* If type is TINYINT and length is provided, throw error if length out of bounds */
+      else if ( property.type == `TINYINT` && !isNaN(property.length) && ( property.length <= 0 || property.length > 4 ) )
+        throw new Error(`ezobjects.createTable(): Property '${property.name}' of type ${property.type} has length out of bounds, must be between 1 and 4.`);
+
+      /* If type is SMALLINT and length is provided, throw error if length out of bounds */
+      else if ( property.type == `SMALLINT` && !isNaN(property.length) && ( property.length <= 0 || property.length > 6 ) )
+        throw new Error(`ezobjects.createTable(): Property '${property.name}' of type ${property.type} has length out of bounds, must be between 1 and 6.`);
+
+      /* If type is MEDIUMINT and length is provided, throw error if length out of bounds */
+      else if ( property.type == `MEDIUMINT` && !isNaN(property.length) && ( property.length <= 0 || property.length > 8 ) )
+        throw new Error(`ezobjects.createTable(): Property '${property.name}' of type ${property.type} has length out of bounds, must be between 1 and 8.`);
+
+      /* If type is INT or INTEGER and length is provided, throw error if length out of bounds */
+      else if ( ( property.type == `INT` || property.type == `INTEGER` ) && !isNaN(property.length) && ( property.length <= 0 || property.length > 11 ) )
+        throw new Error(`ezobjects.createTable(): Property '${property.name}' of type ${property.type} has length out of bounds, must be between 1 and 11.`);
+
+      /* If type is BIGINT and length is provided, throw error if length out of bounds */
+      else if ( property.type == `BIGINT` && !isNaN(property.length) && ( property.length <= 0 || property.length > 20 ) )
+        throw new Error(`ezobjects.createTable(): Property '${property.name}' of type ${property.type} has length out of bounds, must be between 1 and 20.`);
+
+      /* If type can use decimals and decimals are provided, throw error if decimals out of bounds */
+      else if ( typeof property.ezobjectType.hasDecimals == `boolean` && property.ezobjectType.hasDecimals && !isNaN(property.decimals) && ( property.decimals < 0 || property.decimals > property.length ) )
+        throw new Error(`ezobjects.createTable(): Property '${property.name}' of type ${property.type} has decimals out of bounds, must be between 0 and the configured 'length'.`);
+
+      /** Types where length is provided and so decimals are required, throw error if missing */
+      else if ( typeof property.ezobjectType.lengthRequiresDecimals == `boolean` && property.ezobjectType.lengthRequiresDecimals && !isNaN(property.length) && isNaN(property.decimals) )
+        throw new Error(`ezobjects.createTable(): Property '${property.name}' of type ${property.type} used with length, but without decimals.`);
+
+      const ezobjectType = ezobjectTypes.find(x => x.name == property.type);
+      
+      if ( !ezobjectType )
+        throw new Error(`ezobjects.validateConfig(): Invalid property type '${typeof property.type == 'string' ? property.type : 'not string'}'.`);
+    
+      property.ezobjectType = ezobjectType;
+    });
+  }
+}
+
 /**
- * @module ezobjects
+ * @module ezobjects-mysql
  * @copyright 2018 Rich Lowe
  * @license MIT
  * @description Easy automatic class creation using simple configuration objects.  Capable
@@ -13,35 +128,17 @@ const mysqlConnection = require(`./mysql-connection`);
  * and update() methods in addition to the constructor, initializer, and getters/setters for
  * all configured properties.
  *
- * @signature ezobjects.createTable(db, obj)
- * @param db MySQLConnection
+ * @signature ezobjects.createTable(obj, db)
  * @param obj Object Configuration object
+ * @param db MySQLConnection
  * @description A function for automatically generating a MySQL table, if it doesn't already
  * exist, based on the values in the provided configuration object.
  */
-module.exports.createTable = async (db, obj) => {
+module.exports.createTable = async (obj, db) => {
   if ( typeof db != `object` || db.constructor.name != `MySQLConnection` )
     throw new Error(`ezobjects.createTable(): Invalid database argument.`);
-  else if ( typeof obj != `object` )
-    throw new Error(`ezobjects.createTable(): Invalid table configuration argument.`);
-    
-  /** Create some helpful arrays for identifying MySQL types that have certain features */
-  const mysqlTypesAllowed = [`BIT`, `TINYINT`, `SMALLINT`, `MEDIUMINT`, `INT`, `INTEGER`, `BIGINT`, `REAL`, `DOUBLE`, `FLOAT`,
-                             `DECIMAL`, `NUMERIC`, `DATE`, `TIME`, `TIMESTAMP`, `DATETIME`, `YEAR`, `CHAR`, `VARCHAR`, `BINARY`,
-                             `VARBINARY`, `TINYBLOB`, `BLOB`, `MEDIUMBLOB`, `LONGBLOB`, `TINYTEXT`, `TEXT`, `MEDIUMTEXT`,
-                             `LONGTEXT`, `ENUM`, `SET`, `JSON`];
-
-  const mysqlTypesWithLength = [`BIT`, `TINYINT`, `SMALLINT`, `MEDIUMINT`, `INT`, `INTEGER`, `BIGINT`, `REAL`, `DOUBLE`, `FLOAT`,
-                                `DECIMAL`, `NUMERIC`, `CHAR`, `VARCHAR`, `BINARY`, `VARBINARY`, `BLOB`, `TEXT`];
-
-  const mysqlTypesWithDecimals = [`REAL`, `DOUBLE`, `FLOAT`, `DECIMAL`, `NUMERIC`];
-
-  const mysqlTypesWithLengthRequiringDecimals = [`REAL`, `DOUBLE`, `FLOAT`];
-
-  const mysqlTypesWithUnsignedAndZerofill = [`TINYINT`, `SMALLINT`, `MEDIUMINT`, `INT`, `INTEGER`, `BIGINT`, `REAL`, `DOUBLE`, `FLOAT`,
-                                  `DECIMAL`, `NUMERIC`];
-
-  const mysqlTypesWithCharacterSetAndCollate = [`CHAR`, `VARCHAR`, `TINYTEXT`, `TEXT`, `MEDIUMTEXT`, `LONGTEXT`, `ENUM`, `SET`];
+  else if ( !validateConfig(obj) )
+    return;
   
   /** Helper method that can be recursively called to add all properties to the create query */
   const addPropertiesToCreateQuery = (obj) => {
@@ -52,57 +149,49 @@ module.exports.createTable = async (db, obj) => {
     /** Loop through each property */
     obj.properties.forEach((property) => {
       /** Ignore properties that don`t have MySQL types */
-      if ( typeof property.mysqlType == `undefined` )
+      if ( property.type != 'FUNCTION' && typeof property.store == `boolean` && !property.store )
         return;
-
-      /** Convert the type to upper case for reliable string comparison */
-      property.mysqlType = property.mysqlType.toUpperCase();
-
+      else if ( property.type == 'FUNCTION' && ( typeof property.store != `boolean` || !property.store ) )
+        return;
+      
       /** Add property name and type to query */
-      createQuery += `${property.name} ${property.mysqlType}`;
-
-      /** Types where length is required, throw error if missing */
-      if ( property.mysqlType == `VARCHAR` && isNaN(property.length) )
-        throw new Error(`Property of type VARCHAR used without required length.`);
-      else if ( property.mysqlType == `VARBINARY` && isNaN(property.length) )
-        throw new Error(`Property of type VARBINARY used without required length.`);
-      else if ( mysqlTypesWithLengthRequiringDecimals.includes(property.mysqlType) && !isNaN(property.length) && isNaN(property.decimals) )
-        throw new Error(`Property of type REAL, DOUBLE, or FLOAT used with length, but without decimals.`);
+      if ( property.type == `BOOLEAN` )
+        createQuery += `${property.name} TINYINT`;
+      else if ( property.type == `FUNCTION` )
+        createQuery += `${property.name} TEXT`;
+      else
+        createQuery += `${property.name} ${property.type}`;
 
       /** Properties with length and/or decimals */
-      if ( !isNaN(property.length) && mysqlTypesWithLength.includes(property.mysqlType) && ( !mysqlTypesWithDecimals.includes(property.mysqlType) || isNaN(property.decimals) ) )
-        createQuery += `(${property.length})`;
-      else if ( !isNaN(property.length) && !isNaN(property.decimals) && mysqlTypesWithLength.includes(property.mysqlType) && mysqlTypesWithDecimals.includes(property.mysqlType) )
+      if ( !isNaN(property.length) && !isNaN(property.decimals) && typeof property.ezobjectType.hasLength == 'boolean' && property.ezobjectType.hasLength && typeof property.ezobjectType.hasDecimals == 'boolean' && property.ezobjectType.hasDecimals )
         createQuery += `(${property.length}, ${property.decimals})`;
-
+      else if ( !isNaN(property.length) && typeof property.ezobjectType.hasLength == 'boolean' && property.ezobjectType.hasLength )
+        createQuery += `(${property.length})`;
+      
       /** Properties with UNSIGNED */
-      if ( property.unsigned && mysqlTypesWithUnsignedAndZerofill.includes(property.mysqlType) )
+      if ( typeof property.ezobjectType.hasUnsignedAndZeroFill == `boolean` && property.ezobjectType.hasUnsignedAndZeroFill && typeof property.unsigned == 'boolean' && property.unsigned )
         createQuery += ` UNSIGNED`;
 
       /** Properties with ZEROFILL */
-      if ( property.zerofill && mysqlTypesWithUnsignedAndZerofill.includes(property.mysqlType) )
+      if ( typeof property.ezobjectType.hasUnsignedAndZeroFill == `boolean` && property.ezobjectType.hasUnsignedAndZeroFill && typeof property.zerofill == 'boolean' && property.zerofill )
         createQuery += ` ZEROFILL`;
 
       /** Properties with CHARACTER SET */
-      if ( property.charsetName && mysqlTypesWithCharacterSetAndCollate.includes(property.mysqlType) )
-        createQuery += ` CHARACTER SET ${property.charsetName}`;
+      if ( typeof property.ezobjectType.hasCharacterSetAndCollate == `boolean` && property.ezobjectType.hasCharacterSetAndCollate && typeof property.characterSet == 'string' )
+        createQuery += ` CHARACTER SET ${property.characterSet}`;
 
       /** Properties with COLLATE */
-      if ( property.collationName && mysqlTypesWithCharacterSetAndCollate.includes(property.mysqlType) )
-        createQuery += ` COLLATE ${property.collationName}`;
+      if ( typeof property.ezobjectType.hasCharacterSetAndCollate == `boolean` && property.ezobjectType.hasCharacterSetAndCollate && typeof property.collate == 'string' )
+        createQuery += ` COLLATE ${property.collate}`;
 
       /** Properties with NULL */
-      if ( property.null )
+      if ( typeof property.allowNull == `boolean` && property.allowNull )
         createQuery += ` NULL`;
       else
         createQuery += ` NOT NULL`;
 
-      /** Properties with DEFAULT */
-      if ( property.mysqlDefault )
-        createQuery += ` DEFAULT ${property.mysqlDefault}`;
-
       /** Properties with AUTO_INCREMENT */
-      if ( property.autoIncrement )
+      if ( property.autoIncrement || property.name == 'id' )
         createQuery += ` AUTO_INCREMENT`;
 
       /** Properties with UNIQUE KEY */
@@ -110,7 +199,7 @@ module.exports.createTable = async (db, obj) => {
         createQuery += ` UNIQUE`;
 
       /** Properties with PRIMARY KEY */
-      if ( property.primary )
+      if ( property.name == 'id' )
         createQuery += ` PRIMARY`;
 
       if ( property.unique || property.primary )
@@ -118,7 +207,7 @@ module.exports.createTable = async (db, obj) => {
 
       /** Properties with COMMENT */
       if ( property.comment && typeof property.comment == `string` )
-        createQuery += ` COMMENT '${property.comment.replace(`'`, ``)}'`;
+        createQuery += ` COMMENT '${property.comment.replace(`'`, `''`)}'`;
 
       createQuery += `, `;
     });
@@ -286,27 +375,11 @@ module.exports.createObject = (obj) => {
       obj.properties.forEach((property) => {
         /** If there is no init transform, set to default */
         if ( typeof property.initTransform !== `function` )
-          property.initTransform = defaultTransform;
+          property.initTransform = typeof property.ezobjectType == 'object' && typeof property.ezobjectType.initTransform == 'function' ? typeof property.ezobjectType.initTransform : defaultTransform;
 
-        /** Initialize 'number' types to zero */
-        if ( property.type && property.type.split(`|`).includes(`number`) )
-          this[property.name](property.initTransform(data[property.name]) || property.default || 0);
-
-        /** Initialize 'boolean' types to false */
-        else if ( property.type && property.type.split(`|`).includes(`boolean`) )
-          this[property.name](property.initTransform(data[property.name]) || property.default || false);
-        
-        /** Initialize 'string' types to empty */
-        else if ( property.type && property.type.split(`|`).includes(`string`) )
-          this[property.name](property.initTransform(data[property.name]) || property.default || ``);
-
-        /** Initialize 'function' types to empty function */
-        else if ( property.type && property.type.split(`|`).includes(`function`) )
-          this[property.name](property.initTransform(data[property.name]) || property.default || emptyFunction);
-        
-        /** Initialize 'Array' types to empty */
-        else if ( property.type && property.type.split(`|`).includes(`Array`) )
-          this[property.name](property.initTransform(data[property.name]) || property.default || []);
+        /** Initialize types to defaults */
+        if ( typeof property.ezobjectType != 'undefined' )
+          this[property.name](property.initTransform(data[property.name]) || property.default || property.ezobjectType.default);
 
         /** Initialize all other types to null */
         else
@@ -316,22 +389,25 @@ module.exports.createObject = (obj) => {
   };
   
   /** Loop through each property in the obj */
-  obj.properties.forEach((property) => {    
+  obj.properties.forEach((property) => {  
+    /** Convert the type to upper case for reliable string comparison */
+    property.type = property.type.toUpperCase();
+    
     /** If there is no getter transform, set to default */
     if ( typeof property.getTransform !== `function` )
-      property.getTransform = defaultTransform;
+      property.getTransform = typeof property.ezobjectType == 'object' && typeof property.ezobjectType.getTransform == 'function' ? typeof property.ezobjectType.getTransform : defaultTransform;
     
     /** If there is no setter transform, set to default */
     if ( typeof property.setTransform !== `function` )
-      property.setTransform = defaultTransform;
+      property.setTransform = typeof property.ezobjectType == 'object' && typeof property.ezobjectType.setTransform == 'function' ? typeof property.ezobjectType.setTransform : defaultTransform;
     
     /** If there is no save transform, set to default */
     if ( typeof property.saveTransform !== `function` )
-      property.saveTransform = defaultTransform;
+      property.saveTransform = typeof property.ezobjectType == 'object' && typeof property.ezobjectType.saveTransform == 'function' ? typeof property.ezobjectType.saveTransform : defaultTransform;
     
     /** If there is no load transform, set to default */
     if ( typeof property.loadTransform !== `function` )
-      property.loadTransform = defaultTransform;
+      property.getTransform = typeof property.ezobjectType == 'object' && typeof property.ezobjectType.loadTransform == 'function' ? typeof property.ezobjectType.loadTransform : defaultTransform;
     
     /** Create class method on prototype */
     parent[obj.className].prototype[property.name] = function (arg) { 
@@ -341,28 +417,12 @@ module.exports.createObject = (obj) => {
 
       /** Setters */
       
-      /** For `number` type properties */
-      else if ( property.type && property.type.split(`|`).includes(`number`) && typeof arg == `number` )
+      /** For `int` type properties */
+      else if ( typeof property.ezobjectType == 'object' && typeof arg == property.ezobjectType.type )
         this[`_${property.name}`] = property.setTransform(arg); 
       
-      /** For `boolean` type properties */
-      else if ( property.type && property.type.split(`|`).includes(`boolean`) && typeof arg == `boolean` )
-        this[`_${property.name}`] = property.setTransform(arg); 
-
-      /** For `string` type properties */
-      else if ( property.type && property.type.split(`|`).includes(`string`) && typeof arg == `string` )
-        this[`_${property.name}`] = property.setTransform(arg); 
-      
-      /** For `function` type properties */
-      else if ( property.type && property.type.split(`|`).includes(`function`) && typeof arg == `function` )
-        this[`_${property.name}`] = property.setTransform(arg); 
-      
-      /** For `Array` type propeties */
-      else if ( property.type && property.type.split(`|`).includes(`Array`) && typeof arg == `object` && arg.constructor.name == `Array` )
-        this[`_${property.name}`] = property.setTransform(arg); 
-
       /** For all other property types */
-      else if ( arg === null || ( typeof arg == `object` && property.type && property.type.split(`|`).includes(arg.constructor.name) ) || ( typeof property.instanceOf == `string` && property.instanceOf.split(`|`).some(x => module.exports.instanceOf(arg, x)) ) )
+      else if ( arg === null || ( typeof arg == `object` && property.type && property.type == arg.constructor.name ) || ( typeof property.instanceOf == `string` && module.exports.instanceOf(arg, property.instanceOf) ) )
         this[`_${property.name}`] = property.setTransform(arg); 
 
       /** Handle type errors */
@@ -427,7 +487,7 @@ module.exports.createObject = (obj) => {
                 return;
 
               /** Ignore properties that don`t have MySQL types */
-              if ( typeof property.mysqlType == `undefined` )
+              if ( typeof property.type == `undefined` )
                 return;
               
               /** Add property to params array after performing the save transform */
@@ -454,7 +514,7 @@ module.exports.createObject = (obj) => {
                 return;
               
               /** Ignore properties that don`t have MySQL types */
-              if ( typeof property.mysqlType == `undefined` )
+              if ( typeof property.type == `undefined` )
                 return;
               
               /** Append property name to query */
@@ -484,7 +544,7 @@ module.exports.createObject = (obj) => {
                 return;
 
               /** Ignore properties that don`t have MySQL types */
-              if ( typeof property.mysqlType == `undefined` )
+              if ( typeof property.type == `undefined` )
                 return;
               
               /** Append placeholder to query */
@@ -570,7 +630,7 @@ module.exports.createObject = (obj) => {
             /** Loop through each property */
             obj.properties.forEach((property) => {
               /** Ignore properties that don`t have MySQL types */
-              if ( typeof property.mysqlType == `undefined` )
+              if ( typeof property.type == `undefined` )
                 return;
               
               /** Append property name to query */
@@ -608,7 +668,7 @@ module.exports.createObject = (obj) => {
             /** Loop through each property */
             obj.properties.forEach((property) => {
               /** Ignore properties that don`t have MySQL types */
-              if ( typeof property.mysqlType == `undefined` )
+              if ( typeof property.type == `undefined` )
                 return;
               
               /** Append property in object */
@@ -687,7 +747,7 @@ module.exports.createObject = (obj) => {
                 return;
               
               /** Ignore properties that don`t have MySQL types */
-              if ( typeof property.mysqlType == `undefined` )
+              if ( typeof property.type == `undefined` )
                 return;
 
               /** Add property to params array after performing the save transform */
@@ -717,7 +777,7 @@ module.exports.createObject = (obj) => {
                 return;
 
               /** Ignore properties that don`t have MySQL types */
-              if ( typeof property.mysqlType == `undefined` )
+              if ( typeof property.type == `undefined` )
                 return;
               
               /** Append property update to query */
