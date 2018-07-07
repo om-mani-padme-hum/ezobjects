@@ -33,7 +33,7 @@
   "author": "Rich Lowe",
   "license": "MIT",
   "dependencies": {
-    "moment": "^2.22.1",
+    "moment": "^2.22.2",
     "mysql": "^2.15.0"
   },
   "devDependencies": {

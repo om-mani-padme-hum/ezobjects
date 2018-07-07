@@ -20,8 +20,6 @@ const db = new ezobjects.MySQLConnection(JSON.parse(fs.readFileSync(`mysql-confi
 const configExample = {
   tableName: `examples`,
   className: `Example`,
-  extends: DatabaseRecord,
-  extendsConfig: configDatabaseRecord,
   properties: [
     { name: `id`, type: `int` },
     { name: `bitExample`, type: `bit`, length: 2 },
@@ -57,7 +55,6 @@ const configExample = {
     { name: `longtextExample`, type: `longtext` },
     { name: `enumExample`, type: `enum`, values: [`one`, `two`, `three`] },
     { name: `setExample`, type: `set`, values: [`a`, `b`, `c`, `d`] },
-    
     
     { name: `booleanExample`, type: `boolean` },
     { name: `functionExample`, type: `function` },
@@ -144,12 +141,13 @@ const example = new Example({
   smallintExample: -32767,
   mediumintExample: -8388608,
   intExample: -2147483648,
-  bigintExample: `-9223372036854775808`,
+  integerExample: -2147483648,
+//  bigintExample: -9223372036854775808,
   doubleExample: 193448295822329038402340234.23840923804823094809234245,
   floatExample: 1927492498374.2348927395,
   decimalExample: 23.452,
   numericExample: 942.28734,
-  dateExample: new Date(`06-20-1986`),
+  dateExample: new Date(`1986-06-20`),
   timeExample: `-838:59:59`,
   timestampExample: new Date(`2011-07-16T04:52:23-06:00`),
   datetimeExample: new Date(`2011-07-16T04:52:23-06:00`),
@@ -172,8 +170,8 @@ const example = new Example({
   setExample: `a,d`,
   
   booleanExample: true,
-  functionExample: function (arg) { alert(`I am ${arg}`); },
-  functionExample2: function (arg) { alert(`I am ${arg} stored`); },
+  functionExample: function test(arg) { alert(`I am ${arg}`); },
+  functionExample2: function test(arg) { alert(`I am ${arg} stored`); },
   ezobjectTypeExample: new OtherObj({ name: `Type Example` }),
   ezobjectInstanceExample: new ExtendedObj({ name: `Instance Example Stored` }),
   ezobjectInstanceExample2: new ExtendedObj({ name: `Instance Example Not Stored` }),
@@ -184,7 +182,8 @@ const example = new Example({
   smallintArrayExample: [-32767, 32767],
   mediumintArrayExample: [-8388608, 8388608],
   intArrayExample: [-2147483648, 2147483648],
-  bigintArrayExample: [`-9223372036854775808`, `9223372036854775808`],
+  integerArrayExample: [-2147483648, 2147483648],
+  bigintArrayExample: [-9223372036854775808, 9223372036854775808],
   doubleArrayExample: [-193448295822329038402340234.23840923804823094809234245, 193448295822329038402340234.23840923804823094809234245],
   floatArrayExample: [-1927492498374.2348927395, 1927492498374.2348927395],
   decimalArrayExample: [-23.452, 23.452],
@@ -221,33 +220,36 @@ const example = new Example({
 
 /** Log the initialized example object */
 console.log(`Initialized example object:`);
-console.log(util.inspect(example2, { depth: null }));
+console.log(util.inspect(example, { depth: null }));
 
 /** Self-executing async wrapper so we can await results */
 (async () => {
-  try {
+  //try {
+    /** Create table if it doesn`t already exist */
+    await ezobjects.createTable(configOtherObj, db);
+    
     /** Create table if it doesn`t already exist */
     await ezobjects.createTable(configExample, db);
 
     /** Insert example into the database */
     await example.insert(db);
-    
+
     /** Get the inserted ID */
     const id = example.id();
     
     /** Create a second example object */
     const example2 = new Example();
-    
+
     /** Attempt to load the original example from the database into example2 */
     await example2.load(id, db);
-    
+        
     /** Log the database loaded example object */
     console.log(`\nDatabase loaded example object:`);
     console.log(util.inspect(example2, { depth: null }));
-  } catch ( err ) {
-    console.log(err.message);
-  } finally {
+  //} catch ( err ) {
+  //  console.log(err.message);
+  //} finally {
     /** Close database connection */
     db.close();
-  }
+  //}
 })();
