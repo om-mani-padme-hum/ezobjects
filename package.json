@@ -1,7 +1,7 @@
 {
   "name": "ezobjects-mysql",
   "version": "2.11.6",
-  "description": "Easy JavaScript Class Objects Associated w/ MySQL Database Tables",
+  "description": "Easy Auto-Generated Strictly-Typed JavaScript Class Objects",
   "main": "index.js",
   "scripts": {
     "start": "node example.js",
@@ -13,7 +13,9 @@
   },
   "keywords": [
     "easy",
-    "mysql",
+    "strict",
+    "strictly",
+    "typed",
     "auto",
     "automatic",
     "quick",
@@ -26,19 +28,11 @@
     "create",
     "creation",
     "generate",
-    "generation",
-    "linked"
+    "generation"
   ],
   "author": "Rich Lowe",
   "license": "MIT",
-  "dependencies": {
-<<<<<<< HEAD
-    "moment": "^2.22.1"
-=======
-    "moment": "^2.22.2",
-    "mysql": "^2.15.0"
->>>>>>> 6d49df4442e867a351c43326fb61424fa52015aa
-  },
+  "dependencies": {},
   "devDependencies": {
     "docket-parser": "^0.6.7"
   }

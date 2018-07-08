@@ -1,25 +1,14 @@
 /**
- * @module ezobjects-mysql
+ * @module ezobjects
  * @copyright 2018 Rich Lowe
  * @license MIT
  * @description Easy automatic class creation using simple configuration objects.  Capable
-<<<<<<< HEAD
  * of automatically creating ES6 classes with constructor, initializer, and getters/setters 
  * for all configured properties.
  */
-=======
- * of automatically creating a matching MySQL table and generating delete(), insert(), load(), 
- * and update() methods in addition to the constructor, initializer, and getters/setters for
- * all configured properties.
- */
 
 /** Require external modules */
-const url = require(`url`);
-const moment = require(`moment`);
 const util = require(`util`);
-
-/** Require local modules */
-const mysqlConnection = require(`./mysql-connection`);
 
 /** Figure out proper parent scope between node (global) and browser (window) */
 let parent;
@@ -31,75 +20,71 @@ else
 
 /** Define the EZ Object types, their associated JavaScript and MySQL types, defaults, quirks, transforms, etc... */
 const ezobjectTypes = [
-  { type: `bit`, javascriptType: 'Buffer', defaultMySQLType: `bit`, default: Buffer.from([]), hasLength: true, saveTransform: x => parseInt(x.join(''), 2) },
-  { type: `tinyint`, javascriptType: 'number', defaultMySQLType: `tinyint`, default: 0, hasLength: true, hasUnsignedAndZeroFill: true, setTransform: x => parseInt(x) },
-  { type: `smallint`, javascriptType: 'number', defaultMySQLType: `smallint`, default: 0, hasLength: true, hasUnsignedAndZeroFill: true, setTransform: x => parseInt(x) },
-  { type: `mediumint`, javascriptType: 'number', defaultMySQLType: `mediumint`, default: 0, hasLength: true, hasUnsignedAndZeroFill: true, setTransform: x => parseInt(x) },
-  { type: `int`, javascriptType: 'number', defaultMySQLType: `int`, default: 0, hasLength: true, hasUnsignedAndZeroFill: true, setTransform: x => parseInt(x) },
-  { type: `integer`, javascriptType: 'number', defaultMySQLType: `integer`, default: 0, hasLength: true, hasUnsignedAndZeroFill: true, setTransform: x => parseInt(x) },
-  { type: `bigint`, javascriptType: 'number', defaultMySQLType: `bigint`, default: 0, hasLength: true, hasUnsignedAndZeroFill: true, setTransform: x => parseInt(x), saveTransform: x => x.toString(), loadTransform: x => parseInt(x) },
-  { type: `real`, javascriptType: 'number', defaultMySQLType: `real`, default: 0, hasLength: true, hasDecimals: true, hasUnsignedAndZeroFill: true, lengthRequiresDecimals: true, setTransform: x => parseFloat(x) },
-  { type: `double`, javascriptType: 'number', defaultMySQLType: `double`, default: 0, hasLength: true, hasDecimals: true, hasUnsignedAndZeroFill: true, lengthRequiresDecimals: true, setTransform: x => parseFloat(x) },
-  { type: `float`, javascriptType: 'number', defaultMySQLType: `float`, default: 0, hasLength: true, hasDecimals: true, hasUnsignedAndZeroFill: true, lengthRequiresDecimals: true, setTransform: x => parseFloat(x) },
-  { type: `decimal`, javascriptType: 'number', defaultMySQLType: `decimal`, default: 0, hasLength: true, hasDecimals: true, hasUnsignedAndZeroFill: true, setTransform: x => parseFloat(x) },
-  { type: `numeric`, javascriptType: 'number', defaultMySQLType: `numeric`, default: 0, hasLength: true, hasDecimals: true, hasUnsignedAndZeroFill: true, setTransform: x => parseFloat(x) },
-  { type: `date`, javascriptType: 'Date', defaultMySQLType: `date`, default: new Date(0), saveTransform: x => moment(x).format(`YYYY-MM-DD`), loadTransform: x => new Date(x) },
-  { type: `time`, javascriptType: `string`, defaultMySQLType: `time`, default: '00:00:00' },
-  { type: `timestamp`, javascriptType: 'Date', defaultMySQLType: `timestamp`, default: new Date(0), saveTransform: x => moment(x).format(`YYYY-MM-DD HH:mm:ss.SSSSSS`), loadTransform: x => new Date(x) },
-  { type: `datetime`, javascriptType: 'Date', defaultMySQLType: `datetime`, default: new Date(0), saveTransform: x => moment(x).format(`YYYY-MM-DD HH:mm:ss.SSSSSS`), loadTransform: x => new Date(x) },
-  { type: `year`, javascriptType: `number`, defaultMySQLType: `year`, default: 1970, setTransform: x => parseInt(x) },
-  { type: `char`, javascriptType: `string`, defaultMySQLType: `char`, default: '', hasLength: true, hasCharacterSetAndCollate: true },
-  { type: `varchar`, javascriptType: `string`, defaultMySQLType: `varchar`, default: '', hasLength: true, lengthRequired: true, hasCharacterSetAndCollate: true },
-  { type: `binary`, javascriptType: `Buffer`, defaultMySQLType: `binary`, default: Buffer.from([]), hasLength: true, saveTransform: x => x.toString(), loadTransform: x => Buffer.from(x) },
-  { type: `varbinary`, javascriptType: `Buffer`, defaultMySQLType: `varbinary`, default: Buffer.from([]), lengthRequired: true, hasLength: true, saveTransform: x => x.toString(), loadTransform: x => Buffer.from(x) },
-  { type: `tinyblob`, javascriptType: `Buffer`, defaultMySQLType: `tinyblob`, default: Buffer.from([]), saveTransform: x => x.toString(), loadTransform: x => Buffer.from(x) },
-  { type: `blob`, javascriptType: `Buffer`, defaultMySQLType: `blob`, default: Buffer.from([]), hasLength: true, saveTransform: x => x.toString(), loadTransform: x => Buffer.from(x) },
-  { type: `mediumblob`, javascriptType: `Buffer`, defaultMySQLType: `mediumblob`, default: Buffer.from([]), saveTransform: x => x.toString(), loadTransform: x => Buffer.from(x) },
-  { type: `longblob`, javascriptType: `Buffer`, defaultMySQLType: `longblob`, default: Buffer.from([]), saveTransform: x => x.toString(), loadTransform: x => Buffer.from(x) },
-  { type: `tinytext`, javascriptType: `string`, defaultMySQLType: `tinytext`, default: '', hasCharacterSetAndCollate: true },
-  { type: `text`, javascriptType: `string`, defaultMySQLType: `text`, default: '', hasLength: true, hasCharacterSetAndCollate: true },
-  { type: `mediumtext`, javascriptType: `string`, defaultMySQLType: `mediumtext`, default: '', hasCharacterSetAndCollate: true },
-  { type: `longtext`, javascriptType: `string`, defaultMySQLType: `longtext`, default: '', hasCharacterSetAndCollate: true },
-  { type: `enum`, javascriptType: `string`, defaultMySQLType: `enum`, default: '', hasCharacterSetAndCollate: true },
-  { type: `set`, javascriptType: `string`, defaultMySQLType: `set`, default: '', hasCharacterSetAndCollate: true },
-  { type: `boolean`, javascriptType: `boolean`, defaultMySQLType: `tinyint`, default: false, saveTransform: x => x ? 1 : 0, loadTransform: x => x ? true: false },
-  { type: `function`, javascriptType: `function`, defaultMySQLType: `text`, default: function () {}, saveTransform: x => x.toString(), loadTransform: x => eval(x) },
-  { type: `other`, javascriptType: `object`, defaultMySQLType: `int`, default: null, setTransform: (x, type) => typeof x == 'object' && x && ( x.constructor.name == type || module.exports.instanceOf(x, type) ) ? x : null, saveTransform: x => x ? x.id() : -1, loadTransform: async (x, type, db) => await (new parent[type]).load(x, db) },
+  { type: `int`, javascriptType: 'number', default: 0, setTransform: x => parseInt(x) },
+  { type: `float`, javascriptType: 'number', default: 0, setTransform: x => parseFloat(x) },
+  { type: `string`, javascriptType: 'string', default: '' },
+  { type: `boolean`, javascriptType: 'boolean', default: false, setTransform: x => x ? true : false },
+  { type: `function`, javascriptType: 'function', default: () => {} },
+  { type: `date`, javascriptType: 'Date', default: new Date(0) },
+  { type: `buffer`, javascriptType: 'Buffer', default: Buffer.from([]) },
+  { type: `other`, javascriptType: 'object', default: null },
   
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `bit`, saveTransform: x => x.map(y => y.join(`|`)).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y.split(`|`).map(z => parseInt(z)))) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `tinyint`, setTransform: x => x.map(y => parseInt(y)).filter(y => !isNaN(y)), saveTransform: x => x.join(`,`), loadTransform: x => x.split(`,`).map(y => parseInt(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `smallint`, setTransform: x => x.map(y => parseInt(y)).filter(y => !isNaN(y)), saveTransform: x => x.join(`,`), loadTransform: x => x.split(`,`).map(y => parseInt(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `mediumint`, setTransform: x => x.map(y => parseInt(y)).filter(y => !isNaN(y)), saveTransform: x => x.join(`,`), loadTransform: x => x.split(`,`).map(y => parseInt(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `int`, setTransform: x => x.map(y => parseInt(y)).filter(y => !isNaN(y)), saveTransform: x => x.join(`,`), loadTransform: x => x.split(`,`).map(y => parseInt(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `integer`, setTransform: x => x.map(y => parseInt(y)).filter(y => !isNaN(y)), saveTransform: x => x.join(`,`), loadTransform: x => x.split(`,`).map(y => parseInt(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `bigint`, setTransform: x => x.map(y => parseInt(y)).filter(y => !isNaN(y)), saveTransform: x => x.join(`,`), loadTransform: x => x.split(`,`).map(y => parseInt(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `real`, setTransform: x => x.map(y => parseFloat(y)).filter(y => !isNaN(y)), saveTransform: x => x.join(`,`), loadTransform: x => x.split(`,`).map(y => parseFloat(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `double`, setTransform: x => x.map(y => parseFloat(y)).filter(y => !isNaN(y)), saveTransform: x => x.join(`,`), loadTransform: x => x.split(`,`).map(y => parseFloat(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `float`, setTransform: x => x.map(y => parseFloat(y)).filter(y => !isNaN(y)), saveTransform: x => x.join(`,`), loadTransform: x => x.split(`,`).map(y => parseFloat(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `decimal`, setTransform: x => x.map(y => parseFloat(y)).filter(y => !isNaN(y)), saveTransform: x => x.join(`,`), loadTransform: x => x.split(`,`).map(y => parseFloat(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `numeric`, setTransform: x => x.map(y => parseFloat(y)).filter(y => !isNaN(y)), saveTransform: x => x.join(`,`), loadTransform: x => x.split(`,`).map(y => parseFloat(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `date`, setTransform: x => x.map(y => typeof y == 'object' && y.constructor.name == 'Date' ? y : null).filter(y => y), saveTransform: x => x.map(y => moment(y).format(`YYYY-MM-DD`)).join(`,`), loadTransform: x => x.split(`,`).map(y => new Date(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `time`, setTransform: x => x.map(y => typeof y == 'string' ? y : null).filter(y => y), saveTransform: x => x.join(`,`), loadTransform: x => x.split(`,`) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `timestamp`, setTransform: x => x.map(y => typeof y == 'object' && y.constructor.name == 'Date' ? y : null).filter(y => y), saveTransform: x => x.map(y => moment(y).format(`YYYY-MM-DD HH:mm:ss.SSSSSS`)).join(`,`), loadTransform: x => x.split(`,`).map(y => new Date(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `datetime`, setTransform: x => x.map(y => typeof y == 'object' && y.constructor.name == 'Date' ? y : null).filter(y => y), saveTransform: x => x.map(y => moment(y).format(`YYYY-MM-DD HH:mm:ss.SSSSSS`)).join(`,`), loadTransform: x => x.split(`,`).map(y => new Date(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `year`, setTransform: x => x.map(y => parseInt(y)).filter(y => !isNaN(y)), saveTransform: x => x.join(`,`), loadTransform: x => x.split(`,`).map(y => parseInt(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `char`, setTransform: x => x.map(y => typeof y == 'string' ? y : null).filter(y => y), saveTransform: x => x.join(`!&|&!`), loadTransform: x => x.split(`!&|&!`) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `varchar`, setTransform: x => x.map(y => typeof y == 'string' ? y : null).filter(y => y), saveTransform: x => x.join(`!&|&!`), loadTransform: x => x.split(`!&|&!`) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `binary`, saveTransform: x => x.map(y => y.join(`|`)).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y.split(`|`).map(z => parseInt(z)))) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `varbinary`, saveTransform: x => x.map(y => y.join(`|`)).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y.split(`|`).map(z => parseInt(z)))) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `tinyblob`, saveTransform: x => x.map(y => y.join(`|`)).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y.split(`|`).map(z => parseInt(z)))) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `blob`, saveTransform: x => x.map(y => y.join(`|`)).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y.split(`|`).map(z => parseInt(z)))) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `longtext`, default: [], arrayOfType: `mediumblob`, saveTransform: x => x.map(y => y.join(`|`)).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y.split(`|`).map(z => parseInt(z)))) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `longtext`, default: [], arrayOfType: `longblob`, saveTransform: x => x.map(y => y.join(`|`)).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y.split(`|`).map(z => parseInt(z)))) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `tinytext`, setTransform: x => x.map(y => typeof y == 'string' ? y : null).filter(y => y), saveTransform: x => x.join(`!&|&!`), loadTransform: x => x.split(`!&|&!`) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `text`, setTransform: x => x.map(y => typeof y == 'string' ? y : null).filter(y => y), saveTransform: x => x.join(`!&|&!`), loadTransform: x => x.split(`!&|&!`) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `longtext`, default: [], arrayOfType: `mediumtext`, setTransform: x => x.map(y => typeof y == 'string' ? y : null).filter(y => y), saveTransform: x => x.join(`!&|&!`), loadTransform: x => x.split(`!&|&!`) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `longtext`, default: [], arrayOfType: `longtext`, setTransform: x => x.map(y => typeof y == 'string' ? y : null).filter(y => y), saveTransform: x => x.join(`!&|&!`), loadTransform: x => x.split(`!&|&!`) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `enum`, setTransform: x => x.map(y => typeof y == 'string' ? y : null).filter(y => y), saveTransform: x => x.join(`!&|&!`), loadTransform: x => x.split(`!&|&!`) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `set`, setTransform: x => x.map(y => typeof y == 'string' ? Array.from(new Set(y.split(`,`))).join(`,`) : null).filter(y => y), saveTransform: x => x.join(`!&|&!`), loadTransform: x => x.split(`!&|&!`) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `boolean`, setTransform: x => x.map(y => typeof y == 'boolean' ? y : null).filter(y => y !== null), saveTransform: x => x.map(y => y ? 1 : 0).join(`,`), loadTransform: x => x.split(`,`).map(y => y ? true : false) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `function`, setTransform: x => x.map(y => typeof y == 'function' ? y : null).filter(y => y !== null), saveTransform: x => x.map(y => y.toString()).join(`!&|&!`), loadTransform: x => x.split(`!&|&!`).map(y => eval(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `other`, setTransform: (x, type) => x.map(y => typeof y == 'object' && y && ( y.constructor.name == type || module.exports.instanceOf(y, type) ) ? y : null).filter(y => y !== null), saveTransform: x => x.map(y => y.id()).join(`,`), loadTransform: async (x, type, db) => { const arr = []; for ( let i = 0, list = x.split(`,`), i_max = list.length; i < i_max; i++ ) { if ( !isNaN(parseInt(list[i])) ) arr.push(await (new parent[type]).load(parseInt(list[i]), db)); } return arr; } }
+  { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `int`, 
+    setTransform: (x, property) => {
+      if ( x.some(y => isNaN(y)) )
+        throw new Error(`${property.name}.setTransform(): Non-numeric value passed to Array[int] setter.`);
+      return x.map(y => parseInt(y));
+    } 
+  },
+  { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `float`, 
+    setTransform: (x, property) => {
+      if ( x.some(y => isNaN(y)) )
+        throw new Error(`${property.name}.setTransform(): Non-numeric value passed to Array[float] setter.`);
+      return x.map(y => parseFloat(y));
+    }
+  },
+  { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `string`, 
+    setTransform: (x, property) => {
+      if ( x.some(y => typeof y !== 'string') )
+        throw new Error(`${property.name}.setTransform(): Non-string value passed to Array[string] setter.`);
+      return x;
+    }
+  },
+  { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `boolean`, 
+    setTransform: (x, property) => {
+      if ( x.some(y => typeof y !== 'boolean') )
+        throw new Error(`${property.name}.setTransform(): Non-boolean value passed to Array[boolean] setter.`);
+      return x; 
+    }
+  },
+  { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `function`, 
+    setTransform: (x, property) => {
+      if ( x.some(y => typeof y !== 'function') )
+        throw new Error(`${property.name}.setTransform(): Non-function value passed to Array[function] setter.`);
+      return x; 
+    }
+  },
+  { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `date`, 
+    setTransform: (x, property) => {
+      if ( x.some(y => typeof y !== 'object' || y.constructor.name != 'Date' ) )
+        throw new Error(`${property.name}.setTransform(): Non-Date value passed to Array[Date] setter.`);
+      return x;
+    }
+  },
+  { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `buffer`, 
+    setTransform: (x, property) => {
+      if ( x.some(y => typeof y !== 'object' || y.constructor.name != 'Buffer' ) )
+        throw new Error(`${property.name}.setTransform(): Non-Buffer value passed to Array[Buffer] setter.`);
+      return x; 
+    }
+  },
+  { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `other`, 
+    setTransform: (x, property) => { 
+      if ( x.some(y => typeof y !== 'object' || ( typeof property.type == 'string' && y.constructor.name != property.originalType ) || ( typeof property.instanceOf === 'string' && y.constructor.name != property.instanceOf )) )
+        throw new Error(`${property.name}.setTransform(): Invalid value passed to Array[${typeof property.type === 'string' ? property.originalType : property.instanceOf}] setter.`);
+      return x;
+    }
+  },
 ];
 
 /** Validate configuration for a single property */
@@ -165,90 +150,6 @@ function validatePropertyConfig(property) {
       property.ezobjectType = ezobjectTypes.find(x => x.type == 'other');
   }
   
-  /** If 'length' is provided, make sure it's an integer or NaN */
-  if ( !isNaN(property.length) )
-    property.length = parseInt(property.length);
-  
-  /** If 'decimals' is provided, make sure it's an integer or NaN */
-  if ( !isNaN(property.decimals) )
-    property.decimals = parseInt(property.decimals);
-  
-  /** Set 'hasDecimals' to false if not defined */
-  if ( typeof property.ezobjectType.hasDecimals !== 'boolean' )
-    property.ezobjectType.hasDecimals = false;
-  
-  /** Set 'hasLength' to false if not defined */
-  if ( typeof property.ezobjectType.hasLength !== 'boolean' )
-    property.ezobjectType.hasDecimals = false;
-  
-  /** Set 'lengthRequired' to false if not defined */
-  if ( typeof property.ezobjectType.lengthRequired !== 'boolean' )
-    property.ezobjectType.lengthRequired = false;
-  
-  /** Set 'hasUnsignedAndZeroFill' to false if not defined */
-  if ( typeof property.ezobjectType.hasUnsignedAndZeroFill !== 'boolean' )
-    property.ezobjectType.hasUnsignedAndZeroFill = false;
-  
-  /** Set 'hasCharacterSetAndCollate' to false if not defined */
-  if ( typeof property.ezobjectType.hasCharacterSetAndCollate !== 'boolean' )
-    property.ezobjectType.hasCharacterSetAndCollate = false;
-  
-  /** Set 'lengthRequiresDecimals' to false if not defined */
-  if ( typeof property.ezobjectType.lengthRequiresDecimals !== 'boolean' )
-    property.ezobjectType.lengthRequiresDecimals = false;
-
-  /** Types where length is required, throw error if missing */
-  if ( property.ezobjectType.lengthRequired && isNaN(property.length) )
-    throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' of type ${property.type} missing required length configuration.`);
-
-  /** Types where decimals are provided, but length is missing */
-  if ( property.ezobjectType.hasDecimals && !isNaN(property.decimals) && isNaN(property.length) )
-    throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' of type ${property.type} provided decimals without length configuration.`);
-
-  /* If type is VARCHAR or VARBINARY, both of which require length, throw error if length out of bounds */
-  if ( ( property.type == `varchar` || property.type == `varbinary` ) && ( property.length <= 0 || property.length > 65535 ) )
-    throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' of type ${property.type} has length out of bounds, must be between 1 and 65535.`);
-
-  /* If type is BIT and length is provided, throw error if length out of bounds */
-  if ( property.type == `bit` && !isNaN(property.length) && ( property.length <= 0 || property.length > 64 ) )
-    throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' of type ${property.type} has length out of bounds, must be between 1 and 64.`);
-
-  /* If type is TINYINT and length is provided, throw error if length out of bounds */
-  if ( property.type == `tinyint` && !isNaN(property.length) && ( property.length <= 0 || property.length > 4 ) )
-    throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' of type ${property.type} has length out of bounds, must be between 1 and 4.`);
-
-  /* If type is SMALLINT and length is provided, throw error if length out of bounds */
-  if ( property.type == `smallint` && !isNaN(property.length) && ( property.length <= 0 || property.length > 6 ) )
-    throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' of type ${property.type} has length out of bounds, must be between 1 and 6.`);
-
-  /* If type is MEDIUMINT and length is provided, throw error if length out of bounds */
-  if ( property.type == `mediumint` && !isNaN(property.length) && ( property.length <= 0 || property.length > 8 ) )
-    throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' of type ${property.type} has length out of bounds, must be between 1 and 8.`);
-
-  /* If type is INT or INTEGER and length is provided, throw error if length out of bounds */
-  if ( ( property.type == `int` || property.type == `integer` ) && !isNaN(property.length) && ( property.length <= 0 || property.length > 11 ) )
-    throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' of type ${property.type} has length out of bounds, must be between 1 and 11.`);
-
-  /* If type is BIGINT and length is provided, throw error if length out of bounds */
-  if ( property.type == `bigint` && !isNaN(property.length) && ( property.length <= 0 || property.length > 20 ) )
-    throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' of type ${property.type} has length out of bounds, must be between 1 and 20.`);
-
-  /* If type can use decimals and decimals are provided, throw error if decimals out of bounds */
-  if ( property.ezobjectType.hasDecimals && !isNaN(property.decimals) && ( property.decimals < 0 || property.decimals > property.length ) )
-    throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' of type ${property.type} has decimals out of bounds, must be between 0 and the configured 'length'.`);
-
-  /** Types where length is provided and so decimals are required, throw error if missing */
-  if ( property.ezobjectType.lengthRequiresDecimals && !isNaN(property.length) && isNaN(property.decimals) )
-    throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' of type ${property.type} used with length, but without decimals.`);
-
-  /** If type is ENUM or SET and values missing or invalid, throw error */
-  if ( ( property.ezobjectType.defaultMySQLType == 'enum' || property.ezobjectType.defaultMySQLType == 'set' ) && ( typeof property.values !== 'object' || property.values.constructor.name != 'Array' ) )
-    throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' of type ${property.type} used with missing or invalid values array.`);
-  
-  /** If type is ENUM or SET and values exists but is empty, throw error */
-  if ( ( property.ezobjectType.defaultMySQLType == 'enum' || property.ezobjectType.defaultMySQLType == 'set' ) && property.values.length == 0 )
-    throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' of type ${property.type} used with empty values array, there must be at least one value.`);
-  
   /** Create default transform function that doesn't change the input */
   const defaultTransform = x => x;
   
@@ -272,10 +173,6 @@ function validatePropertyConfig(property) {
   if ( typeof property.loadTransform !== `function` )
     property.loadTransform = typeof property.ezobjectType == 'object' && typeof property.ezobjectType.loadTransform == 'function' ? property.ezobjectType.loadTransform : defaultTransform;
       
-  /** Fully determine whether to store properties in database */
-  if ( typeof property.store !== `boolean` )
-    property.store = true;
-  
   /** Fully determine whether to allow nulls for this property */
   if ( typeof property.allowNull !== `boolean` && property.ezobjectType.type != 'other' )
     property.allowNull = false;
@@ -306,188 +203,6 @@ function validateClassConfig(obj) {
     validatePropertyConfig(property);
   });
 }
-
-/** Validate configuration for a creating MySQL table based on class configuration */
-function validateTableConfig(obj) {  
-  /** If configuration has missing or invalid 'tableName' configuration, throw error */
-  if ( typeof obj.tableName !== 'string' || !obj.tableName.match(/[a-z_]+/) )
-    throw new Error(`ezobjects.validateTableConfig(): Configuration has missing or invalid 'tableName', must be string containing characters 'a-z_'.`);
-
-  validateClassConfig(obj);
-}
-
-/*
- * @signature ezobjects.createTable(obj, db)
- * @param obj Object Configuration object
- * @param db MySQLConnection
- * @description A function for automatically generating a MySQL table, if it doesn't already
- * exist, based on the values in the provided configuration object.
- */
-module.exports.createTable = async (obj, db) => {
-  if ( typeof db != `object` || db.constructor.name != `MySQLConnection` )
-    throw new Error(`ezobjects.createTable(): Invalid database argument.`);
-  
-  /** Validate table configuration */
-  validateTableConfig(obj);
-  
-  /** Helper method that can be recursively called to add all properties to the create query */
-  const addPropertiesToCreateQuery = (obj) => {
-    /** If this object extends another, recursively add properties from the extended object */
-    if ( obj.extendsConfig )
-      addPropertiesToCreateQuery(obj.extendsConfig);
-
-    /** Loop through each property */
-    obj.properties.forEach((property) => {
-      /** If we don't want this property to be stored in the database, don't include it in the create query */
-      if ( !property.store )
-        return;
-      
-      /** Add property name and type to query */
-      createQuery += `${property.name} ${property.ezobjectType.defaultMySQLType.toUpperCase()}`;
-
-      /** Add value lists for ENUM and SET types */
-      if ( property.ezobjectType.defaultMySQLType.toUpperCase() == 'ENUM' || property.ezobjectType.defaultMySQLType.toUpperCase() == 'SET' ) {
-        createQuery += `(`;
-        
-        /** Loop through each value and output */
-        property.values.forEach((value) => {
-          createQuery += `'${value}', `;
-        });
-        
-        /** Trim extra ', ' from value list, if there was at least one */
-        if ( property.values.length > 0 )
-          createQuery = createQuery.substr(0, createQuery.length - 2);
-        
-        createQuery += `)`;
-      }
-      
-      /** Properties with length and/or decimals */
-      if ( !isNaN(property.length) && !isNaN(property.decimals) && typeof property.ezobjectType.hasLength == 'boolean' && property.ezobjectType.hasLength && typeof property.ezobjectType.hasDecimals == 'boolean' && property.ezobjectType.hasDecimals )
-        createQuery += `(${property.length}, ${property.decimals})`;
-      else if ( !isNaN(property.length) && typeof property.ezobjectType.hasLength == 'boolean' && property.ezobjectType.hasLength )
-        createQuery += `(${property.length})`;
-      
-      /** Properties with UNSIGNED */
-      if ( typeof property.ezobjectType.hasUnsignedAndZeroFill == `boolean` && property.ezobjectType.hasUnsignedAndZeroFill && typeof property.unsigned == 'boolean' && property.unsigned )
-        createQuery += ` UNSIGNED`;
-
-      /** Properties with ZEROFILL */
-      if ( typeof property.ezobjectType.hasUnsignedAndZeroFill == `boolean` && property.ezobjectType.hasUnsignedAndZeroFill && typeof property.zerofill == 'boolean' && property.zerofill )
-        createQuery += ` ZEROFILL`;
-
-      /** Properties with CHARACTER SET */
-      if ( typeof property.ezobjectType.hasCharacterSetAndCollate == `boolean` && property.ezobjectType.hasCharacterSetAndCollate && typeof property.characterSet == 'string' )
-        createQuery += ` CHARACTER SET ${property.characterSet}`;
-
-      /** Properties with COLLATE */
-      if ( typeof property.ezobjectType.hasCharacterSetAndCollate == `boolean` && property.ezobjectType.hasCharacterSetAndCollate && typeof property.collate == 'string' )
-        createQuery += ` COLLATE ${property.collate}`;
-
-      /** Properties with NULL */
-      if ( property.allowNull )
-        createQuery += ` NULL`;
-      else
-        createQuery += ` NOT NULL`;
-
-      /** Properties with AUTO_INCREMENT */
-      if ( property.autoIncrement || property.name == 'id' )
-        createQuery += ` AUTO_INCREMENT`;
-
-      /** Properties with UNIQUE KEY */
-      if ( property.unique )
-        createQuery += ` UNIQUE`;
-
-      /** Properties with PRIMARY KEY */
-      if ( property.name == 'id' )
-        createQuery += ` PRIMARY KEY`;
-
-      /** Properties with COMMENT */
-      if ( property.comment && typeof property.comment == `string` )
-        createQuery += ` COMMENT '${property.comment.replace(`'`, `''`)}'`;
-
-      createQuery += `, `;
-    });
-  };
-
-  /** Helper method that can be recursively called to add all indexes to the create query */
-  const addIndexesToCreateQuery = (obj) => {
-    /** If this object extends another, recursively add indexes from the extended object */
-    if ( obj.extendsConfig )
-      addIndexesToCreateQuery(obj.extendsConfig);
-
-    /** If there are any indexes defined */
-    if ( obj.indexes ) {
-      /** Loop through each index */
-      obj.indexes.forEach((index) => {
-        /** Convert the type to upper case for reliable string comparison */
-        index.type = index.type.toUpperCase();
-        
-        /** If type is not defined, default to BTREE */
-        if ( typeof index.type !== `string` )
-          index.type = `BTREE`;
-
-        /** Validate index settings */
-        if ( index.type != `BTREE` && index.type != `HASH` )
-          throw new Error(`ezobjects.createTable(): Invalid index type '${index.type}'.`);
-        else if ( index.visible && index.invisible )
-          throw new Error(`ezobjects.createTable(): Index cannot have both VISIBLE and INVISIBLE options set.`);
-
-        /** Add index name and type to query */
-        createQuery += `INDEX ${index.name} USING ${index.type} (`;
-
-        /** Loop through each indexed column and append to query */
-        index.columns.forEach((column) => {
-          createQuery += `${column}, `;
-        });
-
-        /** Trim off extra ', ' from columns */
-        createQuery = createQuery.substr(0, createQuery.length - 2);
-
-        /** Close column list */
-        createQuery += `)`;
-
-        /** Indexes with KEY_BLOCK_SIZE */
-        if ( typeof index.keyBlockSize === `number` )
-          createQuery += ` KEY_BLOCK_SIZE ${index.keyBlockSize}`;
-
-        /** Indexes with WITH PARSER */
-        if ( typeof index.parserName === `string` )
-          createQuery += ` WITH PARSER ${index.parserName}`;
-
-        /** Indexes with COMMENT */
-        if ( typeof index.comment === `string` )
-          createQuery += ` COMMENT '${index.comment.replace(`'`, ``)}'`;
-
-        /** Indexes with VISIBLE */
-        if ( typeof index.visible === `boolean` && index.visible )
-          createQuery += ` VISIBLE`;
-
-        /** Indexes with INVISIBLE */
-        if ( typeof index.visible === `boolean` && index.invisible )
-          createQuery += ` INVISIBLE`;
-
-        createQuery += `, `;
-      });
-    }
-  };
-
-  /** Begin create table query */
-  let createQuery = `CREATE TABLE IF NOT EXISTS ${obj.tableName} (`;
-
-  /** Call recursive methods to add properties and indexes to query */
-  addPropertiesToCreateQuery(obj);
-  addIndexesToCreateQuery(obj);
-
-  /** Trim extra ', ' from property and/or index list */
-  createQuery = createQuery.substr(0, createQuery.length - 2);
-
-  /** Close property and/or index list */
-  createQuery += `)`;
-  
-  /** Await query execution and return result */
-  return await db.query(createQuery);
-};
->>>>>>> 6d49df4442e867a351c43326fb61424fa52015aa
 
 /**
  * @signature ezobjects.instanceOf(obj, constructorName)
@@ -524,25 +239,8 @@ module.exports.instanceOf = (obj, constructorName) => {
  * the values in the provided configuration object.
  */
 module.exports.createClass = (obj) => {
-<<<<<<< HEAD
-  /** Add properties array if one wasn't set */
-  if ( !obj.properties )
-    obj.properties = [];
-    
-  /** Create default transform function that doesn't change the input */
-  const defaultTransform = x => x;
-  
-  let parent;
-  
-  /** Figure out proper global scope between node (global) and browser (window) */
-  if ( typeof window !== `undefined` )
-    parent = window;
-  else
-    parent = global;
-=======
   /** Validate class configuration */
   validateClassConfig(obj);
->>>>>>> 6d49df4442e867a351c43326fb61424fa52015aa
 
   /** Create new class on global scope */
   parent[obj.className] = class extends (obj.extends || Object) {
@@ -584,38 +282,8 @@ module.exports.createClass = (obj) => {
 
       /** Loop through each property in the obj */
       obj.properties.forEach((property) => {
-<<<<<<< HEAD
-        /** If there is no init transform, set to default */
-        if ( typeof property.initTransform !== `function` )
-          property.initTransform = defaultTransform;
-
-        /** Initialize 'int' and 'double' types to zero */
-        if ( property.type && ( property.type.split(`|`).includes(`int`) || property.type.split(`|`).includes(`double`) ) )
-          this[property.name](property.initTransform(data[property.name]) || property.default || 0);
-
-        /** Initialize 'boolean' types to false */
-        else if ( property.type && property.type.split(`|`).includes(`boolean`) )
-          this[property.name](property.initTransform(data[property.name]) || property.default || false);
-        
-        /** Initialize 'string' types to empty */
-        else if ( property.type && property.type.split(`|`).includes(`string`) )
-          this[property.name](property.initTransform(data[property.name]) || property.default || ``);
-
-        /** Initialize 'function' types to empty function */
-        else if ( property.type && property.type.split(`|`).includes(`function`) )
-          this[property.name](property.initTransform(data[property.name]) || property.default || emptyFunction);
-        
-        /** Initialize 'Array' types to empty */
-        else if ( property.type && property.type.split(`|`).includes(`Array`) )
-          this[property.name](property.initTransform(data[property.name]) || property.default || []);
-
-        /** Initialize all other types to null */
-        else
-          this[property.name](property.initTransform(data[property.name]) || property.default || null);
-=======
         /** Initialize types to defaults */
         this[property.name](property.initTransform(data[property.name]) || property.default || property.ezobjectType.default);
->>>>>>> 6d49df4442e867a351c43326fb61424fa52015aa
       });
     }
   };
@@ -632,36 +300,6 @@ module.exports.createClass = (obj) => {
       else if ( !property.allowNull && ![`object`, `Buffer`, `Array`, `Date`].includes(property.ezobjectType.javascriptType) && typeof arg == property.ezobjectType.javascriptType )
         this[`_${property.name}`] = property.setTransform(arg, property.instanceOf ? property.instanceOf : property.originalType); 
       
-<<<<<<< HEAD
-      /** For `int` type properties */
-      else if ( typeof arg == `number` && property.type && property.type.split(`|`).includes(`int`) )
-        this[`_${property.name}`] = parseInt(property.setTransform(arg)); 
-      
-      /** For `double` type properties */
-      else if ( typeof arg == `number` && property.type && property.type.split(`|`).includes(`double`) )
-        this[`_${property.name}`] = parseFloat(property.setTransform(arg)); 
-      
-      /** For `boolean` type properties */
-      else if ( typeof arg == `boolean` && property.type && property.type.split(`|`).includes(`boolean`) )
-        this[`_${property.name}`] = property.setTransform(arg); 
-
-      /** For `string` type properties */
-      else if ( typeof arg == `string` && property.type && property.type.split(`|`).includes(`string`) )
-        this[`_${property.name}`] = property.setTransform(arg).toString(); 
-      
-      /** For `function` type properties */
-      else if ( typeof arg == `function` && property.type && property.type.split(`|`).includes(`function`) )
-        this[`_${property.name}`] = property.setTransform(arg); 
-      
-      /** For `Array` type propeties */
-      else if ( arg !== null && typeof arg == `object` && arg.constructor.name == `Array` && property.type && property.type.split(`|`).includes(`Array`) )
-        this[`_${property.name}`] = property.setTransform(arg); 
-
-      /** For all other property types */
-      else if ( arg === null || ( typeof arg == `object` && property.type && property.type.split(`|`).includes(arg.constructor.name) ) || ( typeof property.instanceOf == `string` && property.instanceOf.split(`|`).some(x => module.exports.instanceOf(arg, x)) ) )
-        this[`_${property.name}`] = property.setTransform(arg); 
-
-=======
       /** Setter for nullable standard property types */
       else if ( property.allowNull && ![`object`, `Buffer`, `Array`, `Date`].includes(property.ezobjectType.javascriptType) )
         this[`_${property.name}`] = property.setTransform(arg, property.instanceOf ? property.instanceOf : property.originalType); 
@@ -682,388 +320,13 @@ module.exports.createClass = (obj) => {
       else if ( arg === null || typeof arg === `object` && ( property.originalType && property.originalType == arg.constructor.name ) || ( typeof arg == `object` && typeof property.instanceOf == `string` && module.exports.instanceOf(arg, property.instanceOf) ) )
         this[`_${property.name}`] = property.setTransform(arg, property.instanceOf ? property.instanceOf : property.originalType); 
       
->>>>>>> 6d49df4442e867a351c43326fb61424fa52015aa
       /** Handle type errors */
       else 
-        throw new TypeError(`${this.constructor.name}.${property.name}(${typeof arg}): Invalid signature.`); 
+        throw new TypeError(`${this.constructor.name}.${property.name}(${typeof arg}): Invalid signature, requires '${typeof property.type === 'string' ? property.originalType : property.instanceOf}'.`); 
       
       /** Return this object for set call chaining */
       return this; 
     };
-<<<<<<< HEAD
-=======
-    
-    /** Create MySQL delete method on prototype */
-    parent[obj.className].prototype.delete = async function (db) { 
-      /** If the argument is a valid database, delete the record */
-      if ( typeof db == `object` && db.constructor.name == `MySQLConnection` )
-        await db.query(`DELETE FROM ${obj.tableName} WHERE id = ?`, [this.id()]);
-
-      /** Otherwise throw TypeError */
-      else
-        throw new TypeError(`${this.constructor.name}.delete(${typeof db}): Invalid signature.`);
-
-      /** Allow for call chaining */
-      return this;
-    };
-
-    /** Create MySQL insert method on prototype */
-    parent[obj.className].prototype.insert = async function (arg1) { 
-      /** Provide option for inserting record from browser if developer implements ajax backend */
-      if ( typeof window !== `undefined` && typeof arg1 == `string` ) {
-        /** Attempt to parse the URL */
-        const url = new URL(arg1);
-
-        /** Attempt to retrieve a JSON response from the parsed URL */
-        const result = await $.get({
-          url: url.href,
-          data: JSON.stringify(this),
-          dataType: `json`
-        });
-
-        /** If successful, store id, if not, throw error */
-        if ( result && result.insertId )
-          this.id(result.insertId);
-        else
-          throw new Error(`${obj.className}.insert(): Unable to insert record, invalid response from remote host.`);
-      }
-
-      /** If the argument is a valid database, insert record into database and capture ID */
-      else if ( typeof arg1 == `object` && arg1.constructor.name == `MySQLConnection` ) {
-        /** Create array for storing values to insert */
-        const params = [];
-
-        /** Create helper method for recursively adding properties to params array */
-        const propertyValues = (obj) => {
-          /** If this object extends another, recursively add properties from the extended object */
-          if ( obj.extendsConfig )
-            propertyValues(obj.extendsConfig);
-
-          /** Loop through each property */
-          obj.properties.forEach((property) => {
-            /** Ignore ID since we`ll get that from the insert, also ignore properties not stored */
-            if ( property.name == `id` || !property.store )
-              return;
-
-            /** Add property to params array after performing the save transform */
-            params.push(property.saveTransform(this[property.name]()));
-          });
-        };
-
-        /** Recursively add properties to params array */
-        propertyValues(obj);
-
-        /** Begin INSERT query */
-        let query = `INSERT INTO ${obj.tableName} (`;
-
-        /** Create helper method for recursively adding property names to query */
-        const propertyNames = (obj) => {
-          /** If this object extends another, recursively add property names from the extended object */
-          if ( obj.extendsConfig )
-            propertyNames(obj.extendsConfig);
-
-          /** Loop through each property */
-          obj.properties.forEach((property) => {
-            /** Ignore ID since we`ll get that from the insert, also ignore properties not stored */
-            if ( property.name == `id` || !property.store )
-              return;
-
-            /** Append property name to query */
-            query += `${property.name}, `;
-          });
-        };
-
-        /** Add property names to query */
-        propertyNames(obj);
-
-        /** Trim extra `, ` from property list */
-        query = query.substr(0, query.length - 2);
-
-        /** Continue query */
-        query += `) VALUES (`;
-
-        /** Create helper method for recursively adding property value placeholders to query */
-        const propertyPlaceholders = (obj) => {
-          /** If this object extends another, recursively add property placeholders from the extended object */
-          if ( obj.extendsConfig )
-            propertyPlaceholders(obj.extendsConfig);
-
-          /** Loop through each property */
-          obj.properties.forEach((property) => {
-            /** Ignore ID since we`ll get that from the insert, also ignore properties not stored */
-            if ( property.name == `id` || !property.store )
-              return;
-
-            /** Append placeholder to query */
-            query += `?, `;
-          });
-        };
-
-        /** Add property placeholders to query */
-        propertyPlaceholders(obj);
-
-        /** Trim extra `, ` from placeholder list */
-        query = query.substr(0, query.length - 2);
-
-        /** Finish query */
-        query += `)`;
-        
-        /** Execute query to add record to database */
-        const result = await arg1.query(query, params);
-
-        /** Store the resulting insert ID */
-        this.id(result.insertId);
-      } 
-
-      /** Otherwise throw TypeError */
-      else {
-        throw new TypeError(`${this.constructor.name}.insert(${typeof arg1}): Invalid signature.`);
-      }
-
-      /** Allow for call chaining */
-      return this;
-    };
-
-    /** Create MySQL load method on prototype */
-    parent[obj.className].prototype.load = async function (arg1, db) {        
-      /** Provide option for loading record from browser if developer implements ajax backend */
-      if ( typeof window !== `undefined` && typeof arg1 == `string` && arg1.match(/^http\:\/\//i) ) {
-        /** Attempt to parse the URL */
-        const url = new URL(arg1);
-
-        /** Attempt to retrieve a JSON response from the parsed URL */
-        const result = await $.get({
-          url: url.href,
-          dataType: `json`
-        });
-
-        /** If result is invalid, throw error */
-        if ( !result )
-          throw new Error(`${obj.className}.load(): Unable to load record, invalid response from remote host.`);
-
-        /** Create helper method for recursively loading property values into object */
-        const loadProperties = async (obj) => {
-          /** If this object extends another, recursively add extended property values into objecct */
-          if ( obj.extendsConfig )
-            await loadProperties(obj.extendsConfig);
-
-          /** Loop through each property */
-          for ( let i = 0, i_max = obj.properties.length; i < i_max; i++ ) {
-            /** Don't attempt to load properties that are not stored in the database */
-            if ( !obj.properties[i].store )
-              continue;
-            
-            /** Append property in object */
-            if ( typeof arg1[obj.properties[i].name] !== `undefined` ) {
-              if ( typeof db == 'object' && db.constructor.name == 'MySQLConnection' )
-                this[obj.properties[i].name](await obj.properties[i].loadTransform(result[obj.properties[i].name], obj.properties[i].instanceOf ? obj.properties[i].instanceOf : obj.properties[i].originalType, db));
-              else
-                this[obj.properties[i].name](await obj.properties[i].loadTransform(result[obj.properties[i].name], obj.properties[i].instanceOf ? obj.properties[i].instanceOf : obj.properties[i].originalType));
-            }
-          }
-        };
-
-        /** Store loaded record properties into object */
-        await loadProperties(obj);
-      }
-
-      /** If the first argument is a valid database and the second is a number, load record from database by ID */
-      else if ( ( typeof arg1 == `number` || typeof arg1 == `string` ) && typeof db == `object` && db.constructor.name == `MySQLConnection` ) {
-        if ( typeof arg1 == `string` && typeof obj.stringSearchField !== `string` )
-          throw new Error(`${obj.className}.load(): String argument is not a URL so loading from database, but no 'stringSearchField' configured.`);
-
-        /** Begin SELECT query */
-        let query = `SELECT `;
-
-        /** Create helper method for recursively adding property names to query */
-        const propertyNames = (obj) => {
-          /** If this object extends another, recursively add property names from the extended object */
-          if ( obj.extendsConfig )
-            propertyNames(obj.extendsConfig);
-
-          /** Loop through each property */
-          obj.properties.forEach((property) => {
-            /** Don't attempt to load properties that are not stored in the database */
-            if ( !property.store )
-              return;
-            
-            /** Append property name to query */
-            query += `${property.name}, `;
-          });
-        };
-
-        /** Add property names to query */
-        propertyNames(obj);
-
-        /** Trim extra `, ` from property list */
-        query = query.substr(0, query.length - 2);
-
-        /** Add from clause */
-        query += ` FROM ${obj.tableName} `;
-
-        /** Add where clause based on whether we're searching by `id` or `stringSearchField` */
-        if ( typeof arg1 === `string` && typeof obj.stringSearchField === `string` )
-          query += `WHERE ${obj.stringSearchField} = ?`;
-        else
-          query += `WHERE id = ?`;
-
-        /** Execute query to load record properties from the database */
-        const result = await db.query(query, [arg1]);
-
-        /** If a record with that ID doesn`t exist, throw error */
-        if ( !result[0] )
-          return null;
-                
-        /** Create helper method for recursively loading property values into object */
-        const loadProperties = async (obj) => {
-          /** If this object extends another, recursively add extended property values into objecct */
-          if ( obj.extendsConfig )
-            await loadProperties(obj.extendsConfig);
-
-          /** Loop through each property */
-          for ( let i = 0, i_max = obj.properties.length; i < i_max; i++ ) {            
-            /** Don't attempt to load properties that are not stored in the database */
-            if ( !obj.properties[i].store )
-              continue;
-
-            /** Append property in object */
-            if ( obj.properties[i].type != 'array' )
-              this[obj.properties[i].name](await obj.properties[i].loadTransform(result[0][obj.properties[i].name], obj.properties[i].instanceOf ? obj.properties[i].instanceOf : obj.properties[i].originalType, db));
-            else
-              this[obj.properties[i].name](await obj.properties[i].loadTransform(result[0][obj.properties[i].name], obj.properties[i].arrayOf.instanceOf ? obj.properties[i].arrayOf.instanceOf : obj.properties[i].arrayOf.type, db));
-          }
-        };
-
-        /** Store loaded record properties into object */
-        await loadProperties(obj);
-      } 
-
-      /** If the first argument is a MySQL RowDataPacket, load from row data */
-      else if ( typeof arg1 == `object` && ( arg1.constructor.name == `RowDataPacket` || arg1.constructor.name == `Object` ) ) {
-        /** Create helper method for recursively loading property values into object */
-        const loadProperties = async (obj) => {
-          /** If this object extends another, recursively add extended property values into objecct */
-          if ( obj.extendsConfig )
-            await loadProperties(obj.extendsConfig);
-
-          /** Loop through each property */
-          for ( let i = 0, i_max = obj.properties.length; i < i_max; i++ ) {
-            /** Don't attempt to load properties that are not stored in the database */
-            if ( !property.store )
-              continue;
-            
-            /** Append property in object */
-            if ( typeof arg1[property.name] !== `undefined` ) {
-              if ( typeof db == 'object' && db.constructor.name == 'MySQLConnection' )
-                this[property.name](await property.loadTransform(arg1[property.name], property.instanceOf ? property.instanceOf : property.originalType, db));
-              else
-                this[property.name](await property.loadTransform(arg1[property.name], property.instanceOf ? property.instanceOf : proeprty.originalType));
-            }
-          }
-        };
-
-        /** Store loaded record properties into object */
-        await loadProperties(obj);
-      } 
-
-      /** Otherwise throw TypeError */
-      else {
-        throw new TypeError(`${this.constructor.name}.load(${typeof arg1}, ${typeof db}): Invalid signature.`);
-      }
-
-      /** Allow for call chaining */
-      return this;
-    };
-
-    /** Create MySQL update method on prototype */
-    parent[obj.className].prototype.update = async function (arg1) { 
-      /** Provide option for inserting record from browser if developer implements ajax backend */
-      if ( typeof window !== `undefined` && typeof arg1 == `string` ) {
-        /** Attempt to parse the URL */
-        const url = new URL(arg1);
-
-        /** Attempt to retrieve a JSON response from the parsed URL */
-        const result = await $.get({
-          url: url.href,
-          data: JSON.stringify(this),
-          dataType: `json`
-        });
-
-        /** If response is invalid, throw error */
-        if ( !result )
-          throw new Error(`${obj.className}.update(): Unable to update record, invalid response from remote host.`);
-      }
-
-      /** If the argument is a valid database, update database record */
-      else if ( typeof arg1 == `object` && arg1.constructor.name == `MySQLConnection` ) {
-        /** Create array for storing values to update */
-        const params = [];
-
-        /** Create helper method for recursively adding properties to params array */
-        const propertyValues = (obj) => {
-          /** If this object extends another, recursively add properties from the extended object */
-          if ( obj.extendsConfig )
-            propertyValues(obj.extendsConfig);
-
-          /** Loop through each property */
-          obj.properties.forEach((property) => {
-            /** Ignore ID since we will use that to locate the record, and will never update it, also ignore properties not stored */
-            if ( property.name == `id` || !property.store )
-              return;
-
-            /** Add property to params array after performing the save transform */
-            params.push(property.saveTransform(this[property.name]()));
-          });
-        };
-
-        /** Recursively add properties to params array */
-        propertyValues(obj);
-
-        /** Add ID to params array at the end so we can locate the record to update */
-        params.push(this.id());
-
-        /** Begin UPDATE query */
-        let query = `UPDATE ${obj.tableName} SET `;
-
-        /** Create helper method for recursively adding property updates to query */
-        const propertyUpdates = (obj) => {
-          /** If this object extends another, recursively add properties from the extended object */
-          if ( obj.extendsConfig )
-            propertyUpdates(obj.extendsConfig);
-
-          /** Loop through each property */
-          obj.properties.forEach((property) => {
-            /** Ignore ID since we will use that to locate the record, and will never update it, also ignore properties not stored */
-            if ( property.name == `id` || !property.store )
-              return;
-
-            /** Append property update to query */
-            query += `${property.name} = ?, `;
-          });
-        };
-
-        /** Add property updates to query */
-        propertyUpdates(obj);
-
-        /** Trim extra `, ` from property list */
-        query = query.substr(0, query.length - 2);
-
-        /** Finish query */
-        query += ` WHERE id = ?`;
-
-        /** Execute query to update record in database */
-        await arg1.query(query, params);
-      } 
-
-      /** Otherwise throw TypeError */
-      else {
-        throw new TypeError(`${this.constructor.name}.update(${typeof arg1}): Invalid signature.`);
-      }
-
-      /** Allow for call chaining */
-      return this;
-    };
->>>>>>> 6d49df4442e867a351c43326fb61424fa52015aa
   });
   
   /** 

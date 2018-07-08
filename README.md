@@ -5,8 +5,7 @@ writing class objects that are strictly typed in JavaScript.  All you have to do
 configurations for each of your objects and then create them using the createClass() function.
 
 * [Installation](#installation)
-* [Basic Example](#basic-example)
-* [Extending the Basic Example](#extending-the-basic-example)
+* [Examples](#examples)
 * [EZ Object Method Signatures](#ez-object-method-signatures)
 * [Module Exports](#module-exports)
 * [Configuration Specifications](#configuration-specifications)
@@ -17,71 +16,144 @@ configurations for each of your objects and then create them using the createCla
 
 `npm install --save ezobjects`
 
-## Basic Example
+## Examples
 
 ```javascript
 const ezobjects = require(`ezobjects`);
 
+/** Configure a basic EZ Object example */
+const configBasicExample = {
+  className: 'BasicExample',
+  properties: [
+    { name: 'name', type: 'string' }
+  ]
+};
+
+/** Create the `BasicExample` class */
+ezobjects.createClass(configBasicExample);
+
+/** Create a new instance of the `BasicExample` class */
+const basicExample1 = new BasicExample();
+
+/** Give it a name using the auto-generated setter */
+basicExample1.name('Basic Example 1');
+
+/** Output the instance to console */
+console.log(basicExample1);
+
 /** 
- * Create a customized object called DatabaseRecord on the 
- * global (node) or window (browser) namespace with a single
- * property called `id`.
+ * Create another instance of the `BasicExample` class, but this time
+ * initialize it with a plain object passed to the constructor.
  */
-ezobjects.createClass({
-  className: `DatabaseRecord`,
-  properties: [
-    { name: `id`, type: `number`, setTransform: x => parseInt(x) }
-  ]
+const basicExample2 = new BasicExample({
+  name: 'Basic Example 2'
 });
- 
-const record = new DatabaseRecord();
 
-console.log(record);
+/** 
+ * Configure a full EZ Object example demonstrating all supported types,
+ * including the ability to extend other objects.
+ */
+const configFullExample = {
+  className: 'FullExample',
+  extends: BasicExample,
+  properties: [
+    { name: 'exampleInt', type: 'int' },
+    { name: 'exampleFloat', type: 'float' },
+    { name: 'exampleString', type: 'string' },
+    { name: 'exampleBoolean', type: 'boolean' },
+    { name: 'exampleFunction', type: 'function' },
+    { name: 'exampleDate', type: 'date' },
+    { name: 'exampleBuffer', type: 'buffer' },
+    { name: 'exampleOtherObj', type: 'BasicExample' },
+    
+    { name: 'exampleIntArray', type: 'array', arrayOf: { type: 'int' } },
+    { name: 'exampleFloatArray', type: 'array', arrayOf: { type: 'float' } },
+    { name: 'exampleStringArray', type: 'array', arrayOf: { type: 'string' } },
+    { name: 'exampleBooleanArray', type: 'array', arrayOf: { type: 'boolean' } },
+    { name: 'exampleFunctionArray', type: 'array', arrayOf: { type: 'function' } },
+    { name: 'exampleDateArray', type: 'array', arrayOf: { type: 'date' } },
+    { name: 'exampleBufferArray', type: 'array', arrayOf: { type: 'buffer' } },
+    { name: 'exampleOtherObjArray', type: 'array', arrayOf: { type: 'BasicExample' } } 
+  ]
+};
+
+/** Create the `FullExample` class */
+ezobjects.createClass(configFullExample);
+
+/** Create a new instance of the `FullExample` class */
+const fullExample = new FullExample({
+  name: `Full Example`,
+  exampleInt: 293,
+  exampleFloat: 194.13489,
+  exampleString: `What's up, doc?`,
+  exampleBoolean: true,
+  exampleFunction: arg => `Hello, ${arg}!`,
+  exampleDate: new Date('1776-07-04'),
+  exampleBuffer: Buffer.from([0x04, 0x7F, 0x93, 0x38]),
+  exampleOtherObj: basicExample1,
+  
+  exampleIntArray: [293, -178, 492],
+  exampleFloatArray: [194.13489, -2890.25, -0.04281],
+  exampleStringArray: [`What's up, doc?`, `Shiver me timbers`],
+  exampleBooleanArray: [true, false, true],
+  exampleFunctionArray: [arg => `Hello, ${arg}!`, arg => `Farewell, ${arg}!`],
+  exampleDateArray: [new Date('1776-07-04'), new Date('1945-12-07')],
+  exampleBufferArray: [Buffer.from([0x04, 0x7F, 0x93, 0x38]), Buffer.from('A string instead')],
+  exampleOtherObjArray: [basicExample1, basicExample2]
+});
+
+/** Output the instance to console */
+console.log(fullExample);
+
+/** Output one of the function responses to console */
+console.log(fullExample.exampleFunctionArray()[1]('Rich'));
+
+/** Try to set a `float` property with a `string` */
+try {
+  /**
+   * This throws a TypeError since string given, not float; the same behavior 
+   * can be expected for all other types, including arrays of types.
+   */
+  fullExample.exampleFloat('test');
+} catch ( err ) {
+  /** Output error message to console */
+  console.log(err.message);
+}
 ```
 
 ### Expected Output
 
 ```
-DatabaseRecord { _id: 0 }
-```
-
-## Extending the Basic Example
-
-```javascript
-ezobjects.createClass({
-  className: `User`,
-  extends: DatabaseRecord,
-  properties: [
-    { name: `username`, type: `string` },
-    { name: `firstName`, type: `string` },
-    { name: `lastName`, type: `string` },
-    { name: `checkingBalance`, type: `number`, setTransform: x => parseFloat(x) },
-    { name: `permissions`, type: `Array` },
-    { name: `favoriteDay`, type: `Date` }
-  ]
-});
-
-const user = new User();
-
-console.log(user);
-```
-
-### Expected Output
-
-```
-User {
-  _id: 0,
-  _username: ``,
-  _firstName: ``,
-  _lastName: ``,
-  _checkingBalance: 0,
-  _permissions: [],
-  _favoriteDay: null }
+BasicExample { _name: 'Basic Example 1' }
+FullExample {
+  _name: 'Full Example',
+  _exampleInt: 293,
+  _exampleFloat: 194.13489,
+  _exampleString: 'What\'s up, doc?',
+  _exampleBoolean: true,
+  _exampleFunction: [Function: exampleFunction],
+  _exampleDate: 1776-07-04T00:00:00.000Z,
+  _exampleBuffer: <Buffer 04 7f 93 38>,
+  _exampleOtherObj: BasicExample { _name: 'Basic Example 1' },
+  _exampleIntArray: [ 293, -178, 492 ],
+  _exampleFloatArray: [ 194.13489, -2890.25, -0.04281 ],
+  _exampleStringArray: [ 'What\'s up, doc?', 'Shiver me timbers' ],
+  _exampleBooleanArray: [ true, false, true ],
+  _exampleFunctionArray: [ [Function], [Function] ],
+  _exampleDateArray: [ 1776-07-04T00:00:00.000Z, 1945-12-07T00:00:00.000Z ],
+  _exampleBufferArray: 
+   [ <Buffer 04 7f 93 38>,
+     <Buffer 41 20 73 74 72 69 6e 67 20 69 6e 73 74 65 61 64> ],
+  _exampleOtherObjArray: 
+   [ BasicExample { _name: 'Basic Example 1' },
+     BasicExample { _name: 'Basic Example 2' } ] }
+Farewell, Rich!
+FullExample.exampleFloat(string): Invalid signature, requires 'float'.
 ```
 
 ## EZ Object Method Signatures
 
-These are the object method signatures even the most basic of EZ Objects will have:
+These are the object method signatures that all of your EZ Objects will have, though note that you can always add other functionality by adding to the object prototype:
 
 ### new MyObject([data])
  * **Parameter:** data - `PlainObject` - (optional)
@@ -106,15 +178,18 @@ it will have the following signatures:
  * **Parameter:** value - `mixed`
  * **Throws:** `TypeError` if `value` is not of the correct javascript data type for myProperty
  * **Returns:** this
- * **Description:** Set the value of the property, throwing an error if the javascript data type does not match the configuration, this is how the strict typing is implemented.  This signature returns `this` to allow for set call chaining.
+ * **Description:** Set the value of the property, throwing a `TypeError` if the javascript data type does not match the configuration, this is how the strict typing is implemented.  This signature returns `this` to allow for set call chaining.
 
 ## Module Exports
 
-The EZ Objects module exports a single function for creating new class objects:
+The EZ Objects module exports two functions:
 
 ### ezobjects.createClass(objectConfig)
-A function that creates an ES6 class corresponding to the configuration outlined in `objectConfig`, with constructor, initializer, getters, setters, and also delete, insert, load, and update if `tableName` is configured
+ * **Description:** A function that creates an ES6 class corresponding to the configuration outlined in `objectConfig`, with constructor, initializer, getters, setters.
 
+### ezobjects.instanceOf(obj, constructorName)
+ * **Description:** A helper function for testing whether `obj` is an descendant of a constructor `constructorName`.
+ 
 ## Configuration Specifications
 
 See the following for how to configure your EZ Objects:
@@ -128,9 +203,10 @@ See the following for how to configure your EZ Objects:
 ### A property configuration can have the following:
 
 * **name** - `string` - (required) Name of the property, must conform to both JavaScript and MySQL rules
-* **type** - `string` - (optional) JavaScript data type, or types if separated by the pipe `|` character, that the property must be equal to -- types can be `string`, `int`, `double`, `boolean`, `function`, `Array`, or any valid object constructor name \[either **type** and/or **instanceOf** is required]
+* **type** - `string` - (optional) JavaScript data type, or types if separated by the pipe `|` character, that the property must be equal to -- types can be `int`, `float`, `string`, `boolean`, `date`, `buffer`, `function`, any other valid object constructor name, or `Array` where `arrayOf` is provided with information about the array element types. \[either **type** and/or **instanceOf** is required]
 * **instanceOf** - `string` - (optional) JavaScript class constructor name, or names if separated by the pipe `|` character, that the property must be an instance of \[either **type** and/or **instanceOf** is required]
 * **default** - `mixed` - (optional) Sets the default value for the property in the class object
+* **arrayOf** - `string` - (required for type `array`) A plain object containing he EZ Object `type` or `instanceOf` of the elements of the array -- types can be `int`, `float`, `string`, `boolean`, `date`, `buffer`, `function`, any other valid object constructor name
 * **initTransform(x)** - `function` - (optional) Function that transforms and returns the property value prior to initializing (does not affect ezobjects defaults or custom defaults)
 * **getTransform(x)** - `function` - (optional) Function that transforms and returns the property value prior to getting
 * **setTransform(x)** - `function` - (optional) Function that transforms and returns the property value prior to setting
@@ -142,6 +218,8 @@ See the following for how to configure your EZ Objects:
 * `string` - ``
 * `boolean` - false
 * `function` - function () { }
+* `Date` - new Date(0)
+* `Buffer` - Buffer.from([])
 * `Array` - []
 * Everything else - null
 
