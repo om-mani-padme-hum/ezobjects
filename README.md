@@ -1,4 +1,4 @@
-# EZ Objects v3.2.0
+# EZ Objects v3.2.1
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects that are strictly typed in JavaScript.  All you have to do is create simple 
@@ -209,13 +209,13 @@ See the following for how to configure your EZ Objects:
 ### A property configuration can have the following:
 
 * **name** - `string` - (required) Name of the property, must conform to JavaScript rules
-* **type** - `string` - (optional) JavaScript data type, or types if separated by the pipe `|` character, that the property must be equal to -- types can be `int`, `float`, `string`, `boolean`, `date`, `buffer`, `function`, any other valid object constructor name, or `Array` where `arrayOf` is provided with information about the array element types. \[either **type** and/or **instanceOf** is required]
-* **instanceOf** - `string` - (optional) JavaScript class constructor name, or names if separated by the pipe `|` character, that the property must be an instance of \[either **type** and/or **instanceOf** is required]
+* **type** - `string` - (optional) JavaScript data type that the property must be equal to -- types can be `int`, `float`, `string`, `boolean`, `date`, `buffer`, `function`, any other valid object constructor name, or `array` where `arrayOf` is provided with information about the array element types. \[either **type** or **instanceOf** is required]
+* **instanceOf** - `string` - (optional) JavaScript class constructor name, that the property must be an instance of \[either **type** and/or **instanceOf** is required]
 * **default** - `mixed` - (optional) Sets the default value for the property in the class object
-* **arrayOf** - `string` - (required for type `array`) A plain object containing he EZ Object `type` or `instanceOf` of the elements of the array -- types can be `int`, `float`, `string`, `boolean`, `date`, `buffer`, `function`, any other valid object constructor name
-* **initTransform(x)** - `function` - (optional) Function that transforms and returns the property value prior to initializing (does not affect ezobjects defaults or custom defaults)
-* **getTransform(x)** - `function` - (optional) Function that transforms and returns the property value prior to getting
-* **setTransform(x)** - `function` - (optional) Function that transforms and returns the property value prior to setting
+* **arrayOf** - `string` - (required for type `array`) A plain object containing he EZ Object `type` or `instanceOf` of the elements of the array -- types can be `int`, `float`, `string`, `boolean`, `date`, `buffer`, `function`, any other valid object constructor name.  \[either **type** or **instanceOf** is required]
+* **initTransform(x, propertyConfig)** - `function` - (optional) Function that transforms and returns the property value prior to initializing (does not affect ezobjects defaults or custom defaults)
+* **getTransform(x, propertyConfig)** - `function` - (optional) Function that transforms and returns the property value prior to getting
+* **setTransform(x, propertyConfig)** - `function` - (optional) Function that transforms and returns the property value prior to setting
 
 ### Default intiailizations for different EZ Object types
 
