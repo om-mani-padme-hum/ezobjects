@@ -43,6 +43,7 @@ const configFullExample = {
     { name: 'exampleFunction', type: 'function' },
     { name: 'exampleDate', type: 'date' },
     { name: 'exampleBuffer', type: 'buffer' },
+    { name: 'exampleSet', type: 'set' },
     { name: 'exampleOtherObj', type: 'BasicExample' },
     
     { name: 'exampleIntArray', type: 'array', arrayOf: { type: 'int' } },
@@ -52,6 +53,7 @@ const configFullExample = {
     { name: 'exampleFunctionArray', type: 'array', arrayOf: { type: 'function' } },
     { name: 'exampleDateArray', type: 'array', arrayOf: { type: 'date' } },
     { name: 'exampleBufferArray', type: 'array', arrayOf: { type: 'buffer' } },
+    { name: 'exampleSetArray', type: 'array', arrayOf: { type: 'set' } },
     { name: 'exampleOtherObjArray', type: 'array', arrayOf: { type: 'BasicExample' } } 
   ]
 };
@@ -69,6 +71,7 @@ const fullExample = new FullExample({
   exampleFunction: arg => `Hello, ${arg}!`,
   exampleDate: new Date('1776-07-04'),
   exampleBuffer: Buffer.from([0x04, 0x7F, 0x93, 0x38]),
+  exampleSet: new Set(['14', 3, false]),
   exampleOtherObj: basicExample1,
   
   exampleIntArray: [293, -178, 492],
@@ -78,6 +81,7 @@ const fullExample = new FullExample({
   exampleFunctionArray: [arg => `Hello, ${arg}!`, arg => `Farewell, ${arg}!`],
   exampleDateArray: [new Date('1776-07-04'), new Date('1941-12-07')],
   exampleBufferArray: [Buffer.from([0x04, 0x7F, 0x93, 0x38]), Buffer.from('A string instead')],
+  exampleSetArray: [new Set(['14', 3, false]), new Set([-14, true, 'pool'])],
   exampleOtherObjArray: [basicExample1, basicExample2]
 });
 
