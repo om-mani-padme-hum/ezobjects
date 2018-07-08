@@ -1,11 +1,11 @@
 {
-  "name": "ezobjects",
+  "name": "ezobjects-mysql",
   "version": "2.11.6",
-  "description": "Easy dynamic object generation with optional MySQL table linking",
+  "description": "Easy JavaScript Class Objects Associated w/ MySQL Database Tables",
   "main": "index.js",
   "scripts": {
-    "start": "node example-mysql.js",
-    "test": "eslint example.js example-mysql.js index.js mysql-connection.js"
+    "start": "node example.js",
+    "test": "eslint example.js index.js"
   },
   "repository": {
     "type": "git",
@@ -13,6 +13,7 @@
   },
   "keywords": [
     "easy",
+    "mysql",
     "auto",
     "automatic",
     "quick",
@@ -26,15 +27,12 @@
     "creation",
     "generate",
     "generation",
-    "mysql",
-    "linked",
-    "database"
+    "linked"
   ],
   "author": "Rich Lowe",
   "license": "MIT",
   "dependencies": {
-    "moment": "^2.22.1",
-    "mysql": "^2.15.0"
+    "moment": "^2.22.1"
   },
   "devDependencies": {
     "docket-parser": "^0.6.7"
