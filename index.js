@@ -16,7 +16,7 @@ else
 
 /** Define the EZ Object types, their associated JavaScript and MySQL types, defaults, quirks, transforms, etc... */
 const ezobjectTypes = [
-  { type: `bit`, javascriptType: 'Buffer', defaultMySQLType: `bit`, default: Buffer.from([]), hasLength: true, saveTransform: x => parseInt(x.join(''), 2), loadTransform: x => Buffer.from(x) },
+  { type: `bit`, javascriptType: 'Buffer', defaultMySQLType: `bit`, default: Buffer.from([]), hasLength: true, saveTransform: x => parseInt(x.join(''), 2) },
   { type: `tinyint`, javascriptType: 'number', defaultMySQLType: `tinyint`, default: 0, hasLength: true, hasUnsignedAndZeroFill: true, setTransform: x => parseInt(x) },
   { type: `smallint`, javascriptType: 'number', defaultMySQLType: `smallint`, default: 0, hasLength: true, hasUnsignedAndZeroFill: true, setTransform: x => parseInt(x) },
   { type: `mediumint`, javascriptType: 'number', defaultMySQLType: `mediumint`, default: 0, hasLength: true, hasUnsignedAndZeroFill: true, setTransform: x => parseInt(x) },
@@ -49,9 +49,9 @@ const ezobjectTypes = [
   { type: `set`, javascriptType: `string`, defaultMySQLType: `set`, default: '', hasCharacterSetAndCollate: true },
   { type: `boolean`, javascriptType: `boolean`, defaultMySQLType: `tinyint`, default: false, saveTransform: x => x ? 1 : 0, loadTransform: x => x ? true: false },
   { type: `function`, javascriptType: `function`, defaultMySQLType: `text`, default: function () {}, saveTransform: x => x.toString(), loadTransform: x => eval(x) },
-  { type: `other`, javascriptType: `object`, defaultMySQLType: `int`, default: null, saveTransform: x => x ? x.id() : -1, loadTransform: async (x, type, db) => await (new parent[type]).load(x, db) },
+  { type: `other`, javascriptType: `object`, defaultMySQLType: `int`, default: null, setTransform: (x, type) => typeof x == 'object' && x && ( x.constructor.name == type || module.exports.instanceOf(x, type) ) ? x : null, saveTransform: x => x ? x.id() : -1, loadTransform: async (x, type, db) => await (new parent[type]).load(x, db) },
   
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `bit`, setTransform: x => x.map(y => parseInt(y)).filter(y => !isNaN(y)), saveTransform: x => x.join(`,`), loadTransform: x => x.split(`,`).map(y => parseInt(y)) },
+  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `bit`, saveTransform: x => x.map(y => y.join(`|`)).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y.split(`|`).map(z => parseInt(z)))) },
   { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `tinyint`, setTransform: x => x.map(y => parseInt(y)).filter(y => !isNaN(y)), saveTransform: x => x.join(`,`), loadTransform: x => x.split(`,`).map(y => parseInt(y)) },
   { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `smallint`, setTransform: x => x.map(y => parseInt(y)).filter(y => !isNaN(y)), saveTransform: x => x.join(`,`), loadTransform: x => x.split(`,`).map(y => parseInt(y)) },
   { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `mediumint`, setTransform: x => x.map(y => parseInt(y)).filter(y => !isNaN(y)), saveTransform: x => x.join(`,`), loadTransform: x => x.split(`,`).map(y => parseInt(y)) },
@@ -70,21 +70,21 @@ const ezobjectTypes = [
   { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `year`, setTransform: x => x.map(y => parseInt(y)).filter(y => !isNaN(y)), saveTransform: x => x.join(`,`), loadTransform: x => x.split(`,`).map(y => parseInt(y)) },
   { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `char`, setTransform: x => x.map(y => typeof y == 'string' ? y : null).filter(y => y), saveTransform: x => x.join(`!&|&!`), loadTransform: x => x.split(`!&|&!`) },
   { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `varchar`, setTransform: x => x.map(y => typeof y == 'string' ? y : null).filter(y => y), saveTransform: x => x.join(`!&|&!`), loadTransform: x => x.split(`!&|&!`) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `blob`, default: [], arrayOfType: `binary`, setTransform: x => x.map(y => parseInt(y)).filter(y => !isNaN(y)), saveTransform: x => x.map(y => y.toString()).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumblob`, default: [], arrayOfType: `varbinary`, setTransform: x => x.map(y => parseInt(y)).filter(y => !isNaN(y)), saveTransform: x => x.map(y => y.toString()).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `blob`, default: [], arrayOfType: `tinyblob`, setTransform: x => x.map(y => parseInt(y)).filter(y => !isNaN(y)), saveTransform: x => x.map(y => y.toString()).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumblob`, default: [], arrayOfType: `blob`, setTransform: x => x.map(y => parseInt(y)).filter(y => !isNaN(y)), saveTransform: x => x.map(y => y.toString()).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `longblob`, default: [], arrayOfType: `mediumblob`, setTransform: x => x.map(y => parseInt(y)).filter(y => !isNaN(y)), saveTransform: x => x.map(y => y.toString()).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `longblob`, default: [], arrayOfType: `longblob`, setTransform: x => x.map(y => parseInt(y)).filter(y => !isNaN(y)), saveTransform: x => x.map(y => y.toString()).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y)) },
+  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `binary`, saveTransform: x => x.map(y => y.join(`|`)).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y.split(`|`).map(z => parseInt(z)))) },
+  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `varbinary`, saveTransform: x => x.map(y => y.join(`|`)).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y.split(`|`).map(z => parseInt(z)))) },
+  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `tinyblob`, saveTransform: x => x => x.map(y => y.join(`|`)).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y.split(`|`).map(z => parseInt(z)))) },
+  { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `blob`, saveTransform: x => x => x.map(y => y.join(`|`)).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y.split(`|`).map(z => parseInt(z)))) },
+  { type: `array`, javascriptType: `Array`, defaultMySQLType: `longtext`, default: [], arrayOfType: `mediumblob`, saveTransform: x => x => x.map(y => y.join(`|`)).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y.split(`|`).map(z => parseInt(z)))) },
+  { type: `array`, javascriptType: `Array`, defaultMySQLType: `longtext`, default: [], arrayOfType: `longblob`, saveTransform: x => x => x.map(y => y.join(`|`)).join(`,`), loadTransform: x => x.split(`,`).map(y => Buffer.from(y.split(`|`).map(z => parseInt(z)))) },
   { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `tinytext`, setTransform: x => x.map(y => typeof y == 'string' ? y : null).filter(y => y), saveTransform: x => x.join(`!&|&!`), loadTransform: x => x.split(`!&|&!`) },
   { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `text`, setTransform: x => x.map(y => typeof y == 'string' ? y : null).filter(y => y), saveTransform: x => x.join(`!&|&!`), loadTransform: x => x.split(`!&|&!`) },
   { type: `array`, javascriptType: `Array`, defaultMySQLType: `longtext`, default: [], arrayOfType: `mediumtext`, setTransform: x => x.map(y => typeof y == 'string' ? y : null).filter(y => y), saveTransform: x => x.join(`!&|&!`), loadTransform: x => x.split(`!&|&!`) },
   { type: `array`, javascriptType: `Array`, defaultMySQLType: `longtext`, default: [], arrayOfType: `longtext`, setTransform: x => x.map(y => typeof y == 'string' ? y : null).filter(y => y), saveTransform: x => x.join(`!&|&!`), loadTransform: x => x.split(`!&|&!`) },
   { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `enum`, setTransform: x => x.map(y => typeof y == 'string' ? y : null).filter(y => y), saveTransform: x => x.join(`!&|&!`), loadTransform: x => x.split(`!&|&!`) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `set`, setTransform: x => x.map(y => typeof y == 'string' ? y : null).filter(y => y), saveTransform: x => x.join(`!&|&!`), loadTransform: x => x.split(`!&|&!`) },
+  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `set`, setTransform: x => x.map(y => typeof y == 'string' ? Array.from(new Set(y.split(`,`))).join(`,`) : null).filter(y => y), saveTransform: x => x.join(`!&|&!`), loadTransform: x => x.split(`!&|&!`) },
   { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `boolean`, setTransform: x => x.map(y => typeof y == 'boolean' ? y : null).filter(y => y !== null), saveTransform: x => x.map(y => y ? 1 : 0).join(`,`), loadTransform: x => x.split(`,`).map(y => y ? true : false) },
   { type: `array`, javascriptType: `Array`, defaultMySQLType: `mediumtext`, default: [], arrayOfType: `function`, setTransform: x => x.map(y => typeof y == 'function' ? y : null).filter(y => y !== null), saveTransform: x => x.map(y => y.toString()).join(`!&|&!`), loadTransform: x => x.split(`!&|&!`).map(y => eval(y)) },
-  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `other`, setTransform: (x, type) => x.map(y => typeof y == 'object' && y.constructor.name == type ? y : null).filter(y => y !== null), saveTransform: x => x.map(y => y.id()).join(`,`), loadTransform: (x, type, db) => x.split(`,`).map(async y => await (new parent[type]).load(y, db)) }
+  { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `other`, setTransform: (x, type) => x.map(y => typeof y == 'object' && y && ( y.constructor.name == type || module.exports.instanceOf(y, type) ) ? y : null).filter(y => y !== null), saveTransform: x => x.map(y => y.id()).join(`,`), loadTransform: async (x, type, db) => { const arr = []; for ( let i = 0, list = x.split(`,`), i_max = list.length; i < i_max; i++ ) { if ( !isNaN(parseInt(list[i])) ) arr.push(await (new parent[type]).load(parseInt(list[i]), db)); } return arr; } }
 ];
 
 /** @todo
@@ -257,23 +257,9 @@ function validatePropertyConfig(property) {
     property.saveTransform = typeof property.ezobjectType == 'object' && typeof property.ezobjectType.saveTransform == 'function' ? property.ezobjectType.saveTransform : defaultTransform;
 
   /** If there is no load transform, set to default */
-  if ( property.type != `array` && typeof property.loadTransform !== `function` )
+  if ( typeof property.loadTransform !== `function` )
     property.loadTransform = typeof property.ezobjectType == 'object' && typeof property.ezobjectType.loadTransform == 'function' ? property.ezobjectType.loadTransform : defaultTransform;
-    
-  /** Handle load transforms for various array types */
-  else if ( property.type == `array` && typeof property.loadTransform !== `function` ) {
-    if ( typeof property.ezobjectType !== 'object' || property.ezobjectType.constructor.name != 'Object' )
-      property.loadTransform = async (x, type, db) => await new parent[property.type].load(x, db);
-    else if ( property.arrayOf.ezobjectType.type == 'int' )
-      property.loadTransform = x => x.split(`,`).map(y => parseInt(y));
-    else if ( property.arrayOf.ezobjectType.type == 'float' )
-      property.loadTransform = x => x.split(`,`).map(y => parseFloat(y));
-    else if ( property.arrayOf.ezobjectType.type == 'string' )
-      property.loadTransform = x => x.split(`!&|&!`);
-    else if ( property.arrayOf.ezobjectType.type == 'boolean' )
-      property.loadTransform = x => x.split(`,`).map(y => y ? true : false);
-  }
-  
+      
   /** Fully determine whether to store properties in database */
   if ( typeof property.store !== `boolean` )
     property.store = true;
@@ -302,12 +288,12 @@ function validateClassConfig(obj) {
   });
 }
 
-function validateTableConfig(obj) {
-  validateClassConfig(obj);
-  
+function validateTableConfig(obj) {  
   /** If configuration has missing or invalid 'tableName' configuration, throw error */
   if ( typeof obj.tableName !== 'string' || !obj.tableName.match(/[a-z_]+/) )
     throw new Error(`ezobjects.validateTableConfig(): Configuration has missing or invalid 'tableName', must be string containing characters 'a-z_'.`);
+
+  validateClassConfig(obj);
 }
 
 /**
@@ -556,16 +542,11 @@ module.exports.createClass = (obj) => {
           delete data[key];
         }
       });
-      
+
       /** Loop through each property in the obj */
       obj.properties.forEach((property) => {
         /** Initialize types to defaults */
-        if ( typeof property.ezobjectType != 'undefined' )
-          this[property.name](property.initTransform(data[property.name]) || property.default || property.ezobjectType.default);
-
-        /** Initialize all other types to null */
-        else
-          this[property.name](property.initTransform(data[property.name]) || property.default || null);
+        this[property.name](property.initTransform(data[property.name]) || property.default || property.ezobjectType.default);
       });
     }
   };
@@ -573,27 +554,31 @@ module.exports.createClass = (obj) => {
   /** Loop through each property in the obj */
   obj.properties.forEach((property) => {  
     /** Create class method on prototype */
-    parent[obj.className].prototype[property.name] = function (arg) {      
+    parent[obj.className].prototype[property.name] = function (arg) {
       /** Getter */
       if ( arg === undefined ) 
         return property.getTransform(this[`_${property.name}`]); 
             
       /** Setter for standard property types */
       else if ( ![`object`, `Buffer`, `Array`, `Date`].includes(property.ezobjectType.javascriptType) && typeof arg == property.ezobjectType.javascriptType )
-        this[`_${property.name}`] = property.setTransform(arg); 
+          this[`_${property.name}`] = property.setTransform(arg, property.instanceOf ? property.instanceOf : property.originalType); 
       
       /** Setter for Buffer property types */
-      else if ( typeof arg == `object` && [`Buffer`, `Array`, `Date`].includes(property.ezobjectType.javascriptType) && ( arg.constructor.name == property.ezobjectType.javascriptType || module.exports.instanceOf(arg, property.ezobjectType.javascriptType) ) )
-        this[`_${property.name}`] = property.setTransform(arg); 
+      else if ( typeof arg == `object` && arg && [`Buffer`, `Array`, `Date`].includes(property.ezobjectType.javascriptType) && ( arg.constructor.name == property.ezobjectType.javascriptType || module.exports.instanceOf(arg, property.ezobjectType.javascriptType) ) ) {
+        if ( property.ezobjectType.javascriptType == `Array` )
+          this[`_${property.name}`] = property.setTransform(arg, property.arrayOf.instanceOf ? property.arrayOf.instanceOf : property.arrayOf.type); 
+        else
+          this[`_${property.name}`] = property.setTransform(arg, property.instanceOf ? property.instanceOf : property.originalType); 
+      }
       
       /** Setter for custom property types */
-      else if ( arg === null || ( typeof arg == `object` && property.originalType && property.originalType == arg.constructor.name ) || ( typeof property.instanceOf == `string` && module.exports.instanceOf(arg, property.instanceOf) ) )
-        this[`_${property.name}`] = property.setTransform(arg); 
-
+      else if ( arg === null || ( typeof arg == `object` && property.originalType && property.originalType == arg.constructor.name ) || ( typeof arg == `object` && typeof property.instanceOf == `string` && module.exports.instanceOf(arg, property.instanceOf) ) )
+        this[`_${property.name}`] = property.setTransform(arg, property.instanceOf ? property.instanceOf : property.originalType); 
+      
       /** Handle type errors */
       else 
         throw new TypeError(`${this.constructor.name}.${property.name}(${typeof arg}): Invalid signature.`); 
-
+      
       /** Return this object for set call chaining */
       return this; 
     };
@@ -753,7 +738,7 @@ module.exports.createClass = (obj) => {
           for ( let i = 0, i_max = obj.properties.length; i < i_max; i++ ) {
             /** Don't attempt to load properties that are not stored in the database */
             if ( !obj.properties[i].store )
-              return;
+              continue;
             
             /** Append property in object */
             if ( typeof arg1[obj.properties[i].name] !== `undefined` ) {
@@ -788,7 +773,7 @@ module.exports.createClass = (obj) => {
             /** Don't attempt to load properties that are not stored in the database */
             if ( !property.store )
               return;
-
+            
             /** Append property name to query */
             query += `${property.name}, `;
           });
@@ -813,8 +798,8 @@ module.exports.createClass = (obj) => {
 
         /** If a record with that ID doesn`t exist, throw error */
         if ( !result[0] )
-          throw new ReferenceError(`${this.constructor.name}.load(): Record ${arg1} in ${obj.tableName} does not exist.`);
-        
+          return null;
+                
         /** Create helper method for recursively loading property values into object */
         const loadProperties = async (obj) => {
           /** If this object extends another, recursively add extended property values into objecct */
@@ -822,27 +807,16 @@ module.exports.createClass = (obj) => {
             await loadProperties(obj.extendsConfig);
 
           /** Loop through each property */
-          for ( let i = 0, i_max = obj.properties.length; i < i_max; i++ ) {
+          for ( let i = 0, i_max = obj.properties.length; i < i_max; i++ ) {            
             /** Don't attempt to load properties that are not stored in the database */
             if ( !obj.properties[i].store )
-              return;
+              continue;
 
             /** Append property in object */
-            try {
+            if ( obj.properties[i].type != 'array' )
               this[obj.properties[i].name](await obj.properties[i].loadTransform(result[0][obj.properties[i].name], obj.properties[i].instanceOf ? obj.properties[i].instanceOf : obj.properties[i].originalType, db));
-            } catch ( err ) {
-              console.log(err);
-              console.log('Trying null...');
-              
-              try {
-                 this[obj.properties[i].name](null);
-                console.log('Success!');
-              } catch ( err ) {
-                console.log('Failed.. exiting..');
-                process.exit(1);
-              }
-            }
-            
+            else
+              this[obj.properties[i].name](await obj.properties[i].loadTransform(result[0][obj.properties[i].name], obj.properties[i].arrayOf.instanceOf ? obj.properties[i].arrayOf.instanceOf : obj.properties[i].arrayOf.type, db));
           }
         };
 
@@ -862,7 +836,7 @@ module.exports.createClass = (obj) => {
           for ( let i = 0, i_max = obj.properties.length; i < i_max; i++ ) {
             /** Don't attempt to load properties that are not stored in the database */
             if ( !property.store )
-              return;
+              continue;
             
             /** Append property in object */
             if ( typeof arg1[property.name] !== `undefined` ) {

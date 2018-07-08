@@ -102,6 +102,7 @@ const configExample = {
     { name: `functionArrayExample2`, type: `Array`, arrayOf: { type: `function`, store: true } },
     { name: `ezobjectTypeArrayExample`, type: `Array`, arrayOf: { type: `OtherObj` } },
     { name: `ezobjectInstanceArrayExample`, type: `Array`, arrayOf: { instanceOf: `OtherObj` } },
+    { name: `ezobjectInstanceArrayExample2`, type: `Array`, arrayOf: { instanceOf: `OtherObj` } },
   ],
   indexes: [
     { name: `varcharExample`, type: `BTREE`, columns: [ `varcharExample` ] },
@@ -167,11 +168,11 @@ const example = new Example({
   mediumtextExample: `I am a bigger text up to 16 MB`,
   longtextExample: `I am a bigger text up to 4 GB`,
   enumExample: `two`,
-  setExample: `a,d`,
+  setExample: `a,d,d`,
   
   booleanExample: true,
-  functionExample: function test(arg) { alert(`I am ${arg}`); },
-  functionExample2: function test(arg) { alert(`I am ${arg} stored`); },
+  functionExample: (arg) => { return `I am ${arg}`; },
+  functionExample2: (arg) => { return `I am ${arg} stored`; },
   ezobjectTypeExample: new OtherObj({ name: `Type Example` }),
   ezobjectInstanceExample: new ExtendedObj({ name: `Instance Example Stored` }),
   ezobjectInstanceExample2: new ExtendedObj({ name: `Instance Example Not Stored` }),
@@ -211,8 +212,8 @@ const example = new Example({
   setArrayExample: [`a,d`, `a,c,d,d`],
   
   booleanArrayExample: [false, true],
-  functionArrayExample: [function (arg) { alert(`I am ${arg} 1`); }, function (arg) { alert(`I am ${arg} 2`); }],
-  functionArrayExample2: [function (arg) { alert(`I am ${arg} stored 1`); }, function (arg) { alert(`I am ${arg} stored 2`); }],
+  functionArrayExample: [(arg) => { return `I am ${arg} 1`; }, (arg) => { return `I am ${arg} 2`; }],
+  functionArrayExample2: [(arg) => { return `I am ${arg} stored 1`; }, (arg) => { return `I am ${arg} stored 2`; }],
   ezobjectTypeArrayExample: [new OtherObj({ name: `Type Example 1` }), new OtherObj({ name: `Type Example 2` })],
   ezobjectInstanceArrayExample: [new ExtendedObj({ name: `Instance Example Stored 1` }), new ExtendedObj({ name: `Instance Example Stored 2` })],
   ezobjectInstanceArrayExample2: [new ExtendedObj({ name: `Instance Example Not Stored 1` }), new ExtendedObj({ name: `Instance Example Not Stored 2` })]
@@ -220,7 +221,7 @@ const example = new Example({
 
 /** Log the initialized example object */
 console.log(`Initialized example object:`);
-console.log(util.inspect(example, { depth: null }));
+console.log(`${util.inspect(example, { depth: null })}\n`);
 
 /** Self-executing async wrapper so we can await results */
 (async () => {
@@ -243,8 +244,11 @@ console.log(util.inspect(example, { depth: null }));
     /** Attempt to load the original example from the database into example2 */
     await example2.load(id, db);
         
+    /** Test stored anonymous function */
+    console.log(`${example2.functionExample()(`Rich`)}\n`);
+  
     /** Log the database loaded example object */
-    console.log(`\nDatabase loaded example object:`);
+    console.log(`Database loaded example object:`);
     console.log(util.inspect(example2, { depth: null }));
   //} catch ( err ) {
   //  console.log(err.message);
