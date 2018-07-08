@@ -32,56 +32,56 @@ const ezobjectTypes = [
   { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `int`, 
     setTransform: (x, property) => {
       if ( x.some(y => isNaN(y)) )
-        throw new Error(`${property.name}.setTransform(): Non-numeric value passed to Array[int] setter.`);
+        throw new TypeError(`${property.name}.setTransform(): Non-numeric value passed to Array[int] setter.`);
       return x.map(y => parseInt(y));
     } 
   },
   { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `float`, 
     setTransform: (x, property) => {
       if ( x.some(y => isNaN(y)) )
-        throw new Error(`${property.name}.setTransform(): Non-numeric value passed to Array[float] setter.`);
+        throw new TypeError(`${property.name}.setTransform(): Non-numeric value passed to Array[float] setter.`);
       return x.map(y => parseFloat(y));
     }
   },
   { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `string`, 
     setTransform: (x, property) => {
       if ( x.some(y => typeof y !== 'string') )
-        throw new Error(`${property.name}.setTransform(): Non-string value passed to Array[string] setter.`);
+        throw new TypeError(`${property.name}.setTransform(): Non-string value passed to Array[string] setter.`);
       return x;
     }
   },
   { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `boolean`, 
     setTransform: (x, property) => {
       if ( x.some(y => typeof y !== 'boolean') )
-        throw new Error(`${property.name}.setTransform(): Non-boolean value passed to Array[boolean] setter.`);
+        throw new TypeError(`${property.name}.setTransform(): Non-boolean value passed to Array[boolean] setter.`);
       return x; 
     }
   },
   { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `function`, 
     setTransform: (x, property) => {
       if ( x.some(y => typeof y !== 'function') )
-        throw new Error(`${property.name}.setTransform(): Non-function value passed to Array[function] setter.`);
+        throw new TypeError(`${property.name}.setTransform(): Non-function value passed to Array[function] setter.`);
       return x; 
     }
   },
   { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `date`, 
     setTransform: (x, property) => {
       if ( x.some(y => typeof y !== 'object' || y.constructor.name != 'Date' ) )
-        throw new Error(`${property.name}.setTransform(): Non-Date value passed to Array[Date] setter.`);
+        throw new TypeError(`${property.name}.setTransform(): Non-Date value passed to Array[Date] setter.`);
       return x;
     }
   },
   { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `buffer`, 
     setTransform: (x, property) => {
       if ( x.some(y => typeof y !== 'object' || y.constructor.name != 'Buffer' ) )
-        throw new Error(`${property.name}.setTransform(): Non-Buffer value passed to Array[Buffer] setter.`);
+        throw new TypeError(`${property.name}.setTransform(): Non-Buffer value passed to Array[Buffer] setter.`);
       return x; 
     }
   },
   { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `other`, 
     setTransform: (x, property) => { 
       if ( x.some(y => typeof y !== 'object' || ( typeof property.type == 'string' && y.constructor.name != property.originalType ) || ( typeof property.instanceOf === 'string' && y.constructor.name != property.instanceOf )) )
-        throw new Error(`${property.name}.setTransform(): Invalid value passed to Array[${typeof property.type === 'string' ? property.originalType : property.instanceOf}] setter.`);
+        throw new TypeError(`${property.name}.setTransform(): Invalid value passed to Array[${typeof property.type === 'string' ? property.originalType : property.instanceOf}] setter.`);
       return x;
     }
   },
