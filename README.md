@@ -1,4 +1,4 @@
-# EZ Objects v3.0.1
+# EZ Objects v3.0.2
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects that are strictly typed in JavaScript.  All you have to do is create simple 
@@ -103,7 +103,7 @@ const fullExample = new FullExample({
   exampleStringArray: [`What's up, doc?`, `Shiver me timbers`],
   exampleBooleanArray: [true, false, true],
   exampleFunctionArray: [arg => `Hello, ${arg}!`, arg => `Farewell, ${arg}!`],
-  exampleDateArray: [new Date('1776-07-04'), new Date('1945-12-07')],
+  exampleDateArray: [new Date('1776-07-04'), new Date('1941-12-07')],
   exampleBufferArray: [Buffer.from([0x04, 0x7F, 0x93, 0x38]), Buffer.from('A string instead')],
   exampleOtherObjArray: [basicExample1, basicExample2]
 });
