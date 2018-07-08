@@ -20,68 +20,116 @@ else
 
 /** Define the EZ Object types, their associated JavaScript and MySQL types, defaults, quirks, transforms, etc... */
 const ezobjectTypes = [
-  { type: `int`, javascriptType: 'number', default: 0, setTransform: x => parseInt(x) },
-  { type: `float`, javascriptType: 'number', default: 0, setTransform: x => parseFloat(x) },
-  { type: `string`, javascriptType: 'string', default: '' },
-  { type: `boolean`, javascriptType: 'boolean', default: false, setTransform: x => x ? true : false },
-  { type: `function`, javascriptType: 'function', default: () => {} },
-  { type: `date`, javascriptType: 'Date', default: new Date(0) },
-  { type: `buffer`, javascriptType: 'Buffer', default: Buffer.from([]) },
-  { type: `other`, javascriptType: 'object', default: null },
+  { type: `int`, javascriptType: 'number', default: 0, 
+    setTransform: (x, property) => {
+      if ( typeof x !== 'number' && ( x !== null || typeof property.allowNull !== 'boolean' || !property.allowNull ) )
+        throw new TypeError(`${property.className}.${property.name}(): Non-numeric value passed to 'int' setter.`);
+      return x === null ? null : parseInt(x);
+    }
+  },
+  { type: `float`, javascriptType: 'number', default: 0, 
+    setTransform: (x, property) => {
+      if ( typeof x !== 'number' && ( x !== null || typeof property.allowNull !== 'boolean' || !property.allowNull ) )
+        throw new TypeError(`${property.className}.${property.name}(): Non-numeric value passed to 'float' setter.`);
+      return x === null ? null : parseFloat(x);
+    } 
+  },
+  { type: `string`, javascriptType: 'string', default: '', 
+    setTransform: (x, property) => {
+      if ( typeof x !== 'string' && ( x !== null || typeof property.allowNull !== 'boolean' || !property.allowNull ) )
+        throw new TypeError(`${property.className}.${property.name}(): Non-string value passed to 'string' setter.`);
+      return x === null ? null : x;
+    } 
+  },
+  { type: `boolean`, javascriptType: 'boolean', default: false, 
+    setTransform: (x, property) => {
+      if ( typeof x !== 'boolean' && ( x !== null || typeof property.allowNull !== 'boolean' || !property.allowNull ) )
+        throw new TypeError(`${property.className}.${property.name}(): Non-boolean value passed to 'boolean' setter.`);
+      return x === null ? null : x ? true : false;
+    } 
+  },
+  { type: `function`, javascriptType: 'function', default: () => {}, 
+    setTransform: (x, property) => {
+      if ( typeof x !== 'function' && ( x !== null || typeof property.allowNull !== 'boolean' || !property.allowNull ) )
+        throw new TypeError(`${property.className}.${property.name}(): Non-function value passed to 'function' setter.`);
+      return x === null ? null : x;
+    }  
+  },
+  { type: `date`, javascriptType: 'Date', default: new Date(0), 
+    setTransform: (x, property) => {
+      if ( ( typeof x !== 'object' || x.constructor.name != 'Date' ) && ( x !== null || typeof property.allowNull !== 'boolean' || !property.allowNull ) )
+        throw new TypeError(`${property.className}.${property.name}(): Non-Date value passed to 'date' setter.`);
+      return x === null ? null : x;
+    }
+  },
+  { type: `buffer`, javascriptType: 'Buffer', default: Buffer.from([]), 
+    setTransform: (x, property) => {
+      if ( ( typeof x !== 'object' || x.constructor.name != 'Buffer' ) && ( x !== null || typeof property.allowNull !== 'boolean' || !property.allowNull ) )
+        throw new TypeError(`${property.className}.${property.name}(): Non-Buffer value passed to 'buffer' setter.`);
+      return x === null ? null : x;
+    } 
+  },
+  { type: `other`, javascriptType: 'object', default: null, 
+    setTransform: (x, property) => {
+      if ( ( typeof x !== 'object' || ( typeof property.type == 'string' && x.constructor.name != property.originalType ) || ( typeof property.instanceOf === 'string' && x.constructor.name != property.instanceOf ) ) && ( x !== null || typeof property.allowNull !== 'boolean' || !property.allowNull ) )
+        throw new TypeError(`${property.className}.${property.name}(): Invalid value passed to '${typeof property.type === 'string' ? property.originalType : property.instanceOf}' setter.`);
+      return x === null ? null : x;
+    }
+  },
   
   { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `int`, 
     setTransform: (x, property) => {
-      if ( x.some(y => isNaN(y)) )
-        throw new TypeError(`${property.name}.setTransform(): Non-numeric value passed to Array[int] setter.`);
-      return x.map(y => parseInt(y));
+      if ( x.some(y => isNaN(y)) && ( x !== null || typeof property.arrayOf.allowNull !== 'boolean' || !property.arrayOf.allowNull ) )
+        throw new TypeError(`${property.className}.${property.name}(): Non-numeric value passed to Array[int] setter.`);
+      return x.map(y => y === null ? null : parseInt(y));
     } 
   },
   { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `float`, 
     setTransform: (x, property) => {
-      if ( x.some(y => isNaN(y)) )
-        throw new TypeError(`${property.name}.setTransform(): Non-numeric value passed to Array[float] setter.`);
-      return x.map(y => parseFloat(y));
+      if ( x.some(y => isNaN(y)) && ( x !== null || typeof property.arrayOf.allowNull !== 'boolean' || !property.arrayOf.allowNull ) )
+        throw new TypeError(`${property.className}.${property.name}(): Non-numeric value passed to Array[float] setter.`);
+      return x.map(y => y === null ? null : parseFloat(y));
     }
   },
   { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `string`, 
     setTransform: (x, property) => {
-      if ( x.some(y => typeof y !== 'string') )
-        throw new TypeError(`${property.name}.setTransform(): Non-string value passed to Array[string] setter.`);
+      if ( x.some(y => typeof y !== 'string') && ( x !== null || typeof property.arrayOf.allowNull !== 'boolean' || !property.arrayOf.allowNull ) )
+        throw new TypeError(`${property.className}.${property.name}(): Non-string value passed to Array[string] setter.`);
       return x;
     }
   },
   { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `boolean`, 
     setTransform: (x, property) => {
-      if ( x.some(y => typeof y !== 'boolean') )
-        throw new TypeError(`${property.name}.setTransform(): Non-boolean value passed to Array[boolean] setter.`);
+      if ( x.some(y => typeof y !== 'boolean') && ( x !== null || typeof property.arrayOf.allowNull !== 'boolean' || !property.arrayOf.allowNull ) )
+        throw new TypeError(`${property.className}.${property.name}(): Non-boolean value passed to Array[boolean] setter.`);
       return x; 
     }
   },
   { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `function`, 
     setTransform: (x, property) => {
-      if ( x.some(y => typeof y !== 'function') )
-        throw new TypeError(`${property.name}.setTransform(): Non-function value passed to Array[function] setter.`);
+      if ( x.some(y => typeof y !== 'function') && ( x !== null || typeof property.arrayOf.allowNull !== 'boolean' || !property.arrayOf.allowNull ) )
+        throw new TypeError(`${property.className}.${property.name}(): Non-function value passed to Array[function] setter.`);
       return x; 
     }
   },
   { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `date`, 
     setTransform: (x, property) => {
-      if ( x.some(y => typeof y !== 'object' || y.constructor.name != 'Date' ) )
-        throw new TypeError(`${property.name}.setTransform(): Non-Date value passed to Array[Date] setter.`);
+      if ( x.some(y => typeof y !== 'object' || y.constructor.name != 'Date' ) && ( x !== null || typeof property.arrayOf.allowNull !== 'boolean' || !property.arrayOf.allowNull ) )
+        throw new TypeError(`${property.className}.${property.name}(): Non-Date value passed to Array[Date] setter.`);
       return x;
     }
   },
   { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `buffer`, 
     setTransform: (x, property) => {
-      if ( x.some(y => typeof y !== 'object' || y.constructor.name != 'Buffer' ) )
-        throw new TypeError(`${property.name}.setTransform(): Non-Buffer value passed to Array[Buffer] setter.`);
+      if ( x.some(y => typeof y !== 'object' || y.constructor.name != 'Buffer' ) && ( x !== null || typeof property.arrayOf.allowNull !== 'boolean' || !property.arrayOf.allowNull ) )
+        throw new TypeError(`${property.className}.${property.name}(): Non-Buffer value passed to Array[Buffer] setter.`);
       return x; 
     }
   },
   { type: `array`, javascriptType: `Array`, default: [], arrayOfType: `other`, 
     setTransform: (x, property) => { 
-      if ( x.some(y => typeof y !== 'object' || ( typeof property.type == 'string' && y.constructor.name != property.originalType ) || ( typeof property.instanceOf === 'string' && y.constructor.name != property.instanceOf )) )
-        throw new TypeError(`${property.name}.setTransform(): Invalid value passed to Array[${typeof property.type === 'string' ? property.originalType : property.instanceOf}] setter.`);
+      if ( x.some(y => typeof y !== 'object' || ( typeof property.arrayOf.type == 'string' && y.constructor.name != property.arrayOf.type ) || ( typeof property.arrayOf.instanceOf === 'string' && y.constructor.name != property.arrayOf.instanceOf )) && ( x !== null || typeof property.arrayOf.allowNull !== 'boolean' || !property.arrayOf.allowNull ) )
+        throw new TypeError(`${property.className}.${property.name}(): Invalid value passed to Array[${typeof property.arrayOf.type === 'string' ? property.arrayOf.type : property.arrayOf.instanceOf}] setter.`);
       return x;
     }
   },
@@ -200,6 +248,8 @@ function validateClassConfig(obj) {
   
   /** Loop through any properties and validate them */
   obj.properties.forEach((property) => {
+    property.className = obj.className;
+    
     validatePropertyConfig(property);
   });
 }
@@ -296,34 +346,9 @@ module.exports.createClass = (obj) => {
       if ( arg === undefined ) 
         return property.getTransform(this[`_${property.name}`]); 
             
-      /** Setter for non-nullable standard property types */
-      else if ( !property.allowNull && ![`object`, `Buffer`, `Array`, `Date`].includes(property.ezobjectType.javascriptType) && typeof arg == property.ezobjectType.javascriptType )
-        this[`_${property.name}`] = property.setTransform(arg, property.instanceOf ? property.instanceOf : property.originalType); 
-      
-      /** Setter for nullable standard property types */
-      else if ( property.allowNull && ![`object`, `Buffer`, `Array`, `Date`].includes(property.ezobjectType.javascriptType) )
-        this[`_${property.name}`] = property.setTransform(arg, property.instanceOf ? property.instanceOf : property.originalType); 
-      
-      /** Setter for non-nullable Array property types */
-      else if ( !property.allowNull && typeof arg == `object` && arg && property.ezobjectType.javascriptType == `Array` && ( arg.constructor.name == property.ezobjectType.javascriptType || module.exports.instanceOf(arg, property.ezobjectType.javascriptType) ) )
-        this[`_${property.name}`] = property.setTransform(arg, property.arrayOf.instanceOf ? property.arrayOf.instanceOf : property.arrayOf.type); 
-      
-      /** Setter for nullable Array property types */
-      else if ( property.allowNull && property.ezobjectType.javascriptType == `Array` && typeof arg == `object` && arg === null )
-        this[`_${property.name}`] = property.setTransform(arg, property.arrayOf.instanceOf ? property.arrayOf.instanceOf : property.arrayOf.type); 
-      
-      /** Setter for non-nullable Buffer and Date types */
-      else if ( !property.allowNull && typeof arg == `object` && arg && [`Buffer`, `Date`].includes(property.ezobjectType.javascriptType) && ( arg.constructor.name == property.ezobjectType.javascriptType || module.exports.instanceOf(arg, property.ezobjectType.javascriptType) ) )
-        this[`_${property.name}`] = property.setTransform(arg, property.instanceOf ? property.instanceOf : property.originalType); 
-    
-      /** Setter for nullable or custom property types */
-      else if ( arg === null || typeof arg === `object` && ( property.originalType && property.originalType == arg.constructor.name ) || ( typeof arg == `object` && typeof property.instanceOf == `string` && module.exports.instanceOf(arg, property.instanceOf) ) )
-        this[`_${property.name}`] = property.setTransform(arg, property.instanceOf ? property.instanceOf : property.originalType); 
-      
-      /** Handle type errors */
-      else 
-        throw new TypeError(`${this.constructor.name}.${property.name}(${typeof arg}): Invalid signature, requires '${typeof property.type === 'string' ? property.originalType : property.instanceOf}'.`); 
-      
+      /** Setter */
+      this[`_${property.name}`] = property.setTransform(arg, property); 
+
       /** Return this object for set call chaining */
       return this; 
     };
