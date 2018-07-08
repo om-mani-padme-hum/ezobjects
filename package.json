@@ -1,18 +1,21 @@
 {
   "name": "ezobjects",
-  "version": "2.11.6",
-  "description": "Easy dynamic object generation with optional MySQL table linking",
+  "version": "3.0.0",
+  "description": "Easy Auto-Generated Strictly-Typed JavaScript Class Objects",
   "main": "index.js",
   "scripts": {
-    "start": "node example-mysql.js",
-    "test": "eslint example.js example-mysql.js index.js mysql-connection.js"
+    "start": "node example.js",
+    "test": "eslint example.js index.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/om-mani-padme-hum/ezobjects.git"
+    "url": "git+https://github.com/om-mani-padme-hum/ezobjects.git"
   },
   "keywords": [
     "easy",
+    "strict",
+    "strictly",
+    "typed",
     "auto",
     "automatic",
     "quick",
@@ -25,18 +28,19 @@
     "create",
     "creation",
     "generate",
-    "generation",
-    "mysql",
-    "linked",
-    "database"
+    "generation"
   ],
   "author": "Rich Lowe",
   "license": "MIT",
-  "dependencies": {
-    "moment": "^2.22.1",
-    "mysql": "^2.15.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "docket-parser": "^0.6.7"
+  },
+  "bugs": {
+    "url": "https://github.com/om-mani-padme-hum/ezobjects/issues"
+  },
+  "homepage": "https://github.com/om-mani-padme-hum/ezobjects#readme",
+  "directories": {
+    "doc": "docs"
   }
 }

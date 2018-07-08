@@ -1,135 +1,101 @@
-const ezobjects = require(`./index`);
+const ezobjects = require('./index');
 
-/** Create a customized object on the global (node) or window (browser) namespace */
-ezobjects.createObject({
-  className: `DatabaseRecord`,
+/** Configure a basic EZ Object example */
+const configBasicExample = {
+  className: 'BasicExample',
   properties: [
-    { name: `id`, type: `number`, setTransform: x => parseInt(x) }
+    { name: 'name', type: 'string' }
   ]
+};
+
+/** Create the `BasicExample` class */
+ezobjects.createClass(configBasicExample);
+
+/** Create a new instance of the `BasicExample` class */
+const basicExample1 = new BasicExample();
+
+/** Give it a name using the auto-generated setter */
+basicExample1.name('Basic Example 1');
+
+/** Output the instance to console */
+console.log(basicExample1);
+
+/** 
+ * Create another instance of the `BasicExample` class, but this time
+ * initialize it with a plain object passed to the constructor.
+ */
+const basicExample2 = new BasicExample({
+  name: 'Basic Example 2'
 });
 
-/** Example of the object newly instansiated */
-const a = new DatabaseRecord();
-
-console.log(a);
-
-/** Create another customized object that extends the first one */
-ezobjects.createObject({
-  className: `Person`,
-  extends: DatabaseRecord,
+/** 
+ * Configure a full EZ Object example demonstrating all supported types,
+ * including the ability to extend other objects.
+ */
+const configFullExample = {
+  className: 'FullExample',
+  extends: BasicExample,
   properties: [
-    { name: `firstName`, type: `string` },
-    { name: `lastName`, type: `string` },
-    { name: `checkingBalance`, type: `number`, setTransform: x => parseFloat(x) },
-    { name: `permissions`, type: `Array` },
-    { name: `favoriteDay`, type: `Date` }
+    { name: 'exampleInt', type: 'int' },
+    { name: 'exampleFloat', type: 'float' },
+    { name: 'exampleString', type: 'string' },
+    { name: 'exampleBoolean', type: 'boolean' },
+    { name: 'exampleFunction', type: 'function' },
+    { name: 'exampleDate', type: 'date' },
+    { name: 'exampleBuffer', type: 'buffer' },
+    { name: 'exampleOtherObj', type: 'BasicExample' },
+    
+    { name: 'exampleIntArray', type: 'array', arrayOf: { type: 'int' } },
+    { name: 'exampleFloatArray', type: 'array', arrayOf: { type: 'float' } },
+    { name: 'exampleStringArray', type: 'array', arrayOf: { type: 'string' } },
+    { name: 'exampleBooleanArray', type: 'array', arrayOf: { type: 'boolean' } },
+    { name: 'exampleFunctionArray', type: 'array', arrayOf: { type: 'function' } },
+    { name: 'exampleDateArray', type: 'array', arrayOf: { type: 'date' } },
+    { name: 'exampleBufferArray', type: 'array', arrayOf: { type: 'buffer' } },
+    { name: 'exampleOtherObjArray', type: 'array', arrayOf: { type: 'BasicExample' } } 
   ]
+};
+
+/** Create the `FullExample` class */
+ezobjects.createClass(configFullExample);
+
+/** Create a new instance of the `FullExample` class */
+const fullExample = new FullExample({
+  name: `Full Example`,
+  exampleInt: 293,
+  exampleFloat: 194.13489,
+  exampleString: `What's up, doc?`,
+  exampleBoolean: true,
+  exampleFunction: arg => `Hello, ${arg}!`,
+  exampleDate: new Date('1776-07-04'),
+  exampleBuffer: Buffer.from([0x04, 0x7F, 0x93, 0x38]),
+  exampleOtherObj: basicExample1,
+  
+  exampleIntArray: [293, -178, 492],
+  exampleFloatArray: [194.13489, -2890.25, -0.04281],
+  exampleStringArray: [`What's up, doc?`, `Shiver me timbers`],
+  exampleBooleanArray: [true, false, true],
+  exampleFunctionArray: [arg => `Hello, ${arg}!`, arg => `Farewell, ${arg}!`],
+  exampleDateArray: [new Date('1776-07-04'), new Date('1945-12-07')],
+  exampleBufferArray: [Buffer.from([0x04, 0x7F, 0x93, 0x38]), Buffer.from('A string instead')],
+  exampleOtherObjArray: [basicExample1, basicExample2]
 });
 
-/** Example of the extended object newly instansiated */
-const b = new Person();
+/** Output the instance to console */
+console.log(fullExample);
 
-console.log(b);
+/** Output one of the function responses to console */
+console.log(fullExample.exampleFunctionArray()[1]('Rich'));
 
-/** Example of the extended object instansiated and initialized using object passed to constructor */
-const c = new Person({
-  id: 1,
-  firstName: `Rich`,
-  lastName: `Lowe`,
-  checkingBalance: 4.87,
-  permissions: [1, 2, 3],
-  favoriteDay: new Date(`01-01-2018`)
-});
-
-console.log(c);
-
-/** Example of the extended object instansiated, then loaded with data using setter methods */
-const d = new Person();
-
-d.id(2);
-d.firstName(`Bert`);
-d.lastName(`Reynolds`);
-d.checkingBalance(91425518.32);
-d.permissions([1, 4]);
-d.favoriteDay(new Date(`06-01-2017`));
-
-console.log(d);
-
-/** Example of the extended object`s properties being accessed using getter methods */
-console.log(`ID: ${d.id()}`);
-console.log(`First Name: ${d.firstName()}`);
-console.log(`Last Name: ${d.lastName()}`);
-console.log(`Checking Balance: $${d.checkingBalance()}`);
-console.log(`Permissions: ${d.permissions().join(`, `)}`);
-console.log(`Favorite Day: ${d.favoriteDay().toString()}`);
-
-/** Adding property to the generated object`s prototype */
-DatabaseRecord.prototype.table = function (arg) {
-  /** Getter */
-  if ( arg === undefined )
-    return this._table;
-  
-  /** Setter */
-  else if ( typeof arg == `string` )
-    this._table = arg;
-  
-  /** Handle type errors */
-  else
-    throw new TypeError(`${this.constructor.name}.table(${typeof arg}): Invalid signature.`);
-  
-  /** Return this object for set call chaining */
-  return this;
-};
-
-/** Yuck, now I have to manually override the init() call if I want it initialized */
-DatabaseRecord.prototype.init = function (data = {}) {
-  this.id(data.id || 0);
-  this.table(data.table || ``);
-};
-
-const e = new DatabaseRecord();
-
-console.log(e);
-
-/** Adding arbitrary capability other than property to the generated object`s prototype */
-DatabaseRecord.prototype.hello = function () {
-  return `Hello, World!`;
-};
-
-const f = new DatabaseRecord();
-
-console.log(f.hello());
-
-/** These objects can be extended instead to accomplish the same things if preferred */
-class DatabaseRecord2 extends DatabaseRecord {
-  constructor(data = {}) {
-    super(data);
-  }
-
-  init(data = {}) {
-    super.init(data);
-    this.test(`Test`);
-  }
-
-  test(arg) {
-    /** Getter */
-    if ( arg === undefined )
-      return this._test;
-
-    /** Setter */
-    else if ( typeof arg == `string` )
-      this._test = arg;
-
-    /** Handle type errors */
-    else
-      throw new TypeError(`${this.constructor.name}.test(${typeof arg}): Invalid signature.`);
-
-    /** Return this object for set call chaining */
-    return this;
-  }
+/** Try to set a `float` property with a `string` */
+try {
+  /**
+   * This throws a TypeError since string given, not float; the same behavior 
+   * can be expected for all other types, including arrays of types.
+   */
+  fullExample.exampleFloat('test');
+} catch ( err ) {
+  /** Output error message to console */
+  console.log(err.message);
 }
-
-const g = new DatabaseRecord2();
-
-console.log(g);
-console.log(g.hello());
+  
