@@ -197,12 +197,12 @@ See the following for how to configure your EZ Objects:
 ### An object configuration can have the following:
 
 * **className** - `string` - (required) Name of the class
-* **properties** - `Array` - (required) An array of property configurations that the object (and MySQL table, if applicable) should have corresponding properties for
+* **properties** - `Array` - (required) An array of property configurations that the object should have corresponding properties for
 * **extends** - `mixed` - (optional) The object that the new object should be extended from \[required to extend object]
 
 ### A property configuration can have the following:
 
-* **name** - `string` - (required) Name of the property, must conform to both JavaScript and MySQL rules
+* **name** - `string` - (required) Name of the property, must conform to JavaScript rules
 * **type** - `string` - (optional) JavaScript data type, or types if separated by the pipe `|` character, that the property must be equal to -- types can be `int`, `float`, `string`, `boolean`, `date`, `buffer`, `function`, any other valid object constructor name, or `Array` where `arrayOf` is provided with information about the array element types. \[either **type** and/or **instanceOf** is required]
 * **instanceOf** - `string` - (optional) JavaScript class constructor name, or names if separated by the pipe `|` character, that the property must be an instance of \[either **type** and/or **instanceOf** is required]
 * **default** - `mixed` - (optional) Sets the default value for the property in the class object
