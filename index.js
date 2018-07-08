@@ -201,7 +201,7 @@ const setSetArrayTransform = (x, property) => {
   else if ( x && x.some(y => y === null && !property.arrayOf.allowNull) )
     throw new TypeError(`${property.className}.${property.name}(): Null value passed as element of 'Array[${property.arrayOf.type}]' setter that doesn't allow null elements.`);
 
-  return x === null ? null : x.map(y => y === null ? null : x);
+  return x === null ? null : x.map(y => y === null ? null : y);
 };
 
 /** Define default set transform for all other arrays of supported types */
