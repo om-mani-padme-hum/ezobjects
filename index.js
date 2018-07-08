@@ -1,3 +1,13 @@
+/**
+ * @module ezobjects-mysql
+ * @copyright 2018 Rich Lowe
+ * @license MIT
+ * @description Easy automatic class creation using simple configuration objects.  Capable
+ * of automatically creating a matching MySQL table and generating delete(), insert(), load(), 
+ * and update() methods in addition to the constructor, initializer, and getters/setters for
+ * all configured properties.
+ */
+
 /** Require external modules */
 const url = require(`url`);
 const moment = require(`moment`);
@@ -87,10 +97,7 @@ const ezobjectTypes = [
   { type: `array`, javascriptType: `Array`, defaultMySQLType: `text`, default: [], arrayOfType: `other`, setTransform: (x, type) => x.map(y => typeof y == 'object' && y && ( y.constructor.name == type || module.exports.instanceOf(y, type) ) ? y : null).filter(y => y !== null), saveTransform: x => x.map(y => y.id()).join(`,`), loadTransform: async (x, type, db) => { const arr = []; for ( let i = 0, list = x.split(`,`), i_max = list.length; i < i_max; i++ ) { if ( !isNaN(parseInt(list[i])) ) arr.push(await (new parent[type]).load(parseInt(list[i]), db)); } return arr; } }
 ];
 
-/** @todo
- Override push, shift methods with type checking
- */
-
+/** Validate configuration for a single property */
 function validatePropertyConfig(property) {  
   /** If name is missing or not a string, throw error */
   if ( typeof property.name !== 'string' )
@@ -263,8 +270,15 @@ function validatePropertyConfig(property) {
   /** Fully determine whether to store properties in database */
   if ( typeof property.store !== `boolean` )
     property.store = true;
+  
+  /** Fully determine whether to allow nulls for this property */
+  if ( typeof property.allowNull !== `boolean` && property.ezobjectType.type != 'other' )
+    property.allowNull = false;
+  else if ( typeof property.allowNull !== `boolean` )
+    property.allowNull = true;
 }
 
+/** Validate configuration for a class */
 function validateClassConfig(obj) {
   /** If configuration is not plain object, throw error */
   if ( typeof obj != `object` || obj.constructor.name != `Object` )
@@ -288,6 +302,7 @@ function validateClassConfig(obj) {
   });
 }
 
+/** Validate configuration for a creating MySQL table based on class configuration */
 function validateTableConfig(obj) {  
   /** If configuration has missing or invalid 'tableName' configuration, throw error */
   if ( typeof obj.tableName !== 'string' || !obj.tableName.match(/[a-z_]+/) )
@@ -296,15 +311,7 @@ function validateTableConfig(obj) {
   validateClassConfig(obj);
 }
 
-/**
- * @module ezobjects-mysql
- * @copyright 2018 Rich Lowe
- * @license MIT
- * @description Easy automatic class creation using simple configuration objects.  Capable
- * of automatically creating a matching MySQL table and generating delete(), insert(), load(), 
- * and update() methods in addition to the constructor, initializer, and getters/setters for
- * all configured properties.
- *
+/*
  * @signature ezobjects.createTable(obj, db)
  * @param obj Object Configuration object
  * @param db MySQLConnection
@@ -333,9 +340,11 @@ module.exports.createTable = async (obj, db) => {
       /** Add property name and type to query */
       createQuery += `${property.name} ${property.ezobjectType.defaultMySQLType.toUpperCase()}`;
 
+      /** Add value lists for ENUM and SET types */
       if ( property.ezobjectType.defaultMySQLType.toUpperCase() == 'ENUM' || property.ezobjectType.defaultMySQLType.toUpperCase() == 'SET' ) {
         createQuery += `(`;
         
+        /** Loop through each value and output */
         property.values.forEach((value) => {
           createQuery += `'${value}', `;
         });
@@ -370,7 +379,7 @@ module.exports.createTable = async (obj, db) => {
         createQuery += ` COLLATE ${property.collate}`;
 
       /** Properties with NULL */
-      if ( typeof property.allowNull == `boolean` && property.allowNull )
+      if ( property.allowNull )
         createQuery += ` NULL`;
       else
         createQuery += ` NOT NULL`;
@@ -414,9 +423,9 @@ module.exports.createTable = async (obj, db) => {
 
         /** Validate index settings */
         if ( index.type != `BTREE` && index.type != `HASH` )
-          throw new Error(`Invalid index type '${index.type}'.`);
+          throw new Error(`ezobjects.createTable(): Invalid index type '${index.type}'.`);
         else if ( index.visible && index.invisible )
-          throw new Error(`Index cannot have both VISIBLE and INVISIBLE options set.`);
+          throw new Error(`ezobjects.createTable(): Index cannot have both VISIBLE and INVISIBLE options set.`);
 
         /** Add index name and type to query */
         createQuery += `INDEX ${index.name} USING ${index.type} (`;
@@ -484,16 +493,21 @@ module.exports.createTable = async (obj, db) => {
 module.exports.instanceOf = (obj, constructorName) => {
   let found = false;
   
+  /** Recursive function for determining if ancestral prototype is an instance of the given `constructorName` */
   const isInstance = (obj) => {
+    /** If it is an instance of `constructorName`, set found to true */
     if ( obj && obj.constructor && obj.constructor.name == constructorName )
       found = true;
     
+    /** If this is an extension of a more fundamental prototype, recursively check it too */
     if ( obj && obj.__proto__ )
       isInstance(obj.__proto__);
   };
   
+  /** See if `obj` is an instance of `constructorName` */
   isInstance(obj);
   
+  /** Return the result */
   return found;
 };
 
@@ -511,8 +525,10 @@ module.exports.createClass = (obj) => {
   parent[obj.className] = class extends (obj.extends || Object) {
     /** Create constructor */
     constructor(data = {}) {
+      /** Initialize super */
       super(data);
       
+      /** Initialize object to values in `data` or defaults */
       this.init(data);
     }
     
@@ -522,7 +538,7 @@ module.exports.createClass = (obj) => {
       if ( typeof super.init === `function` )
         super.init(data);
     
-      /** If data is a string, assume it's JSON encoded and parse */
+      /** If data is a string, assume it's JSON encoded and try and parse */
       if ( typeof data == `string` ) {
         try {
           data = JSON.parse(data);
@@ -559,20 +575,28 @@ module.exports.createClass = (obj) => {
       if ( arg === undefined ) 
         return property.getTransform(this[`_${property.name}`]); 
             
-      /** Setter for standard property types */
-      else if ( ![`object`, `Buffer`, `Array`, `Date`].includes(property.ezobjectType.javascriptType) && typeof arg == property.ezobjectType.javascriptType )
-          this[`_${property.name}`] = property.setTransform(arg, property.instanceOf ? property.instanceOf : property.originalType); 
+      /** Setter for non-nullable standard property types */
+      else if ( !property.allowNull && ![`object`, `Buffer`, `Array`, `Date`].includes(property.ezobjectType.javascriptType) && typeof arg == property.ezobjectType.javascriptType )
+        this[`_${property.name}`] = property.setTransform(arg, property.instanceOf ? property.instanceOf : property.originalType); 
       
-      /** Setter for Buffer property types */
-      else if ( typeof arg == `object` && arg && [`Buffer`, `Array`, `Date`].includes(property.ezobjectType.javascriptType) && ( arg.constructor.name == property.ezobjectType.javascriptType || module.exports.instanceOf(arg, property.ezobjectType.javascriptType) ) ) {
-        if ( property.ezobjectType.javascriptType == `Array` )
-          this[`_${property.name}`] = property.setTransform(arg, property.arrayOf.instanceOf ? property.arrayOf.instanceOf : property.arrayOf.type); 
-        else
-          this[`_${property.name}`] = property.setTransform(arg, property.instanceOf ? property.instanceOf : property.originalType); 
-      }
+      /** Setter for nullable standard property types */
+      else if ( property.allowNull && ![`object`, `Buffer`, `Array`, `Date`].includes(property.ezobjectType.javascriptType) )
+        this[`_${property.name}`] = property.setTransform(arg, property.instanceOf ? property.instanceOf : property.originalType); 
       
-      /** Setter for custom property types */
-      else if ( arg === null || ( typeof arg == `object` && property.originalType && property.originalType == arg.constructor.name ) || ( typeof arg == `object` && typeof property.instanceOf == `string` && module.exports.instanceOf(arg, property.instanceOf) ) )
+      /** Setter for non-nullable Array property types */
+      else if ( !property.allowNull && typeof arg == `object` && arg && property.ezobjectType.javascriptType == `Array` && ( arg.constructor.name == property.ezobjectType.javascriptType || module.exports.instanceOf(arg, property.ezobjectType.javascriptType) ) )
+        this[`_${property.name}`] = property.setTransform(arg, property.arrayOf.instanceOf ? property.arrayOf.instanceOf : property.arrayOf.type); 
+      
+      /** Setter for nullable Array property types */
+      else if ( property.allowNull && property.ezobjectType.javascriptType == `Array` && typeof arg == `object` && arg === null )
+        this[`_${property.name}`] = property.setTransform(arg, property.arrayOf.instanceOf ? property.arrayOf.instanceOf : property.arrayOf.type); 
+      
+      /** Setter for non-nullable Buffer and Date types */
+      else if ( !property.allowNull && typeof arg == `object` && arg && [`Buffer`, `Date`].includes(property.ezobjectType.javascriptType) && ( arg.constructor.name == property.ezobjectType.javascriptType || module.exports.instanceOf(arg, property.ezobjectType.javascriptType) ) )
+        this[`_${property.name}`] = property.setTransform(arg, property.instanceOf ? property.instanceOf : property.originalType); 
+    
+      /** Setter for nullable or custom property types */
+      else if ( arg === null || typeof arg === `object` && ( property.originalType && property.originalType == arg.constructor.name ) || ( typeof arg == `object` && typeof property.instanceOf == `string` && module.exports.instanceOf(arg, property.instanceOf) ) )
         this[`_${property.name}`] = property.setTransform(arg, property.instanceOf ? property.instanceOf : property.originalType); 
       
       /** Handle type errors */
@@ -586,15 +610,12 @@ module.exports.createClass = (obj) => {
     /** Create MySQL delete method on prototype */
     parent[obj.className].prototype.delete = async function (db) { 
       /** If the argument is a valid database, delete the record */
-      if ( typeof db == `object` && db.constructor.name == `MySQLConnection` ) {
-        /** Execute query to delete record from database */
+      if ( typeof db == `object` && db.constructor.name == `MySQLConnection` )
         await db.query(`DELETE FROM ${obj.tableName} WHERE id = ?`, [this.id()]);
-      } 
 
       /** Otherwise throw TypeError */
-      else {
+      else
         throw new TypeError(`${this.constructor.name}.delete(${typeof db}): Invalid signature.`);
-      }
 
       /** Allow for call chaining */
       return this;
@@ -604,14 +625,17 @@ module.exports.createClass = (obj) => {
     parent[obj.className].prototype.insert = async function (arg1) { 
       /** Provide option for inserting record from browser if developer implements ajax backend */
       if ( typeof window !== `undefined` && typeof arg1 == `string` ) {
+        /** Attempt to parse the URL */
         const url = new URL(arg1);
 
+        /** Attempt to retrieve a JSON response from the parsed URL */
         const result = await $.get({
           url: url.href,
           data: JSON.stringify(this),
           dataType: `json`
         });
 
+        /** If successful, store id, if not, throw error */
         if ( result && result.insertId )
           this.id(result.insertId);
         else
@@ -717,14 +741,17 @@ module.exports.createClass = (obj) => {
     /** Create MySQL load method on prototype */
     parent[obj.className].prototype.load = async function (arg1, db) {        
       /** Provide option for loading record from browser if developer implements ajax backend */
-      if ( typeof window !== `undefined` && typeof arg1 == `string` && arg1.match(/^http/i) ) {
+      if ( typeof window !== `undefined` && typeof arg1 == `string` && arg1.match(/^http\:\/\//i) ) {
+        /** Attempt to parse the URL */
         const url = new URL(arg1);
 
+        /** Attempt to retrieve a JSON response from the parsed URL */
         const result = await $.get({
           url: url.href,
           dataType: `json`
         });
 
+        /** If result is invalid, throw error */
         if ( !result )
           throw new Error(`${obj.className}.load(): Unable to load record, invalid response from remote host.`);
 
@@ -785,9 +812,10 @@ module.exports.createClass = (obj) => {
         /** Trim extra `, ` from property list */
         query = query.substr(0, query.length - 2);
 
-        /** Finish query */
+        /** Add from clause */
         query += ` FROM ${obj.tableName} `;
 
+        /** Add where clause based on whether we're searching by `id` or `stringSearchField` */
         if ( typeof arg1 === `string` && typeof obj.stringSearchField === `string` )
           query += `WHERE ${obj.stringSearchField} = ?`;
         else
@@ -865,14 +893,17 @@ module.exports.createClass = (obj) => {
     parent[obj.className].prototype.update = async function (arg1) { 
       /** Provide option for inserting record from browser if developer implements ajax backend */
       if ( typeof window !== `undefined` && typeof arg1 == `string` ) {
+        /** Attempt to parse the URL */
         const url = new URL(arg1);
 
+        /** Attempt to retrieve a JSON response from the parsed URL */
         const result = await $.get({
           url: url.href,
           data: JSON.stringify(this),
           dataType: `json`
         });
 
+        /** If response is invalid, throw error */
         if ( !result )
           throw new Error(`${obj.className}.update(): Unable to update record, invalid response from remote host.`);
       }
