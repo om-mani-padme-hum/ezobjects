@@ -1,4 +1,4 @@
-# EZ Objects v5.2.1
+# EZ Objects v5.2.2
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects that are strictly typed in JavaScript.  All you have to do is create simple 
@@ -14,7 +14,8 @@ configurations for each of your objects and then create them using the createCla
 
 ### Looking for MySQL linked EZ Objects?
 
-EZ Object's MySQL capability has been shifted to a separate package called `ezobjects-mysql` [npm](https://www.npmjs.com/package/ezobjects-mysql) [Git](https://github.com/om-mani-padme-hum/ezobjects-mysql.git).
+EZ Object's MySQL capability has been shifted to a separate package called `ezobjects-mysql` which you can
+find on [npm](https://www.npmjs.com/package/ezobjects-mysql) or [GitHub](https://github.com/om-mani-padme-hum/ezobjects-mysql.git).
 
 ## Installation
 
