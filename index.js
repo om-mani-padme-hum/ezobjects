@@ -441,16 +441,16 @@ function validatePropertyConfig(property) {
     property.type = property.type.toLowerCase();
   }
   
-  /** If type is 'ARRAY' with no 'arrayOf', throw error */
-  if ( property.type == 'array' && ( typeof property.arrayOf !== 'object' || property.arrayOf.constructor.name != 'Object' ) )
-    throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' of type ${property.type} with missing or invalid 'arrayOf'.`);
-  
-  /** If type is 'ARRAY' with 'arrayOf' containing bad or missing type, throw error */
-  if ( property.type == 'array' && typeof property.arrayOf.type != 'string' && typeof property.arrayOf.instanceOf != 'string' )
-    throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' of type ${property.type} with missing or invalid 'arrayOf.type' and/or 'arrayOf.instanceOf', one of them is required.`);
-  
   /** Attach arrayOf 'ezobjectType' if property type is 'array' */
   if ( property.type == 'array' ) {
+    /** If type is 'ARRAY' with no 'arrayOf', throw error */
+    if ( typeof property.arrayOf !== 'object' || property.arrayOf.constructor.name != 'Object' )
+      throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' of type ${property.type} with missing or invalid 'arrayOf'.`);
+
+    /** If type is 'ARRAY' with 'arrayOf' containing bad or missing type, throw error */
+    if ( typeof property.arrayOf.type != 'string' && typeof property.arrayOf.instanceOf != 'string' )
+      throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' of type ${property.type} with missing or invalid 'arrayOf.type' and/or 'arrayOf.instanceOf', one of them is required.`);
+
     /** If it's a standard EZ Object type, attach 'ezobjectType' to property for later use */
     property.ezobjectType = ezobjectTypes.find(x => x.type == property.type && x.arrayOfType == property.arrayOf.type );
 
