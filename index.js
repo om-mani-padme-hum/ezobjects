@@ -18,109 +18,72 @@ if ( typeof window !== `undefined` )
 else
   parent = global;
 
-/** Define default set transform for 'int' types */
-const setIntTransform = (x, property) => {
+/** Define default set transform for non-array types */
+const setTransform = (x, property) => {
   if ( x === null && !property.allowNull )
     throw new TypeError(`${property.className}.${property.name}(): Null value passed to '${property.type}' setter that doesn't allow nulls.`);
-  else if ( x && typeof x !== 'number' )
+  else if ( x && property.ezobjectType.jsType == 'number' && typeof x !== 'number' )
     throw new TypeError(`${property.className}.${property.name}(): Non-numeric value passed to '${property.type}' setter.`);
-  
-  return x === null ? null : parseInt(x);
-};
-
-/** Define default set transform for 'float' types */
-const setFloatTransform = (x, property) => {
-  if ( x === null && !property.allowNull )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed to '${property.type}' setter that doesn't allow nulls.`);
-  else if ( x && typeof x !== 'number' )
-    throw new TypeError(`${property.className}.${property.name}(): Non-numeric value passed to '${property.type}' setter.`);
-  
-  return x === null ? null : parseFloat(x);
-};
-
-/** Define default set transform for 'string' types */
-const setStringTransform = (x, property) => {
-  if ( x === null && !property.allowNull )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed to '${property.type}' setter that doesn't allow nulls.`);
-  else if ( x && typeof x !== 'string' )
+  else if ( x && property.ezobjectType.jsType == 'string' && typeof x !== 'string' )
     throw new TypeError(`${property.className}.${property.name}(): Non-string value passed to '${property.type}' setter.`);
-  
-  return x === null ? null : x;
-};
-
-/** Define default set transform for 'boolean' types */
-const setBooleanTransform = (x, property) => {
-  if ( x === null && !property.allowNull )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed to '${property.type}' setter that doesn't allow nulls.`);
-  else if ( x && typeof x !== 'boolean' )
+  else if ( x && property.ezobjectType.jsType == 'boolean' && typeof x !== 'boolean' )
     throw new TypeError(`${property.className}.${property.name}(): Non-boolean value passed to '${property.type}' setter.`);
-  
-  return x === null ? null : x ? true : false;
-};
-
-/** Define default set transform for 'function' types */
-const setFunctionTransform = (x, property) => {
-  if ( x === null && !property.allowNull )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed to '${property.type}' setter that doesn't allow nulls.`);
-  else if ( x && typeof x !== 'function' )
-    throw new TypeError(`${property.className}.${property.name}(): Non-function value passed to 'function' setter.`);
-  
-  return x === null ? null : x;
-};
-
-/** Define default set transform for 'date' types */
-const setDateTransform = (x, property) => {
-  if ( x === null && !property.allowNull )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed to '${property.type}' setter that doesn't allow nulls.`);
-  else if ( x && ( typeof x !== 'object' || x.constructor.name != 'Date' ) )
+  else if ( x && property.ezobjectType.jsType == 'function' && typeof x !== 'function' )
+    throw new TypeError(`${property.className}.${property.name}(): Non-function value passed to '${property.type}' setter.`);
+  else if ( x && property.ezobjectType.jsType == 'Date' && ( typeof x !== 'object' || x.constructor.type == 'Date' ) )
     throw new TypeError(`${property.className}.${property.name}(): Non-Date value passed to '${property.type}' setter.`);
-  
-  return x === null ? null : x;
-};
-
-/** Define default set transform for 'buffer' types */
-const setBufferTransform = (x, property) => {
-  if ( x === null && !property.allowNull )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed to '${property.type}' setter that doesn't allow nulls.`);
-  else if ( x && ( typeof x !== 'object' || x.constructor.name != 'Buffer' ) )
+  else if ( x && property.ezobjectType.jsType == 'Buffer' && ( typeof x !== 'object' || x.constructor.type == 'Buffer' ) )
     throw new TypeError(`${property.className}.${property.name}(): Non-Buffer value passed to '${property.type}' setter.`);
-  
-  return x === null ? null : x;
-};
-
-/** Define default set transform for 'set' types */
-const setSetTransform = (x, property) => {
-  if ( x === null && !property.allowNull )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed to '${property.type}' setter that doesn't allow nulls.`);
-  else if ( x && ( typeof x !== 'object' || x.constructor.name != 'Set' ) )
-    throw new TypeError(`${property.className}.${property.name}(): Non-string value passed to '${property.type}' setter.`);
-  
-  return x === null ? null : x;
-};
-
-/** Define default set transform for all other non-array types */
-const setOtherTransform = (x, property) => {  
-  if ( x === null && !property.allowNull )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed to '${typeof property.type === 'string' ? property.originalType : property.instanceOf}' setter that doesn't allow nulls.`);
-  else if ( x && ( typeof x !== 'object' || ( typeof property.type == 'string' && x.constructor.name != property.originalType ) || ( typeof property.instanceOf === 'string' && !module.exports.instanceOf(x, property.instanceOf) ) ) )
+  else if ( x && property.ezobjectType.jsType == 'Set' && ( typeof x !== 'object' || x.constructor.type == 'Set' ) )
+    throw new TypeError(`${property.className}.${property.name}(): Non-Set value passed to '${property.type}' setter.`);
+  else if ( x && property.ezobjectType.jsType == 'object' && ( typeof x !== 'object' || ( typeof property.type == 'string' && x.constructor.name != property.originalType ) || ( typeof property.instanceOf === 'string' && !module.exports.instanceOf(x, property.instanceOf) ) ) )
     throw new TypeError(`${property.className}.${property.name}(): Invalid value passed to '${typeof property.type === 'string' ? property.originalType : property.instanceOf}' setter.`);
   
-  return x === null ? null : x;
+  if ( property.ezobjectType.jsType == 'number' )
+    return x === null ? null : parseInt(x);
+  else if ( property.ezobjectType.jsType == 'string' || property.ezobjectType.jsType == 'function' || property.ezobjectType.jsType == 'Date' || property.ezobjectType.jsType == 'Buffer' || property.ezobjectType.jsType == 'Set' || property.ezobjectType.jsType == 'object' )
+    return x === null ? null : x;
+  else if ( property.ezobjectType.jsType == 'boolean' )
+    return x === null ? null : (x ? true : false);
 };
 
-/** Define default set transform for Array[int] types */
-const setIntArrayTransform = (x, property) => {
+/** Define default set transform for array types */
+const setArrayTransform = (x, property) => {
   if ( x === null && !property.allowNull )
     throw new TypeError(`${property.className}.${property.name}(): Null value passed to 'Array' setter that doesn't allow nulls.`);
   else if ( !(x instanceof Array) )
     throw new TypeError(`${property.className}.${property.name}(): Non-Array value passed to 'Array' setter.`);
-  else if ( x && x.some(y => isNaN(y) && y !== null) )
-    throw new TypeError(`${property.className}.${property.name}(): Non-numeric value passed as element of Array[${property.arrayOf.type}] setter.`);
   else if ( x && x.some(y => y === null && !property.arrayOf.allowNull) )
     throw new TypeError(`${property.className}.${property.name}(): Null value passed as element of 'Array[${property.arrayOf.type}]' setter that doesn't allow null elements.`);
-
-  let arr = x.map(y => y === null ? null : parseInt(y));
   
+  let arr = [];
+  
+  if ( property.ezobjectType.jsType == 'number' && x && x.some(y => isNaN(y) && y !== null) )
+    throw new TypeError(`${property.className}.${property.name}(): Non-numeric value passed as element of Array[${property.arrayOf.type}] setter.`);
+  else if ( property.ezobjectType.jsType == 'string' && x && x.some(y => typeof y !== 'string' && y !== null) )
+    throw new TypeError(`${property.className}.${property.name}(): Non-string value passed as element of Array[${property.arrayOf.type}] setter.`);
+  else if ( property.ezobjectType.jsType == 'boolean' && x && x.some(y => typeof y !== 'boolean' && y !== null) )
+    throw new TypeError(`${property.className}.${property.name}(): Non-boolean value passed as element of Array[${property.arrayOf.type}] setter.`);
+  else if ( property.ezobjectType.jsType == 'function' && x && x.some(y => typeof y !== 'function' && y !== null) )
+    throw new TypeError(`${property.className}.${property.name}(): Non-function value passed as element of Array[${property.arrayOf.type}] setter.`);
+  else if ( property.ezobjectType.jsType == 'Date' && x && x.some(y => ( typeof y !== 'object' || y.constructor.name != 'Date' ) && y !== null) )
+    throw new TypeError(`${property.className}.${property.name}(): Non-Date value passed as element of Array[${property.arrayOf.type}] setter.`);
+  else if ( property.ezobjectType.jsType == 'Buffer' && x && x.some(y => ( typeof y !== 'object' || y.constructor.name != 'Buffer' ) && y !== null) )
+    throw new TypeError(`${property.className}.${property.name}(): Non-Buffer value passed as element of Array[${property.arrayOf.type}] setter.`);
+  else if ( property.ezobjectType.jsType == 'Set' && x && x.some(y => ( typeof y !== 'object' || y.constructor.name != 'Set' ) && y !== null) )
+    throw new TypeError(`${property.className}.${property.name}(): Non-Set value passed as element of Array[${property.arrayOf.type}] setter.`);
+  else if ( property.ezobjectType.jsType == 'object' && x && x.some(y => y !== null && (typeof y !== 'object' || ( typeof property.arrayOf.type == 'string' && y.constructor.name != property.arrayOf.type ) || ( typeof property.arrayOf.instanceOf === 'string' && !module.exports.instanceOf(y, property.arrayOf.instanceOf) ))) )
+    throw new TypeError(`${property.className}.${property.name}(): Invalid value passed as element of Array[${typeof property.arrayOf.type === 'string' ? property.arrayOf.type : property.arrayOf.instanceOf}] setter.`);
+  
+  if ( property.arrayOf.ezobjectType.hasDecimals )
+    arr = x.map(y => y === null ? null : parseFloat(y));
+  else if ( property.arrayOf.ezobjectType.jsType == 'number' )
+    arr = x.map(y => y === null ? null : parseInt(y));
+  else if ( property.arrayOf.ezobjectType.jsType == 'boolean' )
+    arr = x.map(y => y === null ? null : (y ? true : false));
+  else
+    arr = x.map(y => y === null ? null : y);
+
   Object.defineProperty(arr, 'push', {
     enumerable: false,
     value: function (x) { const newArr = Array.from(this); newArr.push(x); this.splice(0, this.length); this.push(setIntArrayTransform(newArr, property)); return this.length; }
@@ -139,275 +102,27 @@ const setIntArrayTransform = (x, property) => {
   return x === null ? null : arr;
 };
 
-/** Define default set transform for Array[float] types */
-const setFloatArrayTransform = (x, property) => {
-  if ( x === null && !property.allowNull )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed to 'Array' setter that doesn't allow nulls.`);
-  else if ( !(x instanceof Array) )
-    throw new TypeError(`${property.className}.${property.name}(): Non-Array value passed to 'Array' setter.`);
-  else if ( x && x.some(y => isNaN(y) && y !== null) )
-    throw new TypeError(`${property.className}.${property.name}(): Non-numeric value passed as element of Array[${property.arrayOf.type}] setter.`);
-  else if ( x && x.some(y => y === null && !property.arrayOf.allowNull) )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed as element of 'Array[${property.arrayOf.type}]' setter that doesn't allow null elements.`);
-  
-  let arr = x.map(y => y === null ? null : parseFloat(y));
-  
-  Object.defineProperty(arr, 'push', {
-    enumerable: false,
-    value: function (x) { const newArr = Array.from(this); newArr.push(x); this.splice(0, this.length); this.push(setFloatArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  Object.defineProperty(arr, 'unshift', {
-    enumerable: false,
-    value: function (x) { const newArr = Array.from(this); newArr.unshift(x); this.splice(0, this.length); this.push(setFloatArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  Object.defineProperty(arr, 'fill', {
-    enumerable: false,
-    value: function (x, y, z) { const newArr = Array.from(this); newArr.fill(x, y, z); this.splice(0, this.length); this.push(setFloatArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  return x === null ? null : arr;
-};
-
-/** Define default set transform for Array[string] types */
-const setStringArrayTransform = (x, property) => {
-  if ( x === null && !property.allowNull )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed to 'Array' setter that doesn't allow nulls.`);
-  else if ( !(x instanceof Array) )
-    throw new TypeError(`${property.className}.${property.name}(): Non-Array value passed to 'Array' setter.`);
-  else if ( x && x.some(y => typeof y !== 'string' && y !== null) )
-    throw new TypeError(`${property.className}.${property.name}(): Non-string value passed as element of Array[${property.arrayOf.type}] setter.`);
-  else if ( x && x.some(y => y === null && !property.arrayOf.allowNull) )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed as element of 'Array[${property.arrayOf.type}]' setter that doesn't allow null elements.`);
-
-  let arr = x.map(y => y === null ? null : y);
-  
-  Object.defineProperty(arr, 'push', {
-    enumerable: false,
-    value: function (x) { const newArr = Array.from(this); newArr.push(x); this.splice(0, this.length); this.push(setStringArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  Object.defineProperty(arr, 'unshift', {
-    enumerable: false,
-    value: function (x) { const newArr = Array.from(this); newArr.unshift(x); this.splice(0, this.length); this.push(setStringArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  Object.defineProperty(arr, 'fill', {
-    enumerable: false,
-    value: function (x, y, z) { const newArr = Array.from(this); newArr.fill(x, y, z); this.splice(0, this.length); this.push(setStringArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  return x === null ? null : arr;
-};
-
-/** Define default set transform for Array[boolean] types */
-const setBooleanArrayTransform = (x, property) => {
-  if ( x === null && !property.allowNull )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed to 'Array' setter that doesn't allow nulls.`);
-  else if ( !(x instanceof Array) )
-    throw new TypeError(`${property.className}.${property.name}(): Non-Array value passed to 'Array' setter.`);
-  else if ( x && x.some(y => typeof y !== 'boolean' && y !== null) )
-    throw new TypeError(`${property.className}.${property.name}(): Non-boolean value passed as element of Array[${property.arrayOf.type}] setter.`);
-  else if ( x && x.some(y => y === null && !property.arrayOf.allowNull) )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed as element of 'Array[${property.arrayOf.type}]' setter that doesn't allow null elements.`);
-
-  let arr = x.map(y => y === null ? null : (y ? true : false));
-  
-  Object.defineProperty(arr, 'push', {
-    enumerable: false,
-    value: function (x) { const newArr = Array.from(this); newArr.push(x); this.splice(0, this.length); this.push(setBooleanArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  Object.defineProperty(arr, 'unshift', {
-    enumerable: false,
-    value: function (x) { const newArr = Array.from(this); newArr.unshift(x); this.splice(0, this.length); this.push(setBooleanArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  Object.defineProperty(arr, 'fill', {
-    enumerable: false,
-    value: function (x, y, z) { const newArr = Array.from(this); newArr.fill(x, y, z); this.splice(0, this.length); this.push(setBooleanArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  return x === null ? null : arr;
-};
-
-/** Define default set transform for Array[function] types */
-const setFunctionArrayTransform = (x, property) => {
-  if ( x === null && !property.allowNull )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed to 'Array' setter that doesn't allow nulls.`);
-  else if ( !(x instanceof Array) )
-    throw new TypeError(`${property.className}.${property.name}(): Non-Array value passed to 'Array' setter.`);
-  else if ( x && x.some(y => typeof y !== 'function' && y !== null) )
-    throw new TypeError(`${property.className}.${property.name}(): Non-function value passed as element of Array[${property.arrayOf.type}] setter.`);
-  else if ( x && x.some(y => y === null && !property.arrayOf.allowNull) )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed as element of 'Array[${property.arrayOf.type}]' setter that doesn't allow null elements.`);
-
-  let arr = x.map(y => y === null ? null : y);
-  
-  Object.defineProperty(arr, 'push', {
-    enumerable: false,
-    value: function (x) { const newArr = Array.from(this); newArr.push(x); this.splice(0, this.length); this.push(setFunctionArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  Object.defineProperty(arr, 'unshift', {
-    enumerable: false,
-    value: function (x) { const newArr = Array.from(this); newArr.unshift(x); this.splice(0, this.length); this.push(setFunctionArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  Object.defineProperty(arr, 'fill', {
-    enumerable: false,
-    value: function (x, y, z) { const newArr = Array.from(this); newArr.fill(x, y, z); this.splice(0, this.length); this.push(setFunctionArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  return x === null ? null : arr;
-};
-
-/** Define default set transform for Array[date] types */
-const setDateArrayTransform = (x, property) => {
-  if ( x === null && !property.allowNull )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed to 'Array' setter that doesn't allow nulls.`);
-  else if ( !(x instanceof Array) )
-    throw new TypeError(`${property.className}.${property.name}(): Non-Array value passed to 'Array' setter.`);
-  else if ( x && x.some(y => ( typeof y !== 'object' || y.constructor.name != 'Date' ) && y !== null) )
-    throw new TypeError(`${property.className}.${property.name}(): Non-Date value passed as element of Array[${property.arrayOf.type}] setter.`);
-  else if ( x && x.some(y => y === null && !property.arrayOf.allowNull) )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed as element of 'Array[${property.arrayOf.type}]' setter that doesn't allow null elements.`);
-
-  let arr = x.map(y => y === null ? null : y);
-  
-  Object.defineProperty(arr, 'push', {
-    enumerable: false,
-    value: function (x) { const newArr = Array.from(this); newArr.push(x); this.splice(0, this.length); this.push(setDateArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  Object.defineProperty(arr, 'unshift', {
-    enumerable: false,
-    value: function (x) { const newArr = Array.from(this); newArr.unshift(x); this.splice(0, this.length); this.push(setDateArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  Object.defineProperty(arr, 'fill', {
-    enumerable: false,
-    value: function (x, y, z) { const newArr = Array.from(this); newArr.fill(x, y, z); this.splice(0, this.length); this.push(setDateArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  return x === null ? null : arr;
-};
-
-/** Define default set transform for Array[buffer] types */
-const setBufferArrayTransform = (x, property) => {
-  if ( x === null && !property.allowNull )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed to 'Array' setter that doesn't allow nulls.`);
-  else if ( !(x instanceof Array) )
-    throw new TypeError(`${property.className}.${property.name}(): Non-Array value passed to 'Array' setter.`);
-  else if ( x && x.some(y => ( typeof y !== 'object' || y.constructor.name != 'Buffer' ) && y !== null) )
-    throw new TypeError(`${property.className}.${property.name}(): Non-Buffer value passed as element of Array[${property.arrayOf.type}] setter.`);
-  else if ( x && x.some(y => y === null && !property.arrayOf.allowNull) )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed as element of 'Array[${property.arrayOf.type}]' setter that doesn't allow null elements.`);
-
-  let arr = x.map(y => y === null ? null : y);
-  
-  Object.defineProperty(arr, 'push', {
-    enumerable: false,
-    value: function (x) { const newArr = Array.from(this); newArr.push(x); this.splice(0, this.length); this.push(setBufferArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  Object.defineProperty(arr, 'unshift', {
-    enumerable: false,
-    value: function (x) { const newArr = Array.from(this); newArr.unshift(x); this.splice(0, this.length); this.push(setBufferArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  Object.defineProperty(arr, 'fill', {
-    enumerable: false,
-    value: function (x, y, z) { const newArr = Array.from(this); newArr.fill(x, y, z); this.splice(0, this.length); this.push(setBufferArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  return x === null ? null : arr;
-};
-
-/** Define default set transform for Array[set] types */
-const setSetArrayTransform = (x, property) => {
-  if ( x === null && !property.allowNull )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed to 'Array' setter that doesn't allow nulls.`);
-  else if ( !(x instanceof Array) )
-    throw new TypeError(`${property.className}.${property.name}(): Non-Array value passed to 'Array' setter.`);
-  else if ( x && x.some(y => ( typeof y !== 'object' || y.constructor.name != 'Set' ) && y !== null) )
-    throw new TypeError(`${property.className}.${property.name}(): Non-Set value passed as element of Array[${property.arrayOf.type}] setter.`);
-  else if ( x && x.some(y => y === null && !property.arrayOf.allowNull) )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed as element of 'Array[${property.arrayOf.type}]' setter that doesn't allow null elements.`);
-
-  let arr = x.map(y => y === null ? null : y);
-  
-  Object.defineProperty(arr, 'push', {
-    enumerable: false,
-    value: function (x) { const newArr = Array.from(this); newArr.push(x); this.splice(0, this.length); this.push(setSetArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  Object.defineProperty(arr, 'unshift', {
-    enumerable: false,
-    value: function (x) { const newArr = Array.from(this); newArr.unshift(x); this.splice(0, this.length); this.push(setSetArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  Object.defineProperty(arr, 'fill', {
-    enumerable: false,
-    value: function (x, y, z) { const newArr = Array.from(this); newArr.fill(x, y, z); this.splice(0, this.length); this.push(setSetArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  return x === null ? null : arr;
-};
-
-/** Define default set transform for all other arrays of supported types */
-const setOtherArrayTransform = (x, property) => { 
-  if ( x === null && !property.allowNull )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed to 'Array' setter that doesn't allow nulls.`);
-  else if ( !(x instanceof Array) )
-    throw new TypeError(`${property.className}.${property.name}(): Non-Array value passed to 'Array' setter.`);
-  else if ( x && x.some(y => y !== null && (typeof y !== 'object' || ( typeof property.arrayOf.type == 'string' && y.constructor.name != property.arrayOf.type ) || ( typeof property.arrayOf.instanceOf === 'string' && !module.exports.instanceOf(y, property.arrayOf.instanceOf) ))) )
-    throw new TypeError(`${property.className}.${property.name}(): Invalid value passed as element of Array[${typeof property.arrayOf.type === 'string' ? property.arrayOf.type : property.arrayOf.instanceOf}] setter.`);
- else if ( x && x.some(y => y === null && !property.arrayOf.allowNull) )
-    throw new TypeError(`${property.className}.${property.name}(): Null value passed as element of 'Array[${typeof property.arrayOf.type === 'string' ? property.arrayOf.type : property.arrayOf.instanceOf}]' setter that doesn't allow null elements.`);
-
-  let arr = x.map(y => y === null ? null : y);
-  
-  Object.defineProperty(arr, 'push', {
-    enumerable: false,
-    value: function (x) { const newArr = Array.from(this); newArr.push(x); this.splice(0, this.length); this.push(setOtherArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  Object.defineProperty(arr, 'unshift', {
-    enumerable: false,
-    value: function (x) { const newArr = Array.from(this); newArr.unshift(x); this.splice(0, this.length); this.push(setOtherArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  Object.defineProperty(arr, 'fill', {
-    enumerable: false,
-    value: function (x, y, z) { const newArr = Array.from(this); newArr.fill(x, y, z); this.splice(0, this.length); this.push(setOtherArrayTransform(newArr, property)); return this.length; }
-  });
-  
-  return x === null ? null : arr;
-};
-
 /** Define the EZ Object types, their associated JavaScript and MySQL types, defaults, quirks, transforms, etc... */
 const ezobjectTypes = [
-  { type: `int`, jsType: 'number', default: 0, setTransform: setIntTransform },
-  { type: `float`, jsType: 'number', default: 0, setTransform: setFloatTransform },
-  { type: `string`, jsType: 'string', default: '', setTransform: setStringTransform },
-  { type: `boolean`, jsType: 'boolean', default: false, setTransform: setBooleanTransform },
-  { type: `function`, jsType: 'function', default: () => {}, setTransform: setFunctionTransform },
-  { type: `date`, jsType: 'Date', default: new Date(0), setTransform: setDateTransform },
-  { type: `buffer`, jsType: 'Buffer', default: Buffer.from([]), setTransform: setBufferTransform },
-  { type: `set`, jsType: 'Set', default: new Set(), setTransform: setSetTransform },
-  { type: `other`, jsType: 'object', default: null, setTransform: setOtherTransform },
+  { type: `int`, jsType: 'number', default: 0, setTransform: setTransform },
+  { type: `float`, jsType: 'number', default: 0, setTransform: setTransform },
+  { type: `string`, jsType: 'string', default: '', setTransform: setTransform },
+  { type: `boolean`, jsType: 'boolean', default: false, setTransform: setTransform },
+  { type: `function`, jsType: 'function', default: () => {}, setTransform: setTransform },
+  { type: `date`, jsType: 'Date', default: new Date(0), setTransform: setTransform },
+  { type: `buffer`, jsType: 'Buffer', default: Buffer.from([]), setTransform: setTransform },
+  { type: `set`, jsType: 'Set', default: new Set(), setTransform: setTransform },
+  { type: `other`, jsType: 'object', default: null, setTransform: setTransform },
   
-  { type: `array`, jsType: `Array`, default: [], arrayOfType: `int`, setTransform: setIntArrayTransform },
-  { type: `array`, jsType: `Array`, default: [], arrayOfType: `float`, setTransform: setFloatArrayTransform },
-  { type: `array`, jsType: `Array`, default: [], arrayOfType: `string`, setTransform: setStringArrayTransform },
-  { type: `array`, jsType: `Array`, default: [], arrayOfType: `boolean`, setTransform: setBooleanArrayTransform },
-  { type: `array`, jsType: `Array`, default: [], arrayOfType: `function`, setTransform: setFunctionArrayTransform },
-  { type: `array`, jsType: `Array`, default: [], arrayOfType: `date`, setTransform: setDateArrayTransform },
-  { type: `array`, jsType: `Array`, default: [], arrayOfType: `buffer`, setTransform: setBufferArrayTransform },
-  { type: `array`, jsType: 'Array', default: [], arrayOfType: `set`, setTransform: setSetArrayTransform },
-  { type: `array`, jsType: `Array`, default: [], arrayOfType: `other`, setTransform: setOtherArrayTransform }
+  { type: `array`, jsType: `Array`, default: [], arrayOfType: `int`, setTransform: setArrayTransform },
+  { type: `array`, jsType: `Array`, default: [], arrayOfType: `float`, setTransform: setArrayTransform },
+  { type: `array`, jsType: `Array`, default: [], arrayOfType: `string`, setTransform: setArrayTransform },
+  { type: `array`, jsType: `Array`, default: [], arrayOfType: `boolean`, setTransform: setArrayTransform },
+  { type: `array`, jsType: `Array`, default: [], arrayOfType: `function`, setTransform: setArrayTransform },
+  { type: `array`, jsType: `Array`, default: [], arrayOfType: `date`, setTransform: setArrayTransform },
+  { type: `array`, jsType: `Array`, default: [], arrayOfType: `buffer`, setTransform: setArrayTransform },
+  { type: `array`, jsType: 'Array', default: [], arrayOfType: `set`, setTransform: setArrayTransform },
+  { type: `array`, jsType: `Array`, default: [], arrayOfType: `other`, setTransform: setArrayTransform }
 ];
 
 /** Validate configuration for a single property */
