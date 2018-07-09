@@ -1,6 +1,6 @@
 {
   "name": "ezobjects",
-  "version": "5.2.1",
+  "version": "5.2.2",
   "description": "Easy Auto-Generated Strictly-Typed JavaScript Class Objects",
   "main": "index.js",
   "scripts": {
