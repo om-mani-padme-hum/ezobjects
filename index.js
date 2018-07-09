@@ -7,9 +7,6 @@
  * for all configured properties.
  */
 
-/** Require external modules */
-const util = require(`util`);
-
 /** Figure out proper parent scope between node (global) and browser (window) */
 let parent;
 
