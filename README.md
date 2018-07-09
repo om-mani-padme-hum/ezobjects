@@ -1,4 +1,4 @@
-# EZ Objects v5.1.8
+# EZ Objects v5.2.0
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects that are strictly typed in JavaScript.  All you have to do is create simple 
@@ -218,7 +218,7 @@ See the following for how to configure your EZ Objects:
 * **type** - `string` - (optional) EZ Object type that the property must be equal to -- types can be `int`, `float`, `string`, `boolean`, `date`, `buffer`, `set`, `function`, any other valid object constructor name, or `array` where `arrayOf` is provided with information about the array element types. \[either **type** or **instanceOf** is required]
 * **instanceOf** - `string` - (optional) JavaScript class constructor name, that the property must be an instance of \[either **type** or **instanceOf** is required]
 * **default** - `mixed` - (optional) Sets the default value for the property in the class object
-* **allowNull** - `boolean` - (optional) Indicates the property can be null, default is that only custom object types are nullable
+* **allowNull** - `boolean` - (optional) Indicates the property can be null, default is that only plain objects and custom object types are nullable
 * **arrayOf** - `object` - (required for type `array`) A plain object containing he EZ Object `type` or `instanceOf` of the elements of the array -- types can be `int`, `float`, `string`, `boolean`, `date`, `buffer`, `set`, `function`, or any other valid object constructor name (which can alternatively be used with `instanceOf` instead).  \[either **type** or **instanceOf** is required]
 * **setTransform(x, propertyConfig)** - `function` - (optional) Function that transforms and returns the property value prior to setting
 
