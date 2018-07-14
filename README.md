@@ -1,4 +1,4 @@
-# EZ Objects v5.2.2
+# EZ Objects v5.2.3
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects that are strictly typed in JavaScript.  All you have to do is create simple 
@@ -168,11 +168,11 @@ These are the object method signatures that all of your EZ Objects will have, th
 
 ### new MyObject([data])
  * **Parameter:** data - `PlainObject` - (optional)
- * **Description:** Create a new MyObject object and initialize it using either defaults or any provided key/value pairs in the plain object `data`.  Keys can either be equal to the name of a property, or they can be have an underscore before the name of a property, as would be the case if you were to JSON.stringify() and then JSON.parse() an EZ Object.  This allows for easy transferability in cases where JSON is used as the transfer medium.
+ * **Description:** Create a new MyObject object and initialize it using either defaults or any provided key/value pairs in the plain object `data`.  Keys can either be equal to the name of a property, or they can have an underscore before the name of a property, as would be the case if you were to JSON.stringify() and then JSON.parse() an EZ Object.  This allows for easy transferability in cases where JSON is used as the transfer medium.
 
 ### new MyObject([data])
  * **Parameter:** data - `string` - (optional)
- * **Description:** Create a new MyObject object and initialize it using either defaults or any provided key/value pairs in the JSON encoded string `data`.  Keys can either be equal to the name of a property, or they can be have an underscore before the name of a property, as would be the case if you were to JSON.stringify() an EZ Object.  This allows for easy transferability in cases where JSON is used as the transfer medium.
+ * **Description:** Create a new MyObject object and initialize it using either defaults or any provided key/value pairs in the JSON encoded string `data`.  Keys can either be equal to the name of a property, or they can have an underscore before the name of a property, as would be the case if you were to JSON.stringify() an EZ Object.  This allows for easy transferability in cases where JSON is used as the transfer medium.
 
 ### MyObject.init([data])
  * **Parameter:** data - `PlainObject`
@@ -196,7 +196,7 @@ it will have the following signatures:
 The EZ Objects module exports two functions:
 
 ### ezobjects.createClass(objectConfig)
- * **Description:** A function that creates an ES6 class corresponding to the configuration outlined in `objectConfig`, with constructor, initializer, getters, setters.
+ * **Description:** A function that creates an ES6 class corresponding to the configuration outlined in `objectConfig`, with constructor, initializer, getters, and setters.
 
 ### ezobjects.instanceOf(obj, constructorName)
  * **Description:** A helper function for testing whether `obj` is an descendant of a constructor `constructorName`.
