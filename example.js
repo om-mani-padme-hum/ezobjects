@@ -44,6 +44,7 @@ const configFullExample = {
     { name: 'exampleDate', type: 'date' },
     { name: 'exampleBuffer', type: 'buffer' },
     { name: 'exampleSet', type: 'set' },
+    { name: 'examplePlainObject', type: 'object' },
     { name: 'exampleOtherObj', type: 'BasicExample' },
     
     { name: 'exampleIntArray', type: 'array', arrayOf: { type: 'int' } },
@@ -54,6 +55,7 @@ const configFullExample = {
     { name: 'exampleDateArray', type: 'array', arrayOf: { type: 'date' } },
     { name: 'exampleBufferArray', type: 'array', arrayOf: { type: 'buffer' } },
     { name: 'exampleSetArray', type: 'array', arrayOf: { type: 'set' } },
+    { name: 'examplePlainObjectArray', type: 'array', arrayOf: { type: 'object' } },
     { name: 'exampleOtherObjArray', type: 'array', arrayOf: { type: 'BasicExample' } } 
   ]
 };
@@ -72,6 +74,7 @@ const fullExample = new FullExample({
   exampleDate: new Date('1776-07-04'),
   exampleBuffer: Buffer.from([0x04, 0x7F, 0x93, 0x38]),
   exampleSet: new Set(['14', 3, false]),
+  examplePlainObject: { a: 'I am A', 14: 'Plain Object' },
   exampleOtherObj: basicExample1,
   
   exampleIntArray: [293, -178, 492],
@@ -82,6 +85,7 @@ const fullExample = new FullExample({
   exampleDateArray: [new Date('1776-07-04'), new Date('1941-12-07')],
   exampleBufferArray: [Buffer.from([0x04, 0x7F, 0x93, 0x38]), Buffer.from('A string instead')],
   exampleSetArray: [new Set(['14', 3, false]), new Set([-14, true, 'pool'])],
+  examplePlainObjectArray: [{ a: 'I am A', 14: 'Plain Object' }, { and: 'So am I too a', 930: 'Plain Object' }],
   exampleOtherObjArray: [basicExample1, basicExample2]
 });
 

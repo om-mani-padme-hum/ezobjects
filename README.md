@@ -1,4 +1,4 @@
-# EZ Objects v5.2.3
+# EZ Objects v5.3.0
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects that are strictly typed in JavaScript.  All you have to do is create simple 
@@ -70,6 +70,7 @@ const configFullExample = {
     { name: 'exampleDate', type: 'date' },
     { name: 'exampleBuffer', type: 'buffer' },
     { name: 'exampleSet', type: 'set' },
+    { name: 'examplePlainObject', type: 'object' },
     { name: 'exampleOtherObj', type: 'BasicExample' },
     
     { name: 'exampleIntArray', type: 'array', arrayOf: { type: 'int' } },
@@ -80,6 +81,7 @@ const configFullExample = {
     { name: 'exampleDateArray', type: 'array', arrayOf: { type: 'date' } },
     { name: 'exampleBufferArray', type: 'array', arrayOf: { type: 'buffer' } },
     { name: 'exampleSetArray', type: 'array', arrayOf: { type: 'set' } },
+    { name: 'examplePlainObjectArray', type: 'array', arrayOf: { type: 'object' } },
     { name: 'exampleOtherObjArray', type: 'array', arrayOf: { type: 'BasicExample' } } 
   ]
 };
@@ -98,6 +100,7 @@ const fullExample = new FullExample({
   exampleDate: new Date('1776-07-04'),
   exampleBuffer: Buffer.from([0x04, 0x7F, 0x93, 0x38]),
   exampleSet: new Set(['14', 3, false]),
+  examplePlainObject: { a: 'I am A', 14: 'Plain Object' },
   exampleOtherObj: basicExample1,
   
   exampleIntArray: [293, -178, 492],
@@ -108,6 +111,7 @@ const fullExample = new FullExample({
   exampleDateArray: [new Date('1776-07-04'), new Date('1941-12-07')],
   exampleBufferArray: [Buffer.from([0x04, 0x7F, 0x93, 0x38]), Buffer.from('A string instead')],
   exampleSetArray: [new Set(['14', 3, false]), new Set([-14, true, 'pool'])],
+  examplePlainObjectArray: [{ a: 'I am A', 14: 'Plain Object' }, { and: 'So am I too a', 930: 'Plain Object' }],
   exampleOtherObjArray: [basicExample1, basicExample2]
 });
 
@@ -137,16 +141,17 @@ BasicExample { _name: 'Basic Example 1' }
 FullExample {
   _name: 'Full Example',
   _exampleInt: 293,
-  _exampleFloat: 194.13489,
+  _exampleFloat: 194,
   _exampleString: 'What\'s up, doc?',
   _exampleBoolean: true,
   _exampleFunction: [Function: exampleFunction],
   _exampleDate: 1776-07-04T00:00:00.000Z,
   _exampleBuffer: <Buffer 04 7f 93 38>,
   _exampleSet: Set { '14', 3, false },
+  _examplePlainObject: { '14': 'Plain Object', a: 'I am A' },
   _exampleOtherObj: BasicExample { _name: 'Basic Example 1' },
   _exampleIntArray: [ 293, -178, 492 ],
-  _exampleFloatArray: [ 194.13489, -2890.25, -0.04281 ],
+  _exampleFloatArray: [ 194, -2890, 0 ],
   _exampleStringArray: [ 'What\'s up, doc?', 'Shiver me timbers' ],
   _exampleBooleanArray: [ true, false, true ],
   _exampleFunctionArray: [ [Function], [Function] ],
@@ -154,7 +159,10 @@ FullExample {
   _exampleBufferArray: 
    [ <Buffer 04 7f 93 38>,
      <Buffer 41 20 73 74 72 69 6e 67 20 69 6e 73 74 65 61 64> ],
-  _exampleSetArray: [ [ [Set], [Set] ], [ [Set], [Set] ] ],
+  _exampleSetArray: [ Set { '14', 3, false }, Set { -14, true, 'pool' } ],
+  _examplePlainObjectArray: 
+   [ { '14': 'Plain Object', a: 'I am A' },
+     { '930': 'Plain Object', and: 'So am I too a' } ],
   _exampleOtherObjArray: 
    [ BasicExample { _name: 'Basic Example 1' },
      BasicExample { _name: 'Basic Example 2' } ] }
@@ -214,11 +222,11 @@ See the following for how to configure your EZ Objects:
 ### A property configuration can have the following:
 
 * **name** - `string` - (required) Name of the property, must conform to JavaScript rules
-* **type** - `string` - (optional) EZ Object type that the property must be equal to -- types can be `int`, `float`, `string`, `boolean`, `date`, `buffer`, `set`, `function`, any other valid object constructor name, or `array` where `arrayOf` is provided with information about the array element types. \[either **type** or **instanceOf** is required]
+* **type** - `string` - (optional) EZ Object type that the property must be equal to -- types can be `int`, `float`, `string`, `boolean`, `date`, `buffer`, `set`, `function`, `object`, any other valid object constructor name, or `array` where `arrayOf` is provided with information about the array element types. \[either **type** or **instanceOf** is required]
 * **instanceOf** - `string` - (optional) JavaScript class constructor name, that the property must be an instance of \[either **type** or **instanceOf** is required]
 * **default** - `mixed` - (optional) Sets the default value for the property in the class object
 * **allowNull** - `boolean` - (optional) Indicates the property can be null, default is that only plain objects and custom object types are nullable
-* **arrayOf** - `object` - (required for type `array`) A plain object containing he EZ Object `type` or `instanceOf` of the elements of the array -- types can be `int`, `float`, `string`, `boolean`, `date`, `buffer`, `set`, `function`, or any other valid object constructor name (which can alternatively be used with `instanceOf` instead).  \[either **type** or **instanceOf** is required]
+* **arrayOf** - `object` - (required for type `array`) A plain object containing he EZ Object `type` or `instanceOf` of the elements of the array -- types can be `int`, `float`, `string`, `boolean`, `date`, `buffer`, `set`, `function`, `object`, or any other valid object constructor name (which can alternatively be used with `instanceOf` instead).  \[either **type** or **instanceOf** is required]
 * **setTransform(x, propertyConfig)** - `function` - (optional) Function that transforms and returns the property value prior to setting
 
 ### Default intiailizations for different EZ Object types
@@ -231,6 +239,7 @@ See the following for how to configure your EZ Objects:
 * `date` - `new Date(0)`
 * `buffer` - `Buffer.from([])`
 * `set` - `new Set()`
+* `object` - `{}`
 * `array` - `[]`
 * others - `null`
 

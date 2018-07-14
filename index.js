@@ -33,6 +33,8 @@ const setTransform = (x, property) => {
     throw new TypeError(`${property.className}.${property.name}(): Non-Buffer value passed to '${property.type}' setter.`);
   else if ( x && property.ezobjectType.jsType == 'Set' && ( typeof x !== 'object' || x.constructor.type == 'Set' ) )
     throw new TypeError(`${property.className}.${property.name}(): Non-Set value passed to '${property.type}' setter.`);
+  else if ( x && property.ezobjectType.jsType == 'Object' && ( typeof x !== 'object' || x.constructor.type == 'Object' ) )
+    throw new TypeError(`${property.className}.${property.name}(): Non-Object value passed to '${property.type}' setter.`);
   else if ( x && property.ezobjectType.jsType == 'object' && ( typeof x !== 'object' || ( typeof property.type == 'string' && x.constructor.name != property.originalType ) || ( typeof property.instanceOf === 'string' && !module.exports.instanceOf(x, property.instanceOf) ) ) )
     throw new TypeError(`${property.className}.${property.name}(): Invalid value passed to '${typeof property.type === 'string' ? property.originalType : property.instanceOf}' setter.`);
   
@@ -71,6 +73,8 @@ const setArrayTransform = (x, property) => {
     throw new TypeError(`${property.className}.${property.name}(): Non-Buffer value passed as element of Array[${property.arrayOf.type}] setter.`);
   else if ( property.ezobjectType.jsType == 'Set' && x && x.some(y => ( typeof y !== 'object' || y.constructor.name != 'Set' ) && y !== null) )
     throw new TypeError(`${property.className}.${property.name}(): Non-Set value passed as element of Array[${property.arrayOf.type}] setter.`);
+  else if ( property.ezobjectType.jsType == 'Object' && x && x.some(y => ( typeof y !== 'object' || y.constructor.name != 'Object' ) && y !== null) )
+    throw new TypeError(`${property.className}.${property.name}(): Non-Object value passed as element of Array[${property.arrayOf.type}] setter.`);
   else if ( property.ezobjectType.jsType == 'object' && x && x.some(y => y !== null && (typeof y !== 'object' || ( typeof property.arrayOf.type == 'string' && y.constructor.name != property.arrayOf.type ) || ( typeof property.arrayOf.instanceOf === 'string' && !module.exports.instanceOf(y, property.arrayOf.instanceOf) ))) )
     throw new TypeError(`${property.className}.${property.name}(): Invalid value passed as element of Array[${typeof property.arrayOf.type === 'string' ? property.arrayOf.type : property.arrayOf.instanceOf}] setter.`);
   
@@ -111,6 +115,7 @@ const ezobjectTypes = [
   { type: `date`, jsType: 'Date', default: new Date(0), setTransform: setTransform },
   { type: `buffer`, jsType: 'Buffer', default: Buffer.from([]), setTransform: setTransform },
   { type: `set`, jsType: 'Set', default: new Set(), setTransform: setTransform },
+  { type: `object`, jsType: `Object`, default: {}, setTransform: setTransform },
   { type: `other`, jsType: 'object', default: null, setTransform: setTransform },
   
   { type: `array`, jsType: `Array`, default: [], arrayOfType: `int`, setTransform: setArrayTransform },
@@ -121,6 +126,7 @@ const ezobjectTypes = [
   { type: `array`, jsType: `Array`, default: [], arrayOfType: `date`, setTransform: setArrayTransform },
   { type: `array`, jsType: `Array`, default: [], arrayOfType: `buffer`, setTransform: setArrayTransform },
   { type: `array`, jsType: 'Array', default: [], arrayOfType: `set`, setTransform: setArrayTransform },
+  { type: `array`, jsType: 'Array', default: [], arrayOfType: `object`, setTransform: setArrayTransform },
   { type: `array`, jsType: `Array`, default: [], arrayOfType: `other`, setTransform: setArrayTransform }
 ];
 
