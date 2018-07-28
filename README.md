@@ -226,7 +226,7 @@ See the following for how to configure your EZ Objects:
 * **instanceOf** - `string` - (optional) JavaScript class constructor name, that the property must be an instance of \[either **type** or **instanceOf** is required]
 * **default** - `mixed` - (optional) Sets the default value for the property in the class object
 * **allowNull** - `boolean` - (optional) Indicates the property can be null, default is that only plain objects and custom object types are nullable
-* **arrayOf** - `object` - (required for type `array`) A plain object containing he EZ Object `type` or `instanceOf` of the elements of the array -- types can be `int`, `float`, `string`, `boolean`, `date`, `buffer`, `set`, `function`, `object`, or any other valid object constructor name (which can alternatively be used with `instanceOf` instead).  \[either **type** or **instanceOf** is required]
+* **arrayOf** - `object` - (required for type `array`) A plain object containing he EZ Object `type` or `instanceOf` of the elements of the array -- types can be `int`, `float`, `string`, `boolean`, `date`, `buffer`, `set`, `function`, `plainobject`, or any other valid object constructor name (which can alternatively be used with `instanceOf` instead).  \[either **type** or **instanceOf** is required]
 * **setTransform(x, propertyConfig)** - `function` - (optional) Function that transforms and returns the property value prior to setting
 
 ### Default intiailizations for different EZ Object types
@@ -239,7 +239,7 @@ See the following for how to configure your EZ Objects:
 * `date` - `new Date(0)`
 * `buffer` - `Buffer.from([])`
 * `set` - `new Set()`
-* `object` - `{}`
+* `plainobject` - `{}`
 * `array` - `[]`
 * others - `null`
 
