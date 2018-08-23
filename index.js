@@ -146,14 +146,6 @@ function validatePropertyConfig(property) {
   if ( typeof property.type !== 'string' && typeof property.instanceOf !== 'string' )
     throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' configured with missing or invalid 'type' and/or 'instanceOf', one of them is required.`);
   
-  /** If type is invalid, throw error */
-  if ( property.type && typeof property.type !== 'string' )
-    throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' configured with invalid 'type'.`);
-  
-  /** If instanceOf is invalid, throw error */
-  if ( property.instanceOf && typeof property.instanceOf !== 'string' )
-    throw new Error(`ezobjects.validatePropertyConfig(): Property '${property.name}' configured with invalid 'instanceOf'.`);
-
   /** If the original type has not yet been recorded */
   if ( property.type && typeof property.originalType !== 'string' ) {
     /** Store original type with preserved case */
