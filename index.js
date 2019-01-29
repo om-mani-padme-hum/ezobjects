@@ -284,13 +284,13 @@ module.exports.createClass = (obj) => {
   /** Create new class on global scope */
   parent[obj.className] = class extends (obj.extends || Object) {
     /** Create constructor */
-    constructor(data = {}, first = true) {
+    constructor(data = {}) {
       /** Initialize super */
       super(data);
       
-      /** Initialize object to values in `data` or defaults */
-      if ( first )
-        this.init(data, false);
+      /** If this is the top level class, initialize object to values in `data` or defaults */
+      if ( this.constructor.name == obj.className )
+        this.init(data);
     }
     
     /** Create initializer */
