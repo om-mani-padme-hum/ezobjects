@@ -288,9 +288,9 @@ module.exports.createClass = (obj) => {
       /** Initialize super */
       super(data);
       
-      /** Initialize object to values in `data` or defaults */
-      if ( first )
-        this.init(data, false);
+      /** If this is the top level class, initialize object to values in `data` or defaults */
+      if ( this.constructor.name == obj.className )
+        this.init(data);
     }
     
     /** Create initializer */
@@ -323,7 +323,10 @@ module.exports.createClass = (obj) => {
       /** Loop through each property in the obj */
       obj.properties.forEach((property) => {
         /** Initialize types to defaults */
-        this[property.name](data[property.name] || property.default || property.ezobjectType.default);
+        if ( typeof data[property.name] == `undefined` )
+          this[property.name](property.default || property.ezobjectType.default);
+        else
+          this[property.name](data[property.name]);
       });
     }
   };
