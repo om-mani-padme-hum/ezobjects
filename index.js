@@ -224,7 +224,7 @@ function validateClassConfig(obj) {
     throw new Error(`ezobjects.validateClassConfig(): Invalid table configuration argument, must be plain object.`);
     
   /** If configuration has missing or invalid 'className' configuration, throw error */
-  if ( typeof obj.className !== 'string' || !obj.className.match(/[A-Za-z_0-9$]+/) )
+  if ( typeof obj.className !== 'string' || !obj.className.match(/^[A-Za-z_0-9$]+$/) )
     throw new Error(`ezobjects.validateClassConfig(): Configuration has missing or invalid 'className', must be string containing characters 'A-Za-z_0-9$'.`);
 
   /** Add properties array if one wasn't set */
