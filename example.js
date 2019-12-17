@@ -9,7 +9,7 @@ const configBasicExample = {
 };
 
 /** Create the `BasicExample` class */
-ezobjects.createClass(configBasicExample);
+const BasicExample = ezobjects.createClass(configBasicExample);
 
 /** Create a new instance of the `BasicExample` class */
 const basicExample1 = new BasicExample();
@@ -61,7 +61,7 @@ const configFullExample = {
 };
 
 /** Create the `FullExample` class */
-ezobjects.createClass(configFullExample);
+const FullExample = ezobjects.createClass(configFullExample);
 
 /** Create a new instance of the `FullExample` class */
 const fullExample = new FullExample({

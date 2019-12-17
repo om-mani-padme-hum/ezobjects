@@ -1,4 +1,4 @@
-# EZ Objects v5.4.8
+# EZ Objects v6.0.0
 
 EZ Objects is a Node.js module (that can also be usefully browserify'd) that aims to save you lots of time 
 writing class objects that are strictly typed in JavaScript.  All you have to do is create simple 
@@ -35,7 +35,7 @@ const configBasicExample = {
 };
 
 /** Create the `BasicExample` class */
-ezobjects.createClass(configBasicExample);
+const BasicExample = ezobjects.createClass(configBasicExample);
 
 /** Create a new instance of the `BasicExample` class */
 const basicExample1 = new BasicExample();
@@ -87,7 +87,7 @@ const configFullExample = {
 };
 
 /** Create the `FullExample` class */
-ezobjects.createClass(configFullExample);
+const FullExample = ezobjects.createClass(configFullExample);
 
 /** Create a new instance of the `FullExample` class */
 const fullExample = new FullExample({

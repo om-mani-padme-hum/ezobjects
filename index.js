@@ -7,13 +7,8 @@
  * for all configured properties.
  */
 
-/** Figure out proper parent scope between node (global) and browser (window) */
-let parent;
-
-if ( typeof window !== `undefined` )
-  parent = window;
-else
-  parent = global;
+/** Create object to hold our created EZ objects */
+module.exports.objects = {};
 
 /** Define default set transform for non-array types */
 const setTransform = (x, property) => {
@@ -282,7 +277,7 @@ module.exports.createClass = (obj) => {
   validateClassConfig(obj);
 
   /** Create new class on global scope */
-  parent[obj.className] = class extends (obj.extends || Object) {
+  module.exports.objects[obj.className] = class extends (obj.extends || Object) {
     /** Create constructor */
     constructor(data = {}) {
       /** Initialize super */
@@ -334,7 +329,7 @@ module.exports.createClass = (obj) => {
   /** Loop through each property in the obj */
   obj.properties.forEach((property) => {  
     /** Create class method on prototype */
-    parent[obj.className].prototype[property.name] = function (arg) {
+    module.exports.objects[obj.className].prototype[property.name] = function (arg) {
       /** Getter */
       if ( arg === undefined ) 
         return this[`_${property.name}`]; 
@@ -351,5 +346,7 @@ module.exports.createClass = (obj) => {
    * Because we`re creating this object dynamically, we need to manually give it a name 
    * attribute so we can identify it by its type when we want to.
    */
-  Object.defineProperty(parent[obj.className], `name`, { value: obj.className });
+  Object.defineProperty(module.exports.objects[obj.className], `name`, { value: obj.className });
+  
+  return module.exports.objects[obj.className];
 };
