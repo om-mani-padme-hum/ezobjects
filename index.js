@@ -290,38 +290,27 @@ module.exports.createClass = (obj) => {
     
     /** Create initializer */
     init(data = {}) {
+      /** If data is a string, assume it's JSON and parse */
+      if ( typeof data == `string` )
+        data = JSON.parse(data);
+      
       /** If there is an 'init' function on super, call it */
       if ( typeof super.init === `function` )
         super.init(data);
-    
-      /** If data is a string, assume it's JSON encoded and try and parse */
-      if ( typeof data == `string` ) {
-        try {
-          data = JSON.parse(data);
-        } catch ( err ) {
-          throw new Error(`${this.constructor.name}.init(${typeof data}): Initialization string is not valid JSON.`);
-        }
-      }
-
-      /** Loop through each key/val pair in data */
-      Object.keys(data).forEach((key) => {
-        /** If key begins with '_' */
-        if ( key.match(/^_/) ) {
-          /** Create a new key with the '_' character stripped from the beginning */
-          Object.defineProperty(data, key.replace(/^_/, ``), Object.getOwnPropertyDescriptor(data, key));
-          
-          /** Delete the old key that has '_' */
-          delete data[key];
-        }
-      });
 
       /** Loop through each property in the obj */
       obj.properties.forEach((property) => {
         /** Initialize types to defaults */
-        if ( typeof data[property.name] == `undefined` )
-          this[property.name](property.default || property.ezobjectType.default);
-        else
+        if ( typeof data[property.name] == `function` )
+          this[property.name](data[property.name]());
+        else if ( typeof data[property.name] != `undefined` )
           this[property.name](data[property.name]);
+        else if ( typeof data[`_${property.name}`] == `function` )
+          this[property.name](data[`_${property.name}`]());
+        else if ( typeof data[`_${property.name}`] != `undefined` )
+          this[property.name](data[`_${property.name}`]);
+        else
+          this[property.name](property.default || property.ezobjectType.default);
       });
     }
   };
