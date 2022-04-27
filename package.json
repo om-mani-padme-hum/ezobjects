@@ -33,7 +33,7 @@
   "author": "Rich Lowe",
   "license": "MIT",
   "dependencies": {
-    "docket-parser": "^0.7.5"
+    "docket-parser": "^0.7.6"
   },
   "devDependencies": {},
   "bugs": {
