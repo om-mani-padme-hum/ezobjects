@@ -32,10 +32,6 @@
   ],
   "author": "Rich Lowe",
   "license": "MIT",
-  "dependencies": {
-    "docket-parser": "^0.7.6"
-  },
-  "devDependencies": {},
   "bugs": {
     "url": "https://github.com/om-mani-padme-hum/ezobjects/issues"
   },
